@@ -1,8 +1,11 @@
-const CACHE = "vinogastos-cache-v1";
+const CACHE = "vinogastos-cache-v2";
 const ASSETS = [
   "./",
   "./index.html",
-  "./manifest.webmanifest"
+  "./manifest.webmanifest",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./apple-touch-icon.png"
 ];
 
 self.addEventListener("install", (event) => {
@@ -23,16 +26,16 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
+
   event.respondWith(
     caches.match(req).then((cached) => {
       return cached || fetch(req).then((res) => {
-        // cache new GET responses lightly
         if (req.method === "GET" && res.status === 200 && res.type === "basic") {
           const clone = res.clone();
           caches.open(CACHE).then(cache => cache.put(req, clone));
         }
         return res;
-      }).catch(() => cached); // offline fallback
+      }).catch(() => cached);
     })
   );
 });
