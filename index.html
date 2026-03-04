@@ -12,11 +12,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VinoGastos">
 
-  <!-- iOS icon (SVG data URI; si luego quieres PNG real, te lo hago) -->
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201024%201024'%3E%3Cdefs%3E%3CradialGradient%20id='g'%20cx='30%25'%20cy='20%25'%20r='85%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23c04b6a'/%3E%3Cstop%20offset='50%25'%20stop-color='%237a1631'/%3E%3Cstop%20offset='100%25'%20stop-color='%232a0b14'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect%20x='80'%20y='80'%20width='864'%20height='864'%20rx='220'%20fill='url(%23g)'/%3E%3Cpath%20d='M328%20328h368v144H328V328Zm-64%20208h496v288H264V536Z'%20fill='rgba(255,255,255,0.92)'/%3E%3Cpath%20d='M404%20280v72M620%20280v72'%20stroke='rgba(255,255,255,0.92)'%20stroke-width='42'%20stroke-linecap='round'/%3E%3C/svg%3E">
+  <!-- Iconos -->
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="favicon-64.png"> <!-- opcional -->
 
   <style>
-    /* ======== TINTO: minimal iOS + planner touch ======== */
     :root{
       --wine-900:#2a0b14;
       --wine-800:#3a0e1c;
@@ -38,9 +38,8 @@
       --warn:#f59e0b;
       --danger:#ef4444;
 
-      --r:18px;
       --r2:22px;
-      --tap: 44px; /* iOS friendly tap */
+      --tap: 44px;
     }
 
     @media (prefers-color-scheme: light){
@@ -63,8 +62,7 @@
 
     *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;}
     body{
-      margin:0;
-      color:var(--fg);
+      margin:0;color:var(--fg);
       background:
         radial-gradient(900px 520px at 10% 0%, rgba(154,36,67,.35), transparent 60%),
         radial-gradient(900px 620px at 90% 10%, rgba(192,75,106,.25), transparent 58%),
@@ -72,21 +70,18 @@
         linear-gradient(180deg, var(--wine-900), var(--wine-800) 40%, var(--wine-900));
     }
     body:before{
-      content:"";
-      position:fixed; inset:0;
-      pointer-events:none;
+      content:"";position:fixed;inset:0;pointer-events:none;
       background:
         radial-gradient(2px 2px at 12% 18%, rgba(255,255,255,.18), transparent 60%),
         radial-gradient(2px 2px at 28% 42%, rgba(255,255,255,.14), transparent 60%),
         radial-gradient(2px 2px at 64% 30%, rgba(255,255,255,.12), transparent 60%),
         radial-gradient(2px 2px at 78% 62%, rgba(255,255,255,.12), transparent 60%),
         radial-gradient(2px 2px at 45% 76%, rgba(255,255,255,.10), transparent 60%);
-      opacity:.55;
-      mix-blend-mode: soft-light;
+      opacity:.55;mix-blend-mode: soft-light;
     }
 
     header{
-      position:sticky; top:0; z-index:20;
+      position:sticky;top:0;z-index:20;
       backdrop-filter:saturate(160%) blur(12px);
       background: linear-gradient(90deg,
         color-mix(in srgb, var(--wine-900) 86%, transparent),
@@ -95,7 +90,21 @@
       border-bottom:1px solid var(--line);
     }
 
-    .wrap{max-width:1100px;margin:0 auto;padding:16px 14px 90px;} /* space for bottom nav */
+    /* FIX: letras visibles en header (lo que te fallaba) */
+    header h1{
+      color:#fff7f9 !important;
+      text-shadow: 0 2px 10px rgba(0,0,0,.35);
+    }
+    header .sub{
+      color: rgba(255,247,249,.82) !important;
+      text-shadow: 0 2px 10px rgba(0,0,0,.25);
+    }
+    @media (prefers-color-scheme: light){
+      header h1{ color:#7a1631 !important; text-shadow:none; }
+      header .sub{ color: rgba(122,22,49,.75) !important; text-shadow:none; }
+    }
+
+    .wrap{max-width:1100px;margin:0 auto;padding:16px 14px 90px;}
     .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;}
     .brand{display:flex;align-items:center;gap:12px;}
     .logo{
@@ -105,55 +114,40 @@
         linear-gradient(135deg, var(--wine-400), var(--wine-700));
       border:1px solid rgba(255,255,255,.18);
       box-shadow: var(--shadow-soft);
-      display:grid;place-items:center;
-      flex:0 0 auto;
+      display:grid;place-items:center;flex:0 0 auto;
     }
     .logo svg{opacity:.95}
     h1{font-size:18px;margin:0;letter-spacing:.2px}
-    .sub{font-size:12px;color:color-mix(in srgb,var(--fg) 65%, var(--muted));margin-top:4px}
+    .sub{font-size:12px;margin-top:4px}
 
     .pill{
-      font-size:12px;
+      font-size:12px;white-space:nowrap;
       color:color-mix(in srgb,var(--fg) 72%, var(--muted));
       border:1px solid var(--line);
       padding:7px 11px;border-radius:999px;
       background: color-mix(in srgb, var(--card) 70%, transparent);
       box-shadow: var(--shadow-soft);
-      white-space:nowrap;
     }
 
     .grid{display:grid;gap:14px;margin-top:14px}
     @media(min-width:920px){ .grid{grid-template-columns: 1.2fr .8fr;} }
 
     .card{
-      position:relative;
-      background: var(--card);
+      position:relative;background: var(--card);
       border:1px solid var(--line);
       border-radius:var(--r2);
       box-shadow: var(--shadow);
-      padding:16px;
-      overflow:hidden;
+      padding:16px;overflow:hidden;
     }
     .card:after{
-      content:"";
-      position:absolute;
-      width:240px; height:240px;
-      right:-150px; top:-150px;
+      content:"";position:absolute;width:240px;height:240px;right:-150px;top:-150px;
       background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 55%),
-                  radial-gradient(circle at 60% 60%, rgba(192,75,106,.22), transparent 62%),
-                  linear-gradient(135deg, rgba(154,36,67,.30), rgba(122,22,49,.16));
-      transform: rotate(18deg);
-      border-radius: 70px;
-      opacity:.9;
-      pointer-events:none;
+                radial-gradient(circle at 60% 60%, rgba(192,75,106,.22), transparent 62%),
+                linear-gradient(135deg, rgba(154,36,67,.30), rgba(122,22,49,.16));
+      transform: rotate(18deg);border-radius: 70px;opacity:.9;pointer-events:none;
     }
 
-    .card h2{
-      font-size:14px;margin:0 0 10px;
-      color:color-mix(in srgb, var(--fg) 86%, var(--muted));
-      letter-spacing:.2px;
-    }
-
+    .card h2{font-size:14px;margin:0 0 10px;color:color-mix(in srgb, var(--fg) 86%, var(--muted));letter-spacing:.2px;}
     .split{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .tag{
       display:inline-flex;align-items:center;gap:8px;
@@ -170,13 +164,10 @@
 
     label{font-size:12px;color:color-mix(in srgb,var(--fg) 62%, var(--muted));display:block;margin-bottom:6px}
     input,select,textarea{
-      width:100%; padding:11px 12px;
-      min-height: var(--tap);
-      border-radius:14px;
-      border:1px solid var(--line);
+      width:100%; padding:11px 12px; min-height: var(--tap);
+      border-radius:14px;border:1px solid var(--line);
       background: color-mix(in srgb, var(--card) 75%, transparent);
-      color:var(--fg);
-      outline:none;
+      color:var(--fg); outline:none;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
     }
     @media (prefers-color-scheme: light){
@@ -188,7 +179,6 @@
     @media(min-width:560px){ .row{grid-template-columns:1fr 1fr;} }
 
     .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
-
     button{
       border:0;border-radius:14px;padding:10px 12px;cursor:pointer;
       min-height: var(--tap);
@@ -217,21 +207,14 @@
     .k.wide{grid-column:1 / -1}
 
     table{
-      width:100%;
-      border-collapse:collapse;
-      overflow:hidden;
-      border-radius:18px;
-      border:1px solid var(--line);
+      width:100%;border-collapse:collapse;overflow:hidden;
+      border-radius:18px;border:1px solid var(--line);
       background: color-mix(in srgb, var(--card) 78%, transparent);
       box-shadow: var(--shadow-soft);
     }
     th,td{padding:10px 10px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
-    th{
-      color:color-mix(in srgb,var(--fg) 66%, var(--muted));
-      font-weight:900;
-      text-align:left;
-      background: color-mix(in srgb, var(--card) 70%, rgba(255,255,255,.06));
-    }
+    th{color:color-mix(in srgb,var(--fg) 66%, var(--muted));font-weight:900;text-align:left;
+       background: color-mix(in srgb, var(--card) 70%, rgba(255,255,255,.06));}
     tr:last-child td{border-bottom:0}
 
     .small{font-size:12px;color:color-mix(in srgb,var(--fg) 58%, var(--muted));line-height:1.45}
@@ -240,7 +223,7 @@
     .rightcol .card{position:sticky;top:86px}
     .footer{margin-top:16px;color:color-mix(in srgb,var(--fg) 55%, var(--muted));font-size:12px;text-align:center}
 
-    /* ======== iOS bottom tab bar ======== */
+    /* Bottom tabs */
     .tabs{
       position:fixed; left:0; right:0; bottom:0; z-index:50;
       padding:10px 12px calc(10px + env(safe-area-inset-bottom));
@@ -251,34 +234,24 @@
     @media (prefers-color-scheme: light){
       .tabs{ background: color-mix(in srgb, #ffffff 84%, transparent); }
     }
-
-    .tabbar{
-      max-width:1100px; margin:0 auto;
-      display:grid; grid-template-columns: 1fr 1fr 1fr;
-      gap:10px;
-    }
+    .tabbar{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
     .tab{
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      min-height: 52px;
-      border-radius:18px;
-      border:1px solid var(--line);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      min-height:52px;border-radius:18px;border:1px solid var(--line);
       background: color-mix(in srgb, var(--card) 80%, transparent);
       box-shadow: var(--shadow-soft);
-      cursor:pointer;
-      user-select:none;
+      cursor:pointer;user-select:none;
     }
     .tab span{font-size:12px;font-weight:800;margin-top:6px}
-    .tab svg{opacity:.95}
     .tab.active{
       border-color: color-mix(in srgb, var(--wine-300) 55%, var(--line));
       background: linear-gradient(135deg, color-mix(in srgb, var(--wine-400) 55%, transparent), color-mix(in srgb, var(--wine-600) 55%, transparent));
     }
 
-    /* Sections */
     .section{display:block}
     @media(max-width:919px){
       .grid{grid-template-columns:1fr}
-      .rightcol{display:none} /* in phone, we show Tarjetas as its own tab */
+      .rightcol{display:none}
       .section.hide{display:none}
       .wrap{padding-bottom:110px;}
     }
@@ -308,8 +281,6 @@
 
 <main class="wrap">
   <div class="grid">
-
-    <!-- ======= RESUMEN (left) ======= -->
     <section id="secResumen" class="section leftcol">
       <div class="card">
         <div class="split">
@@ -373,9 +344,7 @@
         <div class="small">Respeta el mes y también la tarjeta si eliges una específica.</div>
         <div style="overflow:auto;margin-top:10px">
           <table>
-            <thead>
-              <tr><th>Categoría</th><th>Total (mes)</th></tr>
-            </thead>
+            <thead><tr><th>Categoría</th><th>Total (mes)</th></tr></thead>
             <tbody id="catsTbody"></tbody>
           </table>
         </div>
@@ -387,10 +356,9 @@
         <div id="remindersList" style="margin-top:10px"></div>
       </div>
 
-      <div class="footer">Tip: en iPhone, “Compartir → Añadir a pantalla de inicio”.</div>
+      <div class="footer">iPhone: “Compartir → Añadir a pantalla de inicio”.</div>
     </section>
 
-    <!-- ======= GASTOS (left) ======= -->
     <section id="secGastos" class="section leftcol hide">
       <div class="card">
         <div class="split">
@@ -398,7 +366,7 @@
           <span class="tag"><span class="dot ok"></span><span>Registro rápido</span></span>
         </div>
 
-        <div class="small">Registra gastos diarios. Puedes filtrar por mes y tarjeta desde la pestaña Resumen (se mantiene).</div>
+        <div class="small">Registra gastos diarios. El filtro de mes y tarjeta está en “Resumen”.</div>
 
         <div style="margin-top:10px" class="row">
           <div>
@@ -437,9 +405,7 @@
         <div style="overflow:auto">
           <table>
             <thead>
-              <tr>
-                <th>Fecha</th><th>Tarjeta</th><th>Categoría</th><th>Monto</th><th>Nota</th><th></th>
-              </tr>
+              <tr><th>Fecha</th><th>Tarjeta</th><th>Categoría</th><th>Monto</th><th>Nota</th><th></th></tr>
             </thead>
             <tbody id="expensesTbody"></tbody>
           </table>
@@ -447,7 +413,6 @@
       </div>
     </section>
 
-    <!-- ======= TARJETAS (right on desktop, tab on mobile) ======= -->
     <aside id="secTarjetas" class="section rightcol">
       <div class="card">
         <div class="split">
@@ -497,11 +462,9 @@
         <div class="small" style="margin-top:8px">⚠️ Elimina tarjetas, nóminas y gastos de este dispositivo.</div>
       </div>
     </aside>
-
   </div>
 </main>
 
-<!-- Bottom tabs (mobile-first) -->
 <nav class="tabs" aria-label="Navegación">
   <div class="tabbar">
     <div class="tab active" id="tabResumen" role="button" tabindex="0">
@@ -526,14 +489,13 @@
 </nav>
 
 <script>
-  // ===== PWA: register service worker =====
+  // Service Worker (offline)
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js").catch(()=>{});
     });
   }
 
-  // ===== Data model =====
   const KEY = "vinogastos_v1";
   const state = load() || { cards: [], expenses: [], incomeByMonth: {} };
 
@@ -545,7 +507,6 @@
     "Viajes","Ahorro","Gastos generales","Entretenimiento","Compras","Otro"
   ];
 
-  // ===== Utils =====
   const $ = (id)=>document.getElementById(id);
   const fmt = (n)=> new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(n||0);
   const today = new Date();
@@ -580,36 +541,28 @@
     return "ok";
   }
 
-  // ===== Init UI =====
   $("todayPill").textContent = new Intl.DateTimeFormat("es-MX",{dateStyle:"full"}).format(today);
   $("gDate").value = toISODate(today);
   $("filterMonth").value = `${today.getFullYear()}-${pad2(today.getMonth()+1)}`;
   $("gCategory").innerHTML = CATEGORIES.map(c=>`<option>${escapeHtml(c)}</option>`).join("");
 
-  // ===== Tabs (mobile) =====
   function setTab(which){
     const isMobile = window.matchMedia("(max-width: 919px)").matches;
-
-    // active tab UI
     ["Resumen","Gastos","Tarjetas"].forEach(t=>{
       $("tab"+t).classList.toggle("active", t===which);
     });
 
     if(!isMobile){
-      // Desktop: show all (grid). Right column visible by CSS.
       $("secResumen").classList.remove("hide");
       $("secGastos").classList.remove("hide");
       $("secTarjetas").classList.remove("hide");
       return;
     }
-
-    // Mobile: one section at a time
     $("secResumen").classList.toggle("hide", which!=="Resumen");
     $("secGastos").classList.toggle("hide", which!=="Gastos");
     $("secTarjetas").classList.toggle("hide", which!=="Tarjetas");
     window.scrollTo({top:0, behavior:"smooth"});
   }
-
   function bindTab(id, which){
     const el = $(id);
     const go = ()=>setTab(which);
@@ -620,11 +573,6 @@
   bindTab("tabGastos","Gastos");
   bindTab("tabTarjetas","Tarjetas");
 
-  // default
-  setTab("Resumen");
-  window.addEventListener("resize", ()=> setTab(document.querySelector(".tab.active")?.id?.replace("tab","") || "Resumen"));
-
-  // ===== Filtering =====
   function getFilteredExpenses(){
     const m = $("filterMonth").value || "";
     const card = $("filterCard").value || "__all__";
@@ -635,7 +583,6 @@
     }).sort((a,b)=> (a.date < b.date ? 1 : -1));
   }
 
-  // ===== Render =====
   function render(){
     save();
     renderCardSelects();
@@ -693,47 +640,37 @@
 
     const mk = $("filterMonth").value;
     const income = Number(state.incomeByMonth?.[mk] || 0);
-    const available = income - month;
-    $("kpiAvailable").value = fmt(available);
+    $("kpiAvailable").value = fmt(income - month);
   }
 
   function renderTotalsByCard(){
     const filtered = getFilteredExpenses();
     const map = new Map();
-    filtered.forEach(e=>{
-      map.set(e.cardId, (map.get(e.cardId)||0) + e.amount);
-    });
+    filtered.forEach(e=> map.set(e.cardId, (map.get(e.cardId)||0) + e.amount));
 
     if(!state.cards.length){
       $("totalsByCard").innerHTML = "Agrega una tarjeta para ver totales.";
       return;
     }
 
-    const list = state.cards.map(c=>{
+    $("totalsByCard").innerHTML = state.cards.map(c=>{
       const sum = map.get(c.id)||0;
       return `<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)">
         <div>${escapeHtml(c.name)} <span class="small">(${escapeHtml(c.bank||"")})</span></div>
         <div class="mono" style="font-weight:900">${fmt(sum)}</div>
       </div>`;
     }).join("");
-
-    $("totalsByCard").innerHTML = list;
   }
 
   function renderCategoryBreakdown(){
     const filtered = getFilteredExpenses();
     const map = new Map();
     CATEGORIES.forEach(c=>map.set(c,0));
-    filtered.forEach(e=>{
-      map.set(e.category, (map.get(e.category)||0) + e.amount);
-    });
+    filtered.forEach(e=> map.set(e.category, (map.get(e.category)||0) + e.amount));
 
     $("catsTbody").innerHTML = CATEGORIES.map(cat=>{
       const total = map.get(cat)||0;
-      return `<tr>
-        <td>${escapeHtml(cat)}</td>
-        <td class="mono" style="font-weight:900">${fmt(total)}</td>
-      </tr>`;
+      return `<tr><td>${escapeHtml(cat)}</td><td class="mono" style="font-weight:900">${fmt(total)}</td></tr>`;
     }).join("");
   }
 
@@ -813,15 +750,8 @@
     events.forEach(ev=>{
       const uid = makeId() + "@vinogastos";
       const dt = toICSDate(ev.date);
-      lines.push(
-        "BEGIN:VEVENT",
-        `UID:${uid}`,
-        `DTSTAMP:${dtstamp}`,
-        `DTSTART;VALUE=DATE:${dt}`,
-        `SUMMARY:${icsEscape(ev.title)}`,
-        `DESCRIPTION:${icsEscape(ev.description||"")}`,
-        "END:VEVENT"
-      );
+      lines.push("BEGIN:VEVENT",`UID:${uid}`,`DTSTAMP:${dtstamp}`,`DTSTART;VALUE=DATE:${dt}`,
+        `SUMMARY:${icsEscape(ev.title)}`,`DESCRIPTION:${icsEscape(ev.description||"")}`,"END:VEVENT");
     });
     lines.push("END:VCALENDAR");
     return lines.join("\r\n");
@@ -832,11 +762,7 @@
     return `${x.getUTCFullYear()}${pad2(x.getUTCMonth()+1)}${pad2(x.getUTCDate())}T${pad2(x.getUTCHours())}${pad2(x.getUTCMinutes())}${pad2(x.getUTCSeconds())}Z`;
   }
   function icsEscape(s){
-    return String(s||"")
-      .replace(/\\/g,"\\\\")
-      .replace(/\n/g,"\\n")
-      .replace(/,/g,"\\,")
-      .replace(/;/g,"\\;");
+    return String(s||"").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/,/g,"\\,").replace(/;/g,"\\;");
   }
 
   function syncIncomeUI(){
@@ -845,7 +771,6 @@
     $("incomeInput").value = income ? String(income) : "";
   }
 
-  // ===== Actions: income =====
   $("btnSaveIncome").onclick = ()=>{
     const mk = $("filterMonth").value;
     if(!mk){ alert("Selecciona un mes."); return; }
@@ -864,7 +789,6 @@
     }
   };
 
-  // ===== Actions: cards =====
   $("btnAddCard").onclick = ()=>{
     const name = $("cName").value.trim();
     const bank = $("cBank").value.trim();
@@ -884,7 +808,6 @@
     $("cName").value = ""; $("cBank").value = ""; $("cCut").value=""; $("cPay").value="";
   };
 
-  // ===== Actions: expenses =====
   $("btnAddExpense").onclick = ()=>{
     if(!state.cards.length){ alert("Primero agrega una tarjeta/departamental."); return; }
     const amount = parseMoney($("gAmount").value);
@@ -906,7 +829,6 @@
     $("gDate").value = toISODate(new Date());
   };
 
-  // ===== Filters & backup =====
   $("filterMonth").onchange = render;
   $("filterCard").onchange = render;
 
@@ -947,7 +869,9 @@
     }
   };
 
-  // ===== First render =====
+  setTab("Resumen");
+  window.addEventListener("resize", ()=> setTab(document.querySelector(".tab.active")?.id?.replace("tab","") || "Resumen"));
+
   render();
 </script>
 </body>
