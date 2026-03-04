@@ -12,11 +12,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="VinoGastos">
 
-  <!-- Iconos -->
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="favicon-64.png"> <!-- opcional -->
+  <!-- Iconos PRO -->
+  <link rel="apple-touch-icon" href="apple-touch-icon-pro.png">
+  <link rel="icon" type="image/png" href="favicon-64-pro.png">
 
   <style>
+    /* ======== TINTO: minimal iOS + planner touch ======== */
     :root{
       --wine-900:#2a0b14;
       --wine-800:#3a0e1c;
@@ -25,6 +26,11 @@
       --wine-500:#7a1631;
       --wine-400:#9a2443;
       --wine-300:#c04b6a;
+
+      /* Header text colors (force) */
+      --head-title:#fff7f9;          /* blanco rosita */
+      --head-sub:rgba(255,247,249,.82);
+      --head-shadow: 0 2px 12px rgba(0,0,0,.38);
 
       --fg:#f8f3f5;
       --muted:#e7c9d1;
@@ -39,9 +45,10 @@
       --danger:#ef4444;
 
       --r2:22px;
-      --tap: 44px;
+      --tap: 44px; /* iOS friendly tap */
     }
 
+    /* Light mode overrides */
     @media (prefers-color-scheme: light){
       :root{
         --fg:#1b1220;
@@ -50,7 +57,13 @@
         --card: rgba(255,255,255,.92);
         --shadow: 0 18px 40px rgba(15,23,42,.12);
         --shadow-soft: 0 10px 22px rgba(15,23,42,.10);
+
+        /* header text in light mode */
+        --head-title:#7a1631;                 /* tinto */
+        --head-sub:rgba(122,22,49,.78);
+        --head-shadow: none;
       }
+
       body{
         background:
           radial-gradient(900px 520px at 10% 0%, rgba(154,36,67,.18), transparent 60%),
@@ -62,26 +75,32 @@
 
     *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;}
     body{
-      margin:0;color:var(--fg);
+      margin:0;
+      color:var(--fg);
       background:
         radial-gradient(900px 520px at 10% 0%, rgba(154,36,67,.35), transparent 60%),
         radial-gradient(900px 620px at 90% 10%, rgba(192,75,106,.25), transparent 58%),
         radial-gradient(800px 600px at 50% 100%, rgba(122,22,49,.28), transparent 62%),
         linear-gradient(180deg, var(--wine-900), var(--wine-800) 40%, var(--wine-900));
     }
+
+    /* subtle decorative pattern */
     body:before{
-      content:"";position:fixed;inset:0;pointer-events:none;
+      content:"";
+      position:fixed; inset:0;
+      pointer-events:none;
       background:
         radial-gradient(2px 2px at 12% 18%, rgba(255,255,255,.18), transparent 60%),
         radial-gradient(2px 2px at 28% 42%, rgba(255,255,255,.14), transparent 60%),
         radial-gradient(2px 2px at 64% 30%, rgba(255,255,255,.12), transparent 60%),
         radial-gradient(2px 2px at 78% 62%, rgba(255,255,255,.12), transparent 60%),
         radial-gradient(2px 2px at 45% 76%, rgba(255,255,255,.10), transparent 60%);
-      opacity:.55;mix-blend-mode: soft-light;
+      opacity:.55;
+      mix-blend-mode: soft-light;
     }
 
     header{
-      position:sticky;top:0;z-index:20;
+      position:sticky; top:0; z-index:20;
       backdrop-filter:saturate(160%) blur(12px);
       background: linear-gradient(90deg,
         color-mix(in srgb, var(--wine-900) 86%, transparent),
@@ -90,23 +109,10 @@
       border-bottom:1px solid var(--line);
     }
 
-    /* FIX: letras visibles en header (lo que te fallaba) */
-    header h1{
-      color:#fff7f9 !important;
-      text-shadow: 0 2px 10px rgba(0,0,0,.35);
-    }
-    header .sub{
-      color: rgba(255,247,249,.82) !important;
-      text-shadow: 0 2px 10px rgba(0,0,0,.25);
-    }
-    @media (prefers-color-scheme: light){
-      header h1{ color:#7a1631 !important; text-shadow:none; }
-      header .sub{ color: rgba(122,22,49,.75) !important; text-shadow:none; }
-    }
-
-    .wrap{max-width:1100px;margin:0 auto;padding:16px 14px 90px;}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px 14px 90px;} /* space for bottom nav */
     .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;}
     .brand{display:flex;align-items:center;gap:12px;}
+
     .logo{
       width:42px;height:42px;border-radius:16px;
       background:
@@ -114,40 +120,72 @@
         linear-gradient(135deg, var(--wine-400), var(--wine-700));
       border:1px solid rgba(255,255,255,.18);
       box-shadow: var(--shadow-soft);
-      display:grid;place-items:center;flex:0 0 auto;
+      display:grid;place-items:center;
+      flex:0 0 auto;
     }
     .logo svg{opacity:.95}
-    h1{font-size:18px;margin:0;letter-spacing:.2px}
-    .sub{font-size:12px;margin-top:4px}
+
+    /* ======== FIX DEFINITIVO: letras del header (nunca negras) ======== */
+    header h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.2px;
+      color: var(--head-title) !important;
+      -webkit-text-fill-color: var(--head-title) !important; /* iOS/Safari */
+      text-shadow: var(--head-shadow);
+    }
+    header .sub{
+      margin-top:4px;
+      font-size:12px;
+      color: var(--head-sub) !important;
+      -webkit-text-fill-color: var(--head-sub) !important;
+      text-shadow: var(--head-shadow);
+    }
 
     .pill{
-      font-size:12px;white-space:nowrap;
+      font-size:12px;
       color:color-mix(in srgb,var(--fg) 72%, var(--muted));
       border:1px solid var(--line);
       padding:7px 11px;border-radius:999px;
       background: color-mix(in srgb, var(--card) 70%, transparent);
       box-shadow: var(--shadow-soft);
+      white-space:nowrap;
     }
 
     .grid{display:grid;gap:14px;margin-top:14px}
     @media(min-width:920px){ .grid{grid-template-columns: 1.2fr .8fr;} }
 
     .card{
-      position:relative;background: var(--card);
+      position:relative;
+      background: var(--card);
       border:1px solid var(--line);
       border-radius:var(--r2);
       box-shadow: var(--shadow);
-      padding:16px;overflow:hidden;
-    }
-    .card:after{
-      content:"";position:absolute;width:240px;height:240px;right:-150px;top:-150px;
-      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 55%),
-                radial-gradient(circle at 60% 60%, rgba(192,75,106,.22), transparent 62%),
-                linear-gradient(135deg, rgba(154,36,67,.30), rgba(122,22,49,.16));
-      transform: rotate(18deg);border-radius: 70px;opacity:.9;pointer-events:none;
+      padding:16px;
+      overflow:hidden;
     }
 
-    .card h2{font-size:14px;margin:0 0 10px;color:color-mix(in srgb, var(--fg) 86%, var(--muted));letter-spacing:.2px;}
+    /* decorative corner ribbon */
+    .card:after{
+      content:"";
+      position:absolute;
+      width:240px; height:240px;
+      right:-150px; top:-150px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 55%),
+                  radial-gradient(circle at 60% 60%, rgba(192,75,106,.22), transparent 62%),
+                  linear-gradient(135deg, rgba(154,36,67,.30), rgba(122,22,49,.16));
+      transform: rotate(18deg);
+      border-radius: 70px;
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    .card h2{
+      font-size:14px;margin:0 0 10px;
+      color:color-mix(in srgb, var(--fg) 86%, var(--muted));
+      letter-spacing:.2px;
+    }
+
     .split{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .tag{
       display:inline-flex;align-items:center;gap:8px;
@@ -164,10 +202,12 @@
 
     label{font-size:12px;color:color-mix(in srgb,var(--fg) 62%, var(--muted));display:block;margin-bottom:6px}
     input,select,textarea{
-      width:100%; padding:11px 12px; min-height: var(--tap);
+      width:100%;padding:11px 12px;
+      min-height: var(--tap);
       border-radius:14px;border:1px solid var(--line);
       background: color-mix(in srgb, var(--card) 75%, transparent);
-      color:var(--fg); outline:none;
+      color:var(--fg);
+      outline:none;
       box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
     }
     @media (prefers-color-scheme: light){
@@ -179,6 +219,7 @@
     @media(min-width:560px){ .row{grid-template-columns:1fr 1fr;} }
 
     .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+
     button{
       border:0;border-radius:14px;padding:10px 12px;cursor:pointer;
       min-height: var(--tap);
@@ -207,14 +248,26 @@
     .k.wide{grid-column:1 / -1}
 
     table{
-      width:100%;border-collapse:collapse;overflow:hidden;
-      border-radius:18px;border:1px solid var(--line);
+      width:100%;
+      border-collapse:collapse;
+      overflow:hidden;
+      border-radius:18px;
+      border:1px solid var(--line);
       background: color-mix(in srgb, var(--card) 78%, transparent);
       box-shadow: var(--shadow-soft);
     }
-    th,td{padding:10px 10px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
-    th{color:color-mix(in srgb,var(--fg) 66%, var(--muted));font-weight:900;text-align:left;
-       background: color-mix(in srgb, var(--card) 70%, rgba(255,255,255,.06));}
+    th,td{
+      padding:10px 10px;
+      border-bottom:1px solid var(--line);
+      font-size:13px;
+      vertical-align:top
+    }
+    th{
+      color:color-mix(in srgb,var(--fg) 66%, var(--muted));
+      font-weight:900;
+      text-align:left;
+      background: color-mix(in srgb, var(--card) 70%, rgba(255,255,255,.06));
+    }
     tr:last-child td{border-bottom:0}
 
     .small{font-size:12px;color:color-mix(in srgb,var(--fg) 58%, var(--muted));line-height:1.45}
@@ -223,7 +276,7 @@
     .rightcol .card{position:sticky;top:86px}
     .footer{margin-top:16px;color:color-mix(in srgb,var(--fg) 55%, var(--muted));font-size:12px;text-align:center}
 
-    /* Bottom tabs */
+    /* ======== iOS bottom tab bar ======== */
     .tabs{
       position:fixed; left:0; right:0; bottom:0; z-index:50;
       padding:10px 12px calc(10px + env(safe-area-inset-bottom));
@@ -234,24 +287,37 @@
     @media (prefers-color-scheme: light){
       .tabs{ background: color-mix(in srgb, #ffffff 84%, transparent); }
     }
-    .tabbar{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+    .tabbar{
+      max-width:1100px; margin:0 auto;
+      display:grid; grid-template-columns: 1fr 1fr 1fr;
+      gap:10px;
+    }
     .tab{
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      min-height:52px;border-radius:18px;border:1px solid var(--line);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      min-height: 52px;
+      border-radius:18px;
+      border:1px solid var(--line);
       background: color-mix(in srgb, var(--card) 80%, transparent);
       box-shadow: var(--shadow-soft);
-      cursor:pointer;user-select:none;
+      cursor:pointer;
+      user-select:none;
     }
     .tab span{font-size:12px;font-weight:800;margin-top:6px}
+    .tab svg{opacity:.95}
     .tab.active{
       border-color: color-mix(in srgb, var(--wine-300) 55%, var(--line));
-      background: linear-gradient(135deg, color-mix(in srgb, var(--wine-400) 55%, transparent), color-mix(in srgb, var(--wine-600) 55%, transparent));
+      background: linear-gradient(135deg,
+        color-mix(in srgb, var(--wine-400) 55%, transparent),
+        color-mix(in srgb, var(--wine-600) 55%, transparent)
+      );
     }
 
+    /* Sections */
     .section{display:block}
     @media(max-width:919px){
       .grid{grid-template-columns:1fr}
-      .rightcol{display:none}
+      .rightcol{display:none} /* phone: tarjetas is its own tab */
       .section.hide{display:none}
       .wrap{padding-bottom:110px;}
     }
@@ -281,6 +347,8 @@
 
 <main class="wrap">
   <div class="grid">
+
+    <!-- RESUMEN -->
     <section id="secResumen" class="section leftcol">
       <div class="card">
         <div class="split">
@@ -359,6 +427,7 @@
       <div class="footer">iPhone: “Compartir → Añadir a pantalla de inicio”.</div>
     </section>
 
+    <!-- GASTOS -->
     <section id="secGastos" class="section leftcol hide">
       <div class="card">
         <div class="split">
@@ -413,6 +482,7 @@
       </div>
     </section>
 
+    <!-- TARJETAS -->
     <aside id="secTarjetas" class="section rightcol">
       <div class="card">
         <div class="split">
@@ -462,9 +532,11 @@
         <div class="small" style="margin-top:8px">⚠️ Elimina tarjetas, nóminas y gastos de este dispositivo.</div>
       </div>
     </aside>
+
   </div>
 </main>
 
+<!-- Bottom tabs -->
 <nav class="tabs" aria-label="Navegación">
   <div class="tabbar">
     <div class="tab active" id="tabResumen" role="button" tabindex="0">
@@ -489,13 +561,14 @@
 </nav>
 
 <script>
-  // Service Worker (offline)
+  // ===== PWA: register service worker =====
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js").catch(()=>{});
     });
   }
 
+  // ===== Data model =====
   const KEY = "vinogastos_v1";
   const state = load() || { cards: [], expenses: [], incomeByMonth: {} };
 
@@ -507,6 +580,7 @@
     "Viajes","Ahorro","Gastos generales","Entretenimiento","Compras","Otro"
   ];
 
+  // ===== Utils =====
   const $ = (id)=>document.getElementById(id);
   const fmt = (n)=> new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(n||0);
   const today = new Date();
@@ -541,13 +615,16 @@
     return "ok";
   }
 
+  // ===== Init UI =====
   $("todayPill").textContent = new Intl.DateTimeFormat("es-MX",{dateStyle:"full"}).format(today);
   $("gDate").value = toISODate(today);
   $("filterMonth").value = `${today.getFullYear()}-${pad2(today.getMonth()+1)}`;
   $("gCategory").innerHTML = CATEGORIES.map(c=>`<option>${escapeHtml(c)}</option>`).join("");
 
+  // ===== Tabs (mobile) =====
   function setTab(which){
     const isMobile = window.matchMedia("(max-width: 919px)").matches;
+
     ["Resumen","Gastos","Tarjetas"].forEach(t=>{
       $("tab"+t).classList.toggle("active", t===which);
     });
@@ -558,11 +635,13 @@
       $("secTarjetas").classList.remove("hide");
       return;
     }
+
     $("secResumen").classList.toggle("hide", which!=="Resumen");
     $("secGastos").classList.toggle("hide", which!=="Gastos");
     $("secTarjetas").classList.toggle("hide", which!=="Tarjetas");
     window.scrollTo({top:0, behavior:"smooth"});
   }
+
   function bindTab(id, which){
     const el = $(id);
     const go = ()=>setTab(which);
@@ -573,6 +652,11 @@
   bindTab("tabGastos","Gastos");
   bindTab("tabTarjetas","Tarjetas");
 
+  // default
+  setTab("Resumen");
+  window.addEventListener("resize", ()=> setTab(document.querySelector(".tab.active")?.id?.replace("tab","") || "Resumen"));
+
+  // ===== Filtering =====
   function getFilteredExpenses(){
     const m = $("filterMonth").value || "";
     const card = $("filterCard").value || "__all__";
@@ -583,6 +667,7 @@
     }).sort((a,b)=> (a.date < b.date ? 1 : -1));
   }
 
+  // ===== Render =====
   function render(){
     save();
     renderCardSelects();
@@ -750,16 +835,24 @@
     events.forEach(ev=>{
       const uid = makeId() + "@vinogastos";
       const dt = toICSDate(ev.date);
-      lines.push("BEGIN:VEVENT",`UID:${uid}`,`DTSTAMP:${dtstamp}`,`DTSTART;VALUE=DATE:${dt}`,
-        `SUMMARY:${icsEscape(ev.title)}`,`DESCRIPTION:${icsEscape(ev.description||"")}`,"END:VEVENT");
+      lines.push(
+        "BEGIN:VEVENT",
+        `UID:${uid}`,
+        `DTSTAMP:${dtstamp}`,
+        `DTSTART;VALUE=DATE:${dt}`,
+        `SUMMARY:${icsEscape(ev.title)}`,
+        `DESCRIPTION:${icsEscape(ev.description||"")}`,
+        "END:VEVENT"
+      );
     });
     lines.push("END:VCALENDAR");
     return lines.join("\r\n");
   }
-  function toICSDate(d){ return `${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}`; }
+
+  function toICSDate(d){ return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`; }
   function toICSDateTime(d){
     const x = new Date(d.getTime());
-    return `${x.getUTCFullYear()}${pad2(x.getUTCMonth()+1)}${pad2(x.getUTCDate())}T${pad2(x.getUTCHours())}${pad2(x.getUTCMinutes())}${pad2(x.getUTCSeconds())}Z`;
+    return `${x.getUTCFullYear()}${String(x.getUTCMonth()+1).padStart(2,"0")}${String(x.getUTCDate()).padStart(2,"0")}T${String(x.getUTCHours()).padStart(2,"0")}${String(x.getUTCMinutes()).padStart(2,"0")}${String(x.getUTCSeconds()).padStart(2,"0")}Z`;
   }
   function icsEscape(s){
     return String(s||"").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/,/g,"\\,").replace(/;/g,"\\;");
@@ -771,6 +864,7 @@
     $("incomeInput").value = income ? String(income) : "";
   }
 
+  // Actions
   $("btnSaveIncome").onclick = ()=>{
     const mk = $("filterMonth").value;
     if(!mk){ alert("Selecciona un mes."); return; }
@@ -780,6 +874,7 @@
     render();
     alert("Nómina guardada para " + mk);
   };
+
   $("btnClearIncome").onclick = ()=>{
     const mk = $("filterMonth").value;
     if(!mk) return;
@@ -804,6 +899,7 @@
     $("cName").value = ""; $("cBank").value = ""; $("cCut").value=""; $("cPay").value="";
     render();
   };
+
   $("btnResetCard").onclick = ()=>{
     $("cName").value = ""; $("cBank").value = ""; $("cCut").value=""; $("cPay").value="";
   };
@@ -824,23 +920,31 @@
     $("gAmount").value = ""; $("gNote").value = "";
     render();
   };
+
   $("btnResetExpense").onclick = ()=>{
     $("gAmount").value = ""; $("gNote").value = "";
-    $("gDate").value = toISODate(new Date());
+    $("gDate").valueAsDate = new Date();
   };
 
   $("filterMonth").onchange = render;
   $("filterCard").onchange = render;
 
   $("btnClearFilters").onclick = ()=>{
-    $("filterMonth").value = `${today.getFullYear()}-${pad2(today.getMonth()+1)}`;
+    $("filterMonth").value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}`;
     $("filterCard").value = "__all__";
     render();
   };
 
   $("btnExportJSON").onclick = ()=>{
-    downloadText(`vinogastos-respaldo.json`, JSON.stringify(state, null, 2), "application/json");
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "vinogastos-respaldo.json";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 400);
   };
+
   $("btnImportJSON").onclick = ()=> $("fileImport").click();
 
   $("fileImport").onchange = async (ev)=>{
@@ -850,9 +954,11 @@
       const text = await file.text();
       const data = JSON.parse(text);
       if(!data || !Array.isArray(data.cards) || !Array.isArray(data.expenses)) throw new Error("Formato inválido");
+
       state.cards = data.cards || [];
       state.expenses = data.expenses || [];
       state.incomeByMonth = data.incomeByMonth || {};
+
       render();
       alert("Respaldo importado.");
     }catch(e){
@@ -869,8 +975,17 @@
     }
   };
 
+  // Tabs
+  function bindTab(id, which){
+    const el = $(id);
+    const go = ()=>setTab(which);
+    el.addEventListener("click", go);
+    el.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" ") go(); });
+  }
+  bindTab("tabResumen","Resumen");
+  bindTab("tabGastos","Gastos");
+  bindTab("tabTarjetas","Tarjetas");
   setTab("Resumen");
-  window.addEventListener("resize", ()=> setTab(document.querySelector(".tab.active")?.id?.replace("tab","") || "Resumen"));
 
   render();
 </script>
