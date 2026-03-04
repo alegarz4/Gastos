@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>VinoGastos</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#7a1631"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="VinoGastos">
+
+  <!-- iOS icon (SVG data URI; si luego quieres PNG real, te lo hago) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201024%201024'%3E%3Cdefs%3E%3CradialGradient%20id='g'%20cx='30%25'%20cy='20%25'%20r='85%25'%3E%3Cstop%20offset='0%25'%20stop-color='%23c04b6a'/%3E%3Cstop%20offset='50%25'%20stop-color='%237a1631'/%3E%3Cstop%20offset='100%25'%20stop-color='%232a0b14'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect%20x='80'%20y='80'%20width='864'%20height='864'%20rx='220'%20fill='url(%23g)'/%3E%3Cpath%20d='M328%20328h368v144H328V328Zm-64%20208h496v288H264V536Z'%20fill='rgba(255,255,255,0.92)'/%3E%3Cpath%20d='M404%20280v72M620%20280v72'%20stroke='rgba(255,255,255,0.92)'%20stroke-width='42'%20stroke-linecap='round'/%3E%3C/svg%3E">
+
+  <style>
+    /* ======== TINTO: minimal iOS + planner touch ======== */
+    :root{
+      --wine-900:#2a0b14;
+      --wine-800:#3a0e1c;
+      --wine-700:#4b1024;
+      --wine-600:#5e122b;
+      --wine-500:#7a1631;
+      --wine-400:#9a2443;
+      --wine-300:#c04b6a;
+
+      --fg:#f8f3f5;
+      --muted:#e7c9d1;
+      --line: rgba(255,255,255,.14);
+
+      --card: rgba(255,255,255,.08);
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --shadow-soft: 0 10px 26px rgba(0,0,0,.18);
+
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+
+      --r:18px;
+      --r2:22px;
+      --tap: 44px; /* iOS friendly tap */
+    }
+
+    @media (prefers-color-scheme: light){
+      :root{
+        --fg:#1b1220;
+        --muted:#5b2b37;
+        --line: rgba(122,22,49,.16);
+        --card: rgba(255,255,255,.92);
+        --shadow: 0 18px 40px rgba(15,23,42,.12);
+        --shadow-soft: 0 10px 22px rgba(15,23,42,.10);
+      }
+      body{
+        background:
+          radial-gradient(900px 520px at 10% 0%, rgba(154,36,67,.18), transparent 60%),
+          radial-gradient(900px 620px at 90% 10%, rgba(192,75,106,.14), transparent 58%),
+          radial-gradient(800px 600px at 50% 100%, rgba(122,22,49,.16), transparent 62%),
+          linear-gradient(180deg, #fff7f9, #ffffff 40%, #fff7f9);
+      }
+    }
+
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;}
+    body{
+      margin:0;
+      color:var(--fg);
+      background:
+        radial-gradient(900px 520px at 10% 0%, rgba(154,36,67,.35), transparent 60%),
+        radial-gradient(900px 620px at 90% 10%, rgba(192,75,106,.25), transparent 58%),
+        radial-gradient(800px 600px at 50% 100%, rgba(122,22,49,.28), transparent 62%),
+        linear-gradient(180deg, var(--wine-900), var(--wine-800) 40%, var(--wine-900));
+    }
+    body:before{
+      content:"";
+      position:fixed; inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(2px 2px at 12% 18%, rgba(255,255,255,.18), transparent 60%),
+        radial-gradient(2px 2px at 28% 42%, rgba(255,255,255,.14), transparent 60%),
+        radial-gradient(2px 2px at 64% 30%, rgba(255,255,255,.12), transparent 60%),
+        radial-gradient(2px 2px at 78% 62%, rgba(255,255,255,.12), transparent 60%),
+        radial-gradient(2px 2px at 45% 76%, rgba(255,255,255,.10), transparent 60%);
+      opacity:.55;
+      mix-blend-mode: soft-light;
+    }
+
+    header{
+      position:sticky; top:0; z-index:20;
+      backdrop-filter:saturate(160%) blur(12px);
+      background: linear-gradient(90deg,
+        color-mix(in srgb, var(--wine-900) 86%, transparent),
+        color-mix(in srgb, var(--wine-700) 70%, transparent)
+      );
+      border-bottom:1px solid var(--line);
+    }
+
+    .wrap{max-width:1100px;margin:0 auto;padding:16px 14px 90px;} /* space for bottom nav */
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .brand{display:flex;align-items:center;gap:12px;}
+    .logo{
+      width:42px;height:42px;border-radius:16px;
+      background:
+        radial-gradient(14px 14px at 30% 30%, rgba(255,255,255,.25), transparent 55%),
+        linear-gradient(135deg, var(--wine-400), var(--wine-700));
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow: var(--shadow-soft);
+      display:grid;place-items:center;
+      flex:0 0 auto;
+    }
+    .logo svg{opacity:.95}
+    h1{font-size:18px;margin:0;letter-spacing:.2px}
+    .sub{font-size:12px;color:color-mix(in srgb,var(--fg) 65%, var(--muted));margin-top:4px}
+
+    .pill{
+      font-size:12px;
+      color:color-mix(in srgb,var(--fg) 72%, var(--muted));
+      border:1px solid var(--line);
+      padding:7px 11px;border-radius:999px;
+      background: color-mix(in srgb, var(--card) 70%, transparent);
+      box-shadow: var(--shadow-soft);
+      white-space:nowrap;
+    }
+
+    .grid{display:grid;gap:14px;margin-top:14px}
+    @media(min-width:920px){ .grid{grid-template-columns: 1.2fr .8fr;} }
+
+    .card{
+      position:relative;
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--r2);
+      box-shadow: var(--shadow);
+      padding:16px;
+      overflow:hidden;
+    }
+    .card:after{
+      content:"";
+      position:absolute;
+      width:240px; height:240px;
+      right:-150px; top:-150px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 55%),
+                  radial-gradient(circle at 60% 60%, rgba(192,75,106,.22), transparent 62%),
+                  linear-gradient(135deg, rgba(154,36,67,.30), rgba(122,22,49,.16));
+      transform: rotate(18deg);
+      border-radius: 70px;
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    .card h2{
+      font-size:14px;margin:0 0 10px;
+      color:color-mix(in srgb, var(--fg) 86%, var(--muted));
+      letter-spacing:.2px;
+    }
+
+    .split{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .tag{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:12px;padding:6px 11px;border-radius:999px;
+      border:1px solid var(--line);
+      color:color-mix(in srgb,var(--fg) 70%, var(--muted));
+      background: color-mix(in srgb, var(--card) 80%, transparent);
+      box-shadow: var(--shadow-soft);
+    }
+    .dot{width:8px;height:8px;border-radius:99px;background:var(--muted)}
+    .dot.ok{background:var(--good)}
+    .dot.warn{background:var(--warn)}
+    .dot.bad{background:var(--danger)}
+
+    label{font-size:12px;color:color-mix(in srgb,var(--fg) 62%, var(--muted));display:block;margin-bottom:6px}
+    input,select,textarea{
+      width:100%; padding:11px 12px;
+      min-height: var(--tap);
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: color-mix(in srgb, var(--card) 75%, transparent);
+      color:var(--fg);
+      outline:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    @media (prefers-color-scheme: light){
+      input,select,textarea{background:#fff;}
+    }
+    textarea{min-height:90px;resize:vertical}
+
+    .row{display:grid;gap:10px}
+    @media(min-width:560px){ .row{grid-template-columns:1fr 1fr;} }
+
+    .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+
+    button{
+      border:0;border-radius:14px;padding:10px 12px;cursor:pointer;
+      min-height: var(--tap);
+      background: linear-gradient(135deg, var(--wine-400), var(--wine-600));
+      color:white;font-weight:800;
+      box-shadow: 0 10px 22px rgba(0,0,0,.22);
+    }
+    button.secondary{
+      background: color-mix(in srgb, var(--card) 75%, rgba(255,255,255,.06));
+      color:var(--fg);
+      border:1px solid var(--line);
+      box-shadow: var(--shadow-soft);
+    }
+    button.good{background: linear-gradient(135deg, #22c55e, #16a34a)}
+    button.danger{background: linear-gradient(135deg, #ef4444, #b91c1c)}
+    button:active{transform:translateY(1px)}
+
+    .kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .k{
+      padding:12px;border-radius:18px;border:1px solid var(--line);
+      background: color-mix(in srgb, var(--card) 75%, transparent);
+      box-shadow: var(--shadow-soft);
+    }
+    .k .t{font-size:12px;color:color-mix(in srgb,var(--fg) 62%, var(--muted))}
+    .k .v{font-size:18px;font-weight:900;margin-top:6px}
+    .k.wide{grid-column:1 / -1}
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      overflow:hidden;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background: color-mix(in srgb, var(--card) 78%, transparent);
+      box-shadow: var(--shadow-soft);
+    }
+    th,td{padding:10px 10px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
+    th{
+      color:color-mix(in srgb,var(--fg) 66%, var(--muted));
+      font-weight:900;
+      text-align:left;
+      background: color-mix(in srgb, var(--card) 70%, rgba(255,255,255,.06));
+    }
+    tr:last-child td{border-bottom:0}
+
+    .small{font-size:12px;color:color-mix(in srgb,var(--fg) 58%, var(--muted));line-height:1.45}
+    .hr{height:1px;background:var(--line);margin:14px 0}
+    .mono{font-variant-numeric: tabular-nums;}
+    .rightcol .card{position:sticky;top:86px}
+    .footer{margin-top:16px;color:color-mix(in srgb,var(--fg) 55%, var(--muted));font-size:12px;text-align:center}
+
+    /* ======== iOS bottom tab bar ======== */
+    .tabs{
+      position:fixed; left:0; right:0; bottom:0; z-index:50;
+      padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+      backdrop-filter:saturate(160%) blur(14px);
+      background: color-mix(in srgb, var(--wine-900) 80%, transparent);
+      border-top:1px solid var(--line);
+    }
+    @media (prefers-color-scheme: light){
+      .tabs{ background: color-mix(in srgb, #ffffff 84%, transparent); }
+    }
+
+    .tabbar{
+      max-width:1100px; margin:0 auto;
+      display:grid; grid-template-columns: 1fr 1fr 1fr;
+      gap:10px;
+    }
+    .tab{
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      min-height: 52px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background: color-mix(in srgb, var(--card) 80%, transparent);
+      box-shadow: var(--shadow-soft);
+      cursor:pointer;
+      user-select:none;
+    }
+    .tab span{font-size:12px;font-weight:800;margin-top:6px}
+    .tab svg{opacity:.95}
+    .tab.active{
+      border-color: color-mix(in srgb, var(--wine-300) 55%, var(--line));
+      background: linear-gradient(135deg, color-mix(in srgb, var(--wine-400) 55%, transparent), color-mix(in srgb, var(--wine-600) 55%, transparent));
+    }
+
+    /* Sections */
+    .section{display:block}
+    @media(max-width:919px){
+      .grid{grid-template-columns:1fr}
+      .rightcol{display:none} /* in phone, we show Tarjetas as its own tab */
+      .section.hide{display:none}
+      .wrap{padding-bottom:110px;}
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="wrap" style="padding-bottom:14px">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M7 7h10v4H7V7Zm-2 6h14v6H5v-6Z" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M9 5v2M15 5v2" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1>VinoGastos</h1>
+          <div class="sub">Minimal iOS + planner touch • Offline • Sin datos sensibles</div>
+        </div>
+      </div>
+      <div class="pill" id="todayPill">—</div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+
+    <!-- ======= RESUMEN (left) ======= -->
+    <section id="secResumen" class="section leftcol">
+      <div class="card">
+        <div class="split">
+          <h2>Resumen</h2>
+          <span class="tag"><span class="dot ok"></span><span id="statusText">Listo</span></span>
+        </div>
+
+        <div class="kpi">
+          <div class="k">
+            <div class="t">Total del mes (gastos)</div>
+            <div class="v mono" id="kpiMonth">$0</div>
+          </div>
+          <div class="k">
+            <div class="t">Total general</div>
+            <div class="v mono" id="kpiAll">$0</div>
+          </div>
+
+          <div class="k wide">
+            <div class="row">
+              <div>
+                <label>Nómina del mes (ingreso)</label>
+                <input id="incomeInput" inputmode="decimal" placeholder="Ej. 18000"/>
+                <div class="small" style="margin-top:6px">Se guarda por mes. Cambia el filtro de mes para capturar otra nómina.</div>
+              </div>
+              <div>
+                <label>Disponible del mes (Nómina - Gastos del mes)</label>
+                <input id="kpiAvailable" readonly />
+                <div class="small" style="margin-top:6px">“Ahorro” cuenta como salida (dinero apartado).</div>
+              </div>
+            </div>
+            <div class="btns">
+              <button class="good" id="btnSaveIncome">Guardar nómina del mes</button>
+              <button class="secondary" id="btnClearIncome">Borrar nómina de este mes</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row">
+          <div>
+            <label>Filtrar por mes</label>
+            <input type="month" id="filterMonth"/>
+          </div>
+          <div>
+            <label>Filtrar por tarjeta/departamental</label>
+            <select id="filterCard"></select>
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="secondary" id="btnClearFilters">Quitar filtros</button>
+          <button class="secondary" id="btnExportJSON">Exportar respaldo (.json)</button>
+          <button class="secondary" id="btnImportJSON">Importar respaldo</button>
+          <input type="file" id="fileImport" accept="application/json" style="display:none"/>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>Gasto del mes por categoría</h2>
+        <div class="small">Respeta el mes y también la tarjeta si eliges una específica.</div>
+        <div style="overflow:auto;margin-top:10px">
+          <table>
+            <thead>
+              <tr><th>Categoría</th><th>Total (mes)</th></tr>
+            </thead>
+            <tbody id="catsTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>Próximos recordatorios</h2>
+        <div class="small">Genera eventos (.ics) para tu calendario.</div>
+        <div id="remindersList" style="margin-top:10px"></div>
+      </div>
+
+      <div class="footer">Tip: en iPhone, “Compartir → Añadir a pantalla de inicio”.</div>
+    </section>
+
+    <!-- ======= GASTOS (left) ======= -->
+    <section id="secGastos" class="section leftcol hide">
+      <div class="card">
+        <div class="split">
+          <h2>Gastos</h2>
+          <span class="tag"><span class="dot ok"></span><span>Registro rápido</span></span>
+        </div>
+
+        <div class="small">Registra gastos diarios. Puedes filtrar por mes y tarjeta desde la pestaña Resumen (se mantiene).</div>
+
+        <div style="margin-top:10px" class="row">
+          <div>
+            <label>Monto</label>
+            <input id="gAmount" inputmode="decimal" placeholder="Ej. 350.50"/>
+          </div>
+          <div>
+            <label>Fecha del gasto</label>
+            <input id="gDate" type="date"/>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Categoría</label>
+            <select id="gCategory"></select>
+          </div>
+          <div>
+            <label>Tarjeta / Departamental</label>
+            <select id="gCard"></select>
+          </div>
+        </div>
+
+        <div>
+          <label>Nota (opcional)</label>
+          <textarea id="gNote" placeholder="Ej. Gasolina / Uber / Liverpool / etc."></textarea>
+        </div>
+
+        <div class="btns">
+          <button id="btnAddExpense">Agregar gasto</button>
+          <button class="secondary" id="btnResetExpense">Limpiar</button>
+        </div>
+
+        <div class="hr"></div>
+
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th><th>Tarjeta</th><th>Categoría</th><th>Monto</th><th>Nota</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="expensesTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======= TARJETAS (right on desktop, tab on mobile) ======= -->
+    <aside id="secTarjetas" class="section rightcol">
+      <div class="card">
+        <div class="split">
+          <h2>Tarjetas / Departamentales</h2>
+          <span class="tag"><span class="dot warn"></span><span>Sin números</span></span>
+        </div>
+
+        <div class="small">Ejemplos: Nu, BBVA, Santander, Liverpool, Suburbia, Coppel, etc.</div>
+
+        <div class="row" style="margin-top:10px">
+          <div>
+            <label>Nombre</label>
+            <input id="cName" placeholder="Ej. Liverpool / Suburbia / Nu / BBVA Azul"/>
+          </div>
+          <div>
+            <label>Banco/Tienda (opcional)</label>
+            <input id="cBank" placeholder="Ej. Liverpool"/>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Día de corte (1–28)</label>
+            <input id="cCut" type="number" min="1" max="28" placeholder="Ej. 15"/>
+          </div>
+          <div>
+            <label>Día límite de pago (1–28)</label>
+            <input id="cPay" type="number" min="1" max="28" placeholder="Ej. 5"/>
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="good" id="btnAddCard">Guardar</button>
+          <button class="secondary" id="btnResetCard">Limpiar</button>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2>Totales por tarjeta (según filtros)</h2>
+        <div id="totalsByCard" class="small"></div>
+
+        <div class="hr"></div>
+
+        <div class="btns">
+          <button class="danger" id="btnNuke">Borrar TODO</button>
+        </div>
+        <div class="small" style="margin-top:8px">⚠️ Elimina tarjetas, nóminas y gastos de este dispositivo.</div>
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+<!-- Bottom tabs (mobile-first) -->
+<nav class="tabs" aria-label="Navegación">
+  <div class="tabbar">
+    <div class="tab active" id="tabResumen" role="button" tabindex="0">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M5 12h14M5 7h14M5 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Resumen</span>
+    </div>
+    <div class="tab" id="tabGastos" role="button" tabindex="0">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M12 3v18M7 7h10M7 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Gastos</span>
+    </div>
+    <div class="tab" id="tabTarjetas" role="button" tabindex="0">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M4 7h16v10H4V7Zm0 4h16" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+      <span>Tarjetas</span>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // ===== PWA: register service worker =====
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(()=>{});
+    });
+  }
+
+  // ===== Data model =====
+  const KEY = "vinogastos_v1";
+  const state = load() || { cards: [], expenses: [], incomeByMonth: {} };
+
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+  const CATEGORIES = [
+    "Comida","Transporte","Gasolina","Super","Servicios","Salud","Escuela",
+    "Viajes","Ahorro","Gastos generales","Entretenimiento","Compras","Otro"
+  ];
+
+  // ===== Utils =====
+  const $ = (id)=>document.getElementById(id);
+  const fmt = (n)=> new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(n||0);
+  const today = new Date();
+  const pad2 = (n)=> String(n).padStart(2,"0");
+  const toISODate = (d)=> `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  const parseMoney = (s)=>{
+    const x = Number(String(s).replace(/[^0-9.]/g,""));
+    return Number.isFinite(x) ? x : NaN;
+  };
+  const monthKeyFromISO = (iso)=> iso?.slice(0,7);
+  function escapeHtml(s){
+    return String(s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+  function makeId(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+  function cardName(id){ return state.cards.find(c=>c.id===id)?.name || "—"; }
+
+  function startOfDay(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
+  function nextDateForDay(day, baseDate){
+    const y = baseDate.getFullYear();
+    const m = baseDate.getMonth();
+    const d1 = new Date(y, m, Math.min(day, 28));
+    if (d1 >= startOfDay(baseDate)) return d1;
+    return new Date(y, m+1, Math.min(day, 28));
+  }
+  function daysUntil(d){
+    const ms = startOfDay(d) - startOfDay(new Date());
+    return Math.ceil(ms / (1000*60*60*24));
+  }
+  function urgencyDot(deltaDays){
+    if (deltaDays <= 2) return "bad";
+    if (deltaDays <= 7) return "warn";
+    return "ok";
+  }
+
+  // ===== Init UI =====
+  $("todayPill").textContent = new Intl.DateTimeFormat("es-MX",{dateStyle:"full"}).format(today);
+  $("gDate").value = toISODate(today);
+  $("filterMonth").value = `${today.getFullYear()}-${pad2(today.getMonth()+1)}`;
+  $("gCategory").innerHTML = CATEGORIES.map(c=>`<option>${escapeHtml(c)}</option>`).join("");
+
+  // ===== Tabs (mobile) =====
+  function setTab(which){
+    const isMobile = window.matchMedia("(max-width: 919px)").matches;
+
+    // active tab UI
+    ["Resumen","Gastos","Tarjetas"].forEach(t=>{
+      $("tab"+t).classList.toggle("active", t===which);
+    });
+
+    if(!isMobile){
+      // Desktop: show all (grid). Right column visible by CSS.
+      $("secResumen").classList.remove("hide");
+      $("secGastos").classList.remove("hide");
+      $("secTarjetas").classList.remove("hide");
+      return;
+    }
+
+    // Mobile: one section at a time
+    $("secResumen").classList.toggle("hide", which!=="Resumen");
+    $("secGastos").classList.toggle("hide", which!=="Gastos");
+    $("secTarjetas").classList.toggle("hide", which!=="Tarjetas");
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  function bindTab(id, which){
+    const el = $(id);
+    const go = ()=>setTab(which);
+    el.addEventListener("click", go);
+    el.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" ") go(); });
+  }
+  bindTab("tabResumen","Resumen");
+  bindTab("tabGastos","Gastos");
+  bindTab("tabTarjetas","Tarjetas");
+
+  // default
+  setTab("Resumen");
+  window.addEventListener("resize", ()=> setTab(document.querySelector(".tab.active")?.id?.replace("tab","") || "Resumen"));
+
+  // ===== Filtering =====
+  function getFilteredExpenses(){
+    const m = $("filterMonth").value || "";
+    const card = $("filterCard").value || "__all__";
+    return state.expenses.filter(e=>{
+      const okM = !m || monthKeyFromISO(e.date) === m;
+      const okC = (card==="__all__") || e.cardId === card;
+      return okM && okC;
+    }).sort((a,b)=> (a.date < b.date ? 1 : -1));
+  }
+
+  // ===== Render =====
+  function render(){
+    save();
+    renderCardSelects();
+    renderExpensesTable();
+    renderKPIs();
+    renderTotalsByCard();
+    renderReminders();
+    renderCategoryBreakdown();
+    syncIncomeUI();
+  }
+
+  function renderCardSelects(){
+    const opts = [
+      `<option value="__all__">Todas</option>`,
+      ...state.cards.map(c=> `<option value="${c.id}">${escapeHtml(c.name)}</option>`)
+    ].join("");
+    $("filterCard").innerHTML = opts;
+
+    const cardOpts = state.cards.length
+      ? state.cards.map(c=> `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("")
+      : `<option value="">Primero agrega una tarjeta</option>`;
+    $("gCard").innerHTML = cardOpts;
+  }
+
+  function renderExpensesTable(){
+    const rows = getFilteredExpenses().map(e=>`
+      <tr>
+        <td class="mono">${e.date}</td>
+        <td>${escapeHtml(cardName(e.cardId))}</td>
+        <td>${escapeHtml(e.category)}</td>
+        <td class="mono">${fmt(e.amount)}</td>
+        <td>${escapeHtml(e.note||"")}</td>
+        <td><button class="secondary" data-del="${e.id}">Eliminar</button></td>
+      </tr>
+    `).join("");
+
+    $("expensesTbody").innerHTML = rows || `
+      <tr><td colspan="6" class="small">Aún no hay gastos con estos filtros.</td></tr>
+    `;
+
+    [...document.querySelectorAll("button[data-del]")].forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.getAttribute("data-del");
+        state.expenses = state.expenses.filter(x=>x.id!==id);
+        render();
+      };
+    });
+  }
+
+  function renderKPIs(){
+    const all = state.expenses.reduce((s,e)=>s+e.amount,0);
+    const month = getFilteredExpenses().reduce((s,e)=>s+e.amount,0);
+    $("kpiAll").textContent = fmt(all);
+    $("kpiMonth").textContent = fmt(month);
+
+    const mk = $("filterMonth").value;
+    const income = Number(state.incomeByMonth?.[mk] || 0);
+    const available = income - month;
+    $("kpiAvailable").value = fmt(available);
+  }
+
+  function renderTotalsByCard(){
+    const filtered = getFilteredExpenses();
+    const map = new Map();
+    filtered.forEach(e=>{
+      map.set(e.cardId, (map.get(e.cardId)||0) + e.amount);
+    });
+
+    if(!state.cards.length){
+      $("totalsByCard").innerHTML = "Agrega una tarjeta para ver totales.";
+      return;
+    }
+
+    const list = state.cards.map(c=>{
+      const sum = map.get(c.id)||0;
+      return `<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)">
+        <div>${escapeHtml(c.name)} <span class="small">(${escapeHtml(c.bank||"")})</span></div>
+        <div class="mono" style="font-weight:900">${fmt(sum)}</div>
+      </div>`;
+    }).join("");
+
+    $("totalsByCard").innerHTML = list;
+  }
+
+  function renderCategoryBreakdown(){
+    const filtered = getFilteredExpenses();
+    const map = new Map();
+    CATEGORIES.forEach(c=>map.set(c,0));
+    filtered.forEach(e=>{
+      map.set(e.category, (map.get(e.category)||0) + e.amount);
+    });
+
+    $("catsTbody").innerHTML = CATEGORIES.map(cat=>{
+      const total = map.get(cat)||0;
+      return `<tr>
+        <td>${escapeHtml(cat)}</td>
+        <td class="mono" style="font-weight:900">${fmt(total)}</td>
+      </tr>`;
+    }).join("");
+  }
+
+  function renderReminders(){
+    const box = $("remindersList");
+    if(!state.cards.length){
+      box.innerHTML = `<div class="small">Agrega tarjetas para crear recordatorios.</div>`;
+      return;
+    }
+
+    const base = new Date();
+    const items = state.cards.map(c=>{
+      const cutD = nextDateForDay(Number(c.cutDay), base);
+      const payD = nextDateForDay(Number(c.payDay), base);
+      return { c, cutD, payD, cutIn:daysUntil(cutD), payIn:daysUntil(payD) };
+    }).sort((a,b)=> Math.min(a.cutIn,a.payIn) - Math.min(b.cutIn,b.payIn));
+
+    box.innerHTML = items.map(({c, cutD, payD, cutIn, payIn})=>{
+      const cutDot = urgencyDot(cutIn);
+      const payDot = urgencyDot(payIn);
+      return `
+        <div style="border:1px solid var(--line);border-radius:18px;padding:12px;margin-bottom:10px;background:color-mix(in srgb, var(--card) 80%, transparent);box-shadow:var(--shadow-soft)">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+            <div style="font-weight:900">${escapeHtml(c.name)}</div>
+            <button class="secondary" data-ics="${c.id}">Calendario (.ics)</button>
+          </div>
+          <div style="margin-top:8px" class="small">
+            <div class="tag" style="margin-right:6px">
+              <span class="dot ${cutDot}"></span>
+              Corte: <span class="mono">${toISODate(cutD)}</span> (en ${cutIn} día(s))
+            </div>
+            <div class="tag" style="margin-top:8px">
+              <span class="dot ${payDot}"></span>
+              Pago: <span class="mono">${toISODate(payD)}</span> (en ${payIn} día(s))
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    [...box.querySelectorAll("button[data-ics]")].forEach(btn=>{
+      btn.onclick = ()=>{
+        const cardId = btn.getAttribute("data-ics");
+        const card = state.cards.find(x=>x.id===cardId);
+        if(!card) return;
+
+        const base = new Date();
+        const cutD = nextDateForDay(Number(card.cutDay), base);
+        const payD = nextDateForDay(Number(card.payDay), base);
+
+        const ics = buildICS([
+          { title:`Corte tarjeta: ${card.name}`, date: cutD, description:`Día de corte de ${card.name}.` },
+          { title:`Pago tarjeta: ${card.name}`, date: payD, description:`Fecha límite de pago de ${card.name}.` }
+        ]);
+        downloadText(`${safeFile(card.name)}-recordatorios.ics`, ics, "text/calendar");
+      };
+    });
+  }
+
+  function safeFile(s){
+    return String(s||"tarjeta").toLowerCase().replace(/[^a-z0-9]+/gi,"-").replace(/^-+|-+$/g,"");
+  }
+  function downloadText(filename, text, mime){
+    const blob = new Blob([text], {type: mime || "text/plain"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+
+  function buildICS(events){
+    const stamp = new Date();
+    const dtstamp = toICSDateTime(stamp);
+    const lines = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//VinoGastos//ES//","CALSCALE:GREGORIAN"];
+    events.forEach(ev=>{
+      const uid = makeId() + "@vinogastos";
+      const dt = toICSDate(ev.date);
+      lines.push(
+        "BEGIN:VEVENT",
+        `UID:${uid}`,
+        `DTSTAMP:${dtstamp}`,
+        `DTSTART;VALUE=DATE:${dt}`,
+        `SUMMARY:${icsEscape(ev.title)}`,
+        `DESCRIPTION:${icsEscape(ev.description||"")}`,
+        "END:VEVENT"
+      );
+    });
+    lines.push("END:VCALENDAR");
+    return lines.join("\r\n");
+  }
+  function toICSDate(d){ return `${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}`; }
+  function toICSDateTime(d){
+    const x = new Date(d.getTime());
+    return `${x.getUTCFullYear()}${pad2(x.getUTCMonth()+1)}${pad2(x.getUTCDate())}T${pad2(x.getUTCHours())}${pad2(x.getUTCMinutes())}${pad2(x.getUTCSeconds())}Z`;
+  }
+  function icsEscape(s){
+    return String(s||"")
+      .replace(/\\/g,"\\\\")
+      .replace(/\n/g,"\\n")
+      .replace(/,/g,"\\,")
+      .replace(/;/g,"\\;");
+  }
+
+  function syncIncomeUI(){
+    const mk = $("filterMonth").value;
+    const income = Number(state.incomeByMonth?.[mk] || 0);
+    $("incomeInput").value = income ? String(income) : "";
+  }
+
+  // ===== Actions: income =====
+  $("btnSaveIncome").onclick = ()=>{
+    const mk = $("filterMonth").value;
+    if(!mk){ alert("Selecciona un mes."); return; }
+    const income = parseMoney($("incomeInput").value);
+    if(!Number.isFinite(income) || income < 0){ alert("Nómina inválida."); return; }
+    state.incomeByMonth[mk] = income;
+    render();
+    alert("Nómina guardada para " + mk);
+  };
+  $("btnClearIncome").onclick = ()=>{
+    const mk = $("filterMonth").value;
+    if(!mk) return;
+    if(confirm("¿Borrar nómina guardada de este mes?")){
+      delete state.incomeByMonth[mk];
+      render();
+    }
+  };
+
+  // ===== Actions: cards =====
+  $("btnAddCard").onclick = ()=>{
+    const name = $("cName").value.trim();
+    const bank = $("cBank").value.trim();
+    const cut = Number($("cCut").value);
+    const pay = Number($("cPay").value);
+
+    if(!name){ alert("Pon un nombre para la tarjeta/departamental."); return; }
+    if(!(cut>=1 && cut<=28) || !(pay>=1 && pay<=28)){
+      alert("Día de corte y pago deben ser entre 1 y 28.");
+      return;
+    }
+    state.cards.push({ id: makeId(), name, bank, cutDay: cut, payDay: pay });
+    $("cName").value = ""; $("cBank").value = ""; $("cCut").value=""; $("cPay").value="";
+    render();
+  };
+  $("btnResetCard").onclick = ()=>{
+    $("cName").value = ""; $("cBank").value = ""; $("cCut").value=""; $("cPay").value="";
+  };
+
+  // ===== Actions: expenses =====
+  $("btnAddExpense").onclick = ()=>{
+    if(!state.cards.length){ alert("Primero agrega una tarjeta/departamental."); return; }
+    const amount = parseMoney($("gAmount").value);
+    const date = $("gDate").value;
+    const category = $("gCategory").value;
+    const cardId = $("gCard").value;
+    const note = $("gNote").value.trim();
+
+    if(!Number.isFinite(amount) || amount<=0){ alert("Monto inválido."); return; }
+    if(!date){ alert("Selecciona una fecha."); return; }
+    if(!cardId){ alert("Selecciona una tarjeta."); return; }
+
+    state.expenses.push({ id: makeId(), amount, date, category, cardId, note });
+    $("gAmount").value = ""; $("gNote").value = "";
+    render();
+  };
+  $("btnResetExpense").onclick = ()=>{
+    $("gAmount").value = ""; $("gNote").value = "";
+    $("gDate").value = toISODate(new Date());
+  };
+
+  // ===== Filters & backup =====
+  $("filterMonth").onchange = render;
+  $("filterCard").onchange = render;
+
+  $("btnClearFilters").onclick = ()=>{
+    $("filterMonth").value = `${today.getFullYear()}-${pad2(today.getMonth()+1)}`;
+    $("filterCard").value = "__all__";
+    render();
+  };
+
+  $("btnExportJSON").onclick = ()=>{
+    downloadText(`vinogastos-respaldo.json`, JSON.stringify(state, null, 2), "application/json");
+  };
+  $("btnImportJSON").onclick = ()=> $("fileImport").click();
+
+  $("fileImport").onchange = async (ev)=>{
+    const file = ev.target.files?.[0];
+    if(!file) return;
+    try{
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if(!data || !Array.isArray(data.cards) || !Array.isArray(data.expenses)) throw new Error("Formato inválido");
+      state.cards = data.cards || [];
+      state.expenses = data.expenses || [];
+      state.incomeByMonth = data.incomeByMonth || {};
+      render();
+      alert("Respaldo importado.");
+    }catch(e){
+      alert("No pude importar ese archivo. Asegúrate que sea un respaldo válido.");
+    }finally{
+      $("fileImport").value = "";
+    }
+  };
+
+  $("btnNuke").onclick = ()=>{
+    if(confirm("¿Seguro? Esto borrará tarjetas, nóminas y gastos de este dispositivo.")){
+      localStorage.removeItem(KEY);
+      location.reload();
+    }
+  };
+
+  // ===== First render =====
+  render();
+</script>
+</body>
+</html>
