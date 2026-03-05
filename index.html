@@ -1,932 +1,543 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-  <title>VinoGastos</title>
-  <meta name="theme-color" content="#8b0a2a"/>
-  <style>
-    :root{
-      --bg:#0b1220; --card:#0f1a2e; --muted:#93a4c7; --fg:#e8f0ff; --line:#21314f;
-      --brand:#0ea5e9; --good:#22c55e; --warn:#f59e0b; --danger:#ef4444;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --r:16px;
-      --navH: 66px;
-    }
-    @media (prefers-color-scheme: light){
-      :root{ --bg:#f6f8ff; --card:#ffffff; --fg:#0b1220; --muted:#526079; --line:#e6eaf5; --shadow: 0 10px 24px rgba(15,23,42,.10); }
-    }
-    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;}
-    body{
-      margin:0;
-      background: radial-gradient(1200px 600px at 20% -10%, rgba(139,10,42,.35), transparent 50%),
-                  radial-gradient(900px 500px at 90% 0%, rgba(14,165,233,.18), transparent 55%),
-                  linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--bg) 88%, #000));
-      color:var(--fg);
-    }
-    header{
-      position:sticky; top:0; z-index:10;
-      backdrop-filter:saturate(160%) blur(12px);
-      background:color-mix(in srgb, var(--bg) 86%, transparent);
-      border-bottom:1px solid var(--line);
-    }
-    .wrap{max-width:1100px;margin:0 auto;padding:14px 14px 16px;}
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-    h1{font-size:18px;margin:6px 0 0;letter-spacing:.2px}
-    .sub{font-size:12px;color:var(--muted);margin-top:2px}
-    .pill{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:6px 10px;border-radius:999px;white-space:nowrap}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gastos</title>
 
-    .grid{display:grid;gap:12px;margin-top:14px}
-    @media(min-width:920px){ .grid{grid-template-columns: 1.2fr .8fr;} }
+<style>
 
-    .card{
-      background:color-mix(in srgb, var(--card) 92%, rgba(139,10,42,.06));
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      box-shadow:var(--shadow);
-      padding:14px;
-    }
-    .card h2{font-size:14px;margin:0 0 10px;color:color-mix(in srgb, var(--fg) 92%, var(--muted))}
-    label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
-    input,select,textarea{
-      width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);
-      background:color-mix(in srgb, var(--card) 92%, #0000); color:var(--fg); outline:none;
-    }
-    textarea{min-height:78px;resize:vertical}
-    .row{display:grid;gap:10px}
-    @media(min-width:560px){ .row{grid-template-columns:1fr 1fr;} }
-    .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
-    button{
-      border:0;border-radius:12px;padding:10px 12px;cursor:pointer;
-      background:var(--brand);color:white;font-weight:800;
-    }
-    button.secondary{background:color-mix(in srgb, var(--card) 60%, var(--line));color:var(--fg);border:1px solid var(--line)}
-    button.danger{background:var(--danger)}
-    button.good{background:var(--good)}
-    button:active{transform:translateY(1px)}
+:root{
+--bg:#0b1220;
+--card:#121a2c;
+--text:#e8f0ff;
+--muted:#93a4c7;
+--line:#1f2a40;
+--accent:#3b82f6;
+--good:#22c55e;
+--danger:#ef4444;
+--radius:14px;
+--navH:70px;
+}
 
-    .split{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .k{padding:12px;border-radius:14px;border:1px solid var(--line);background:color-mix(in srgb,var(--card) 72%, #0000)}
-    .k .t{font-size:12px;color:var(--muted)}
-    .k .v{font-size:18px;font-weight:900;margin-top:6px}
-    .k.wide{grid-column:1 / -1}
+*{box-sizing:border-box;font-family:system-ui;}
 
-    table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:14px;border:1px solid var(--line)}
-    th,td{padding:10px 10px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
-    th{color:var(--muted);font-weight:900;text-align:left;background:color-mix(in srgb,var(--card) 60%, var(--line))}
-    tr:last-child td{border-bottom:0}
+body{
+margin:0;
+background:linear-gradient(180deg,#0b1220,#0e1628);
+color:var(--text);
+}
 
-    .tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
-    .dot{width:8px;height:8px;border-radius:99px;background:var(--muted)}
-    .dot.ok{background:var(--good)}
-    .dot.warn{background:var(--warn)}
-    .dot.bad{background:var(--danger)}
-    .small{font-size:12px;color:var(--muted);line-height:1.4}
-    .hr{height:1px;background:var(--line);margin:12px 0}
-    .mono{font-variant-numeric: tabular-nums;}
-    .footer{margin-top:16px;color:var(--muted);font-size:12px;text-align:center}
+header{
+padding:14px;
+border-bottom:1px solid var(--line);
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
 
-    /* Mobile views */
-    .views{display:block;}
-    .view{display:none;}
-    .view.active{display:block;}
+h1{
+margin:0;
+font-size:18px;
+}
 
-    @media(min-width:920px){
-      .views{display:none;}
-      .desktopGrid{display:grid;}
-      .bottomNav{display:none;}
-    }
-    @media(max-width:919.98px){
-      .desktopGrid{display:none;}
-      main.wrap{padding-bottom: calc(var(--navH) + 14px);}
-    }
+.small{
+font-size:12px;
+color:var(--muted);
+}
 
-    .bottomNav{
-      position:fixed; left:0; right:0; bottom:0; z-index:20;
-      height:var(--navH);
-      padding:10px 14px calc(10px + env(safe-area-inset-bottom));
-      background:color-mix(in srgb, var(--bg) 88%, transparent);
-      border-top:1px solid var(--line);
-      backdrop-filter:saturate(160%) blur(12px);
-      display:flex; gap:10px; justify-content:space-between;
-    }
-    .tabBtn{
-      flex:1;
-      display:flex; align-items:center; justify-content:center; gap:8px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:color-mix(in srgb, var(--card) 60%, var(--line));
-      color:var(--fg);
-      font-weight:900;
-      padding:10px 8px;
-      font-size:13px;
-    }
-    .tabBtn.active{
-      background:linear-gradient(135deg, rgba(139,10,42,.9), rgba(14,165,233,.35));
-      border-color:color-mix(in srgb, var(--brand) 55%, var(--line));
-    }
-    .tabIcon{opacity:.9}
-  </style>
+.wrap{
+padding:14px;
+}
+
+.card{
+background:var(--card);
+border:1px solid var(--line);
+border-radius:var(--radius);
+padding:14px;
+margin-bottom:14px;
+}
+
+label{
+font-size:12px;
+color:var(--muted);
+}
+
+input,select,textarea{
+width:100%;
+padding:10px;
+margin-top:4px;
+border-radius:10px;
+border:1px solid var(--line);
+background:#0f172a;
+color:white;
+}
+
+textarea{
+min-height:70px;
+}
+
+.row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+button{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+}
+
+.btn-primary{
+background:var(--accent);
+color:white;
+}
+
+.btn-good{
+background:var(--good);
+}
+
+.btn-danger{
+background:var(--danger);
+}
+
+.btn-secondary{
+background:#2b3550;
+color:white;
+}
+
+.kpi{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.k{
+background:#0f172a;
+padding:10px;
+border-radius:10px;
+border:1px solid var(--line);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+font-size:13px;
+}
+
+td,th{
+padding:8px;
+border-bottom:1px solid var(--line);
+}
+
+.bottomNav{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+height:var(--navH);
+background:#0b1220;
+border-top:1px solid var(--line);
+display:flex;
+}
+
+.tab{
+flex:1;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:600;
+cursor:pointer;
+}
+
+.tab.active{
+background:#1e293b;
+}
+
+.view{
+display:none;
+}
+
+.view.active{
+display:block;
+}
+
+body.pwa-mobile .desktopGrid{
+display:none;
+}
+
+body.pwa-mobile .bottomNav{
+display:flex;
+}
+
+</style>
 </head>
 
 <body>
+
 <header>
-  <div class="wrap">
-    <div class="topbar">
-      <div>
-        <h1>VinoGastos</h1>
-        <div class="sub">Offline • Sin datos sensibles • Separa Compras vs Pagos</div>
-      </div>
-      <div class="pill" id="todayPill">—</div>
-    </div>
-  </div>
+<div>
+<h1>Gastos</h1>
+<div class="small">Control personal de gastos</div>
+</div>
+
+<div id="fechaHoy" class="small"></div>
 </header>
 
-<main class="wrap">
-  <!-- MOBILE VIEWS -->
-  <section class="views">
-    <section class="view active" id="viewResumen"></section>
-    <section class="view" id="viewGastos"></section>
-    <section class="view" id="viewPagos"></section>
-    <section class="view" id="viewTarjetas"></section>
-  </section>
+<div class="wrap">
 
-  <!-- DESKTOP -->
-  <section class="grid desktopGrid" id="desktopGrid">
-    <section class="leftcol" id="desktopLeft"></section>
-    <aside class="rightcol" id="desktopRight"></aside>
-  </section>
+<div id="viewResumen" class="view active"></div>
+<div id="viewGastos" class="view"></div>
+<div id="viewTarjetas" class="view"></div>
 
-  <div class="footer">iPhone: “Compartir → Añadir a pantalla de inicio”.</div>
-</main>
+</div>
 
-<nav class="bottomNav" id="bottomNav">
-  <button class="tabBtn active" data-tab="Resumen"><span class="tabIcon">☰</span>Resumen</button>
-  <button class="tabBtn" data-tab="Gastos"><span class="tabIcon">＋</span>Gastos</button>
-  <button class="tabBtn" data-tab="Pagos"><span class="tabIcon">✓</span>Pagos</button>
-  <button class="tabBtn" data-tab="Tarjetas"><span class="tabIcon">▦</span>Tarjetas</button>
-</nav>
+<div class="bottomNav">
 
-<!-- ===== TEMPLATES ===== -->
-<template id="tplResumen">
-  <div class="card">
-    <div class="split">
-      <h2>Resumen del mes</h2>
-      <span class="tag"><span class="dot ok"></span><span>Listo</span></span>
-    </div>
+<div class="tab active" data-tab="Resumen">Resumen</div>
+<div class="tab" data-tab="Gastos">Gastos</div>
+<div class="tab" data-tab="Tarjetas">Tarjetas</div>
 
-    <div class="kpi">
-      <div class="k">
-        <div class="t">Compras del mes (Gastos)</div>
-        <div class="v mono" id="kpiSpends">$0</div>
-      </div>
-      <div class="k">
-        <div class="t">Pagos del mes (a tarjetas)</div>
-        <div class="v mono" id="kpiPays">$0</div>
-      </div>
-      <div class="k">
-        <div class="t">Ahorro del mes</div>
-        <div class="v mono" id="kpiSavings">$0</div>
-      </div>
-      <div class="k">
-        <div class="t">Total general (compras)</div>
-        <div class="v mono" id="kpiAll">$0</div>
-      </div>
-
-      <div class="k wide">
-        <div class="row">
-          <div>
-            <label>Nómina del mes (ingreso)</label>
-            <input id="incomeInput" inputmode="decimal" placeholder="Ej. 18000"/>
-            <div class="small" style="margin-top:6px">Se guarda por mes. Cambia el filtro para capturar otra nómina.</div>
-          </div>
-          <div>
-            <label>Disponible del mes (Nómina - Compras - Pagos - Ahorro)</label>
-            <input id="kpiAvailable" readonly />
-            <div class="small" style="margin-top:6px">Si no quieres restar Ahorro aquí, dímelo y lo ajusto.</div>
-          </div>
-        </div>
-        <div class="btns">
-          <button class="good" id="btnSaveIncome">Guardar nómina del mes</button>
-          <button class="secondary" id="btnClearIncome">Borrar nómina de este mes</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="hr"></div>
-
-    <div class="row">
-      <div>
-        <label>Filtrar por mes</label>
-        <input type="month" id="filterMonth"/>
-      </div>
-      <div>
-        <label>Filtrar por tarjeta/departamental</label>
-        <select id="filterCard"></select>
-      </div>
-    </div>
-
-    <div class="btns">
-      <button class="secondary" id="btnClearFilters">Quitar filtros</button>
-      <button class="secondary" id="btnExportJSON">Exportar respaldo (.json)</button>
-      <button class="secondary" id="btnImportJSON">Importar respaldo</button>
-      <input type="file" id="fileImport" accept="application/json" style="display:none"/>
-    </div>
-
-    <div class="hr"></div>
-
-    <h2>Compras del mes por categoría</h2>
-    <div class="small">Este resumen SOLO cuenta “Gastos” (compras). No cuenta “Pagos”.</div>
-    <div style="overflow:auto;margin-top:10px">
-      <table>
-        <thead><tr><th>Categoría</th><th>Total (mes)</th></tr></thead>
-        <tbody id="catsTbody"></tbody>
-      </table>
-    </div>
-
-    <div class="hr"></div>
-
-    <h2>Totales por tarjeta</h2>
-    <div class="small">Compras (gastos) vs Pagos (abonos) según filtros.</div>
-    <div style="overflow:auto;margin-top:10px">
-      <table>
-        <thead><tr><th>Tarjeta</th><th>Compras</th><th>Pagos</th></tr></thead>
-        <tbody id="byCardTbody"></tbody>
-      </table>
-    </div>
-
-    <div class="hr"></div>
-
-    <h2>Próximos recordatorios</h2>
-    <div class="small">Genera eventos (.ics) para tu calendario.</div>
-    <div id="remindersList" style="margin-top:10px"></div>
-  </div>
-</template>
-
-<template id="tplGastos">
-  <div class="card">
-    <div class="split">
-      <h2>Gastos (Compras)</h2>
-      <span class="tag"><span class="dot ok"></span><span>Cuando compras</span></span>
-    </div>
-    <div class="small">Esto es lo que consumiste (comida, gasolina, etc.). El filtro de mes está en “Resumen”.</div>
-
-    <div style="margin-top:10px" class="row">
-      <div>
-        <label>Monto</label>
-        <input id="gAmount" inputmode="decimal" placeholder="Ej. 350.50"/>
-      </div>
-      <div>
-        <label>Fecha de compra</label>
-        <input id="gDate" type="date"/>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Categoría</label>
-        <select id="gCategory"></select>
-      </div>
-      <div>
-        <label>Tarjeta / Departamental</label>
-        <select id="gCard"></select>
-      </div>
-    </div>
-
-    <div>
-      <label>Nota (opcional)</label>
-      <textarea id="gNote" placeholder="Ej. Gasolina / Uber / Liverpool / etc."></textarea>
-    </div>
-
-    <div class="btns">
-      <button id="btnAddExpense">Agregar gasto</button>
-      <button class="secondary" id="btnResetExpense">Limpiar</button>
-    </div>
-
-    <div class="hr"></div>
-
-    <div style="overflow:auto">
-      <table>
-        <thead>
-          <tr><th>Fecha</th><th>Tarjeta</th><th>Categoría</th><th>Monto</th><th>Nota</th><th></th></tr>
-        </thead>
-        <tbody id="expensesTbody"></tbody>
-      </table>
-    </div>
-  </div>
-</template>
-
-<template id="tplPagos">
-  <div class="card">
-    <div class="split">
-      <h2>Pagos a tarjeta (Abonos)</h2>
-      <span class="tag"><span class="dot warn"></span><span>Cuando pagas</span></span>
-    </div>
-    <div class="small">Esto es dinero que salió para pagar la tarjeta. No es “gasto por categoría”, es “pago”.</div>
-
-    <div style="margin-top:10px" class="row">
-      <div>
-        <label>Monto del pago</label>
-        <input id="pAmount" inputmode="decimal" placeholder="Ej. 1500"/>
-      </div>
-      <div>
-        <label>Fecha del pago</label>
-        <input id="pDate" type="date"/>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Tarjeta / Departamental</label>
-        <select id="pCard"></select>
-      </div>
-      <div>
-        <label>Nota (opcional)</label>
-        <input id="pNote" placeholder="Ej. Pago mínimo / Pago total"/>
-      </div>
-    </div>
-
-    <div class="btns">
-      <button class="good" id="btnAddPay">Registrar pago</button>
-      <button class="secondary" id="btnResetPay">Limpiar</button>
-    </div>
-
-    <div class="hr"></div>
-
-    <div style="overflow:auto">
-      <table>
-        <thead>
-          <tr><th>Fecha</th><th>Tarjeta</th><th>Monto</th><th>Nota</th><th></th></tr>
-        </thead>
-        <tbody id="paysTbody"></tbody>
-      </table>
-    </div>
-  </div>
-</template>
-
-<template id="tplTarjetas">
-  <div class="card">
-    <div class="split">
-      <h2>Tarjetas / Departamentales</h2>
-      <span class="tag"><span class="dot ok"></span><span>Sin números</span></span>
-    </div>
-    <div class="small">Ejemplos: Nu, BBVA, Santander, Liverpool, Suburbia, Coppel, etc.</div>
-
-    <div class="row" style="margin-top:10px">
-      <div>
-        <label>Nombre</label>
-        <input id="cName" placeholder="Ej. Liverpool / Suburbia / Nu / BBVA Azul"/>
-      </div>
-      <div>
-        <label>Banco/Tienda (opcional)</label>
-        <input id="cBank" placeholder="Ej. Liverpool"/>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Día de corte (1–28)</label>
-        <input id="cCut" type="number" min="1" max="28" placeholder="Ej. 15"/>
-      </div>
-      <div>
-        <label>Día límite de pago (1–28)</label>
-        <input id="cPay" type="number" min="1" max="28" placeholder="Ej. 5"/>
-      </div>
-    </div>
-
-    <div class="btns">
-      <button class="good" id="btnAddCard">Guardar</button>
-      <button class="secondary" id="btnResetCard">Limpiar</button>
-    </div>
-
-    <div class="hr"></div>
-    <div class="btns">
-      <button class="danger" id="btnNuke">Borrar TODO</button>
-    </div>
-    <div class="small" style="margin-top:8px">⚠️ Elimina tarjetas, nóminas, gastos y pagos de este dispositivo.</div>
-  </div>
-</template>
+</div>
 
 <script>
-  // ---------- Storage ----------
-  const KEY = "vinogastos_v1_gasto_vs_pago";
-  const state = load() || { cards: [], expenses: [], payments: [], incomeByMonth: {} };
-  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)); }catch(e){ return null; } }
-  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
 
-  // ---------- Config ----------
-  const CATEGORIES = [
-    "Comida","Transporte","Gasolina","Super","Servicios","Salud","Escuela",
-    "Viajes","Ahorro","Gastos generales","Entretenimiento","Compras","Otro"
-  ];
+const KEY="gastos_app";
 
-  // ---------- Utils ----------
-  const fmt = (n)=> new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(n||0);
-  const today = new Date();
-  const pad2 = (n)=> String(n).padStart(2,"0");
-  const toISODate = (d)=> `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-  const parseMoney = (s)=>{ const x = Number(String(s).replace(/[^0-9.]/g,"")); return Number.isFinite(x) ? x : NaN; };
-  const monthKeyFromISO = (iso)=> iso?.slice(0,7);
-  const startOfDay = (d)=>{ const x = new Date(d); x.setHours(0,0,0,0); return x; };
-  const daysUntil = (d)=> Math.ceil((startOfDay(d)-startOfDay(new Date()))/(1000*60*60*24));
-  const urgencyDot = (delta)=> delta<=2 ? "bad" : delta<=7 ? "warn" : "ok";
-  const makeId = ()=> Math.random().toString(16).slice(2) + Date.now().toString(16);
-  const escapeHtml = (s)=> String(s||"").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const state=JSON.parse(localStorage.getItem(KEY)) || {
+cards:[],
+expenses:[],
+income:{}
+};
 
-  function cardName(id){ return state.cards.find(c=>c.id===id)?.name || "—"; }
-  function nextDateForDay(day, baseDate){
-    const y = baseDate.getFullYear();
-    const m = baseDate.getMonth();
-    const d1 = new Date(y, m, Math.min(day, 28));
-    if (d1 >= startOfDay(baseDate)) return d1;
-    return new Date(y, m+1, Math.min(day, 28));
-  }
+const categories=[
+"Comida",
+"Transporte",
+"Gasolina",
+"Super",
+"Servicios",
+"Salud",
+"Escuela",
+"Viajes",
+"Ahorro",
+"Gastos generales",
+"Entretenimiento",
+"Compras",
+"Otro"
+];
 
-  // ---------- Tabs ----------
-  function setTab(name){
-    const map = { "Resumen":"viewResumen", "Gastos":"viewGastos", "Pagos":"viewPagos", "Tarjetas":"viewTarjetas" };
-    Object.values(map).forEach(id=> document.getElementById(id).classList.remove("active"));
-    document.getElementById(map[name]).classList.add("active");
-    document.querySelectorAll(".tabBtn").forEach(b=> b.classList.toggle("active", b.getAttribute("data-tab")===name));
-  }
-  document.querySelectorAll(".tabBtn").forEach(btn=>{
-    btn.addEventListener("click", ()=> setTab(btn.getAttribute("data-tab")));
-  });
+function save(){
+localStorage.setItem(KEY,JSON.stringify(state));
+}
 
-  // ---------- Mount templates (mobile + desktop) ----------
-  function cloneTpl(id){ return document.getElementById(id).content.cloneNode(true); }
+function money(n){
+return new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(n||0);
+}
 
-  function mount(){
-    document.getElementById("todayPill").textContent =
-      new Intl.DateTimeFormat("es-MX",{dateStyle:"full"}).format(today);
+function today(){
+return new Date().toISOString().split("T")[0];
+}
 
-    // Desktop
-    const left = document.getElementById("desktopLeft");
-    const right = document.getElementById("desktopRight");
-    left.innerHTML = ""; right.innerHTML = "";
-    left.appendChild(cloneTpl("tplResumen"));
-    left.appendChild(document.createElement("div")).className="hr";
-    left.appendChild(cloneTpl("tplGastos"));
-    left.appendChild(document.createElement("div")).className="hr";
-    left.appendChild(cloneTpl("tplPagos"));
-    right.appendChild(cloneTpl("tplTarjetas"));
+document.getElementById("fechaHoy").innerText=
+new Date().toLocaleDateString("es-MX",{dateStyle:"full"});
 
-    // Mobile
-    ["viewResumen","viewGastos","viewPagos","viewTarjetas"].forEach((vid, i)=>{
-      const v = document.getElementById(vid);
-      v.innerHTML = "";
-      v.appendChild(cloneTpl(["tplResumen","tplGastos","tplPagos","tplTarjetas"][i]));
-    });
+function render(){
 
-    bindAll();
-    renderAll();
+renderResumen();
+renderGastos();
+renderTarjetas();
 
-    if (window.matchMedia("(max-width: 919.98px)").matches) setTab("Resumen");
-  }
+save();
+}
 
-  // ---------- Scoped helpers ----------
-  function getScoped(container, id){ return container.querySelector("#"+id); }
+function renderResumen(){
 
-  function getFilter(container){
-    const m = getScoped(container,"filterMonth")?.value || "";
-    const card = getScoped(container,"filterCard")?.value || "__all__";
-    return { m, card };
-  }
+const view=document.getElementById("viewResumen");
 
-  function filterExpenses({m, card}){
-    return state.expenses.filter(e=>{
-      const okM = !m || monthKeyFromISO(e.date) === m;
-      const okC = (card==="__all__") || e.cardId === card;
-      return okM && okC;
-    });
-  }
+let month=state.expenses.reduce((s,e)=>s+e.amount,0);
 
-  function filterPayments({m, card}){
-    return state.payments.filter(p=>{
-      const okM = !m || monthKeyFromISO(p.date) === m;
-      const okC = (card==="__all__") || p.cardId === card;
-      return okM && okC;
-    });
-  }
+let income=state.income["global"]||0;
 
-  // ---------- Render ----------
-  function renderFor(container){
-    save();
+let disponible=income-month;
 
-    // init defaults
-    const filterMonth = getScoped(container,"filterMonth");
-    if (filterMonth && !filterMonth.value) filterMonth.value = `${today.getFullYear()}-${pad2(today.getMonth()+1)}`;
+let catTotals={};
 
-    const gDate = getScoped(container,"gDate");
-    if (gDate && !gDate.value) gDate.value = toISODate(new Date());
+categories.forEach(c=>catTotals[c]=0);
 
-    const pDate = getScoped(container,"pDate");
-    if (pDate && !pDate.value) pDate.value = toISODate(new Date());
+state.expenses.forEach(e=>{
+catTotals[e.category]+=e.amount;
+});
 
-    // fill selects
-    const filterCard = getScoped(container,"filterCard");
-    if (filterCard){
-      filterCard.innerHTML = [
-        `<option value="__all__">Todas</option>`,
-        ...state.cards.map(c=> `<option value="${c.id}">${escapeHtml(c.name)}</option>`)
-      ].join("");
-    }
+view.innerHTML=`
 
-    const gCard = getScoped(container,"gCard");
-    const pCard = getScoped(container,"pCard");
-    const cardOptions = state.cards.length
-      ? state.cards.map(c=> `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join("")
-      : `<option value="">Primero agrega una tarjeta</option>`;
-    if (gCard) gCard.innerHTML = cardOptions;
-    if (pCard) pCard.innerHTML = cardOptions;
+<div class="card">
 
-    const gCategory = getScoped(container,"gCategory");
-    if (gCategory) gCategory.innerHTML = CATEGORIES.map(c=>`<option>${escapeHtml(c)}</option>`).join("");
+<div class="kpi">
 
-    // compute with current filter (only if this container has filter inputs)
-    const f = filterMonth ? getFilter(container) : { m:"", card:"__all__" };
-    const exp = filterExpenses(f);
-    const pay = filterPayments(f);
+<div class="k">
+<div class="small">Total gastos</div>
+<b>${money(month)}</b>
+</div>
 
-    const spendsMonth = exp.reduce((s,e)=>s+e.amount,0);
-    const paysMonth = pay.reduce((s,p)=>s+p.amount,0);
-    const savingsMonth = exp.filter(e=>e.category==="Ahorro").reduce((s,e)=>s+e.amount,0);
-    const allSpends = state.expenses.reduce((s,e)=>s+e.amount,0);
+<div class="k">
+<div class="small">Disponible</div>
+<b>${money(disponible)}</b>
+</div>
 
-    // KPIs
-    const kpiSpends = getScoped(container,"kpiSpends"); if (kpiSpends) kpiSpends.textContent = fmt(spendsMonth);
-    const kpiPays = getScoped(container,"kpiPays"); if (kpiPays) kpiPays.textContent = fmt(paysMonth);
-    const kpiSavings = getScoped(container,"kpiSavings"); if (kpiSavings) kpiSavings.textContent = fmt(savingsMonth);
-    const kpiAll = getScoped(container,"kpiAll"); if (kpiAll) kpiAll.textContent = fmt(allSpends);
+</div>
 
-    // income & available
-    const incomeInput = getScoped(container,"incomeInput");
-    const kpiAvailable = getScoped(container,"kpiAvailable");
-    if (incomeInput && filterMonth){
-      const mk = filterMonth.value;
-      const income = Number(state.incomeByMonth?.[mk] || 0);
-      incomeInput.value = income ? String(income) : "";
-      if (kpiAvailable){
-        const available = income - spendsMonth - paysMonth - savingsMonth;
-        kpiAvailable.value = fmt(available);
-      }
-    }
+<br>
 
-    // category breakdown (expenses only)
-    const catsTbody = getScoped(container,"catsTbody");
-    if (catsTbody && filterMonth){
-      const map = new Map(); CATEGORIES.forEach(c=>map.set(c,0));
-      exp.forEach(e=> map.set(e.category, (map.get(e.category)||0)+e.amount));
-      catsTbody.innerHTML = CATEGORIES.map(cat=>`
-        <tr><td>${escapeHtml(cat)}</td><td class="mono">${fmt(map.get(cat)||0)}</td></tr>
-      `).join("");
-    }
+<label>Nómina</label>
+<input id="incomeInput" placeholder="Ej 18000">
 
-    // by card table (expenses vs payments)
-    const byCardTbody = getScoped(container,"byCardTbody");
-    if (byCardTbody && filterMonth){
-      const expMap = new Map(), payMap = new Map();
-      state.cards.forEach(c=>{ expMap.set(c.id,0); payMap.set(c.id,0); });
-      exp.forEach(e=> expMap.set(e.cardId, (expMap.get(e.cardId)||0)+e.amount));
-      pay.forEach(p=> payMap.set(p.cardId, (payMap.get(p.cardId)||0)+p.amount));
+<br><br>
 
-      byCardTbody.innerHTML = state.cards.length ? state.cards.map(c=>`
-        <tr>
-          <td>${escapeHtml(c.name)}</td>
-          <td class="mono">${fmt(expMap.get(c.id)||0)}</td>
-          <td class="mono">${fmt(payMap.get(c.id)||0)}</td>
-        </tr>
-      `).join("") : `<tr><td colspan="3" class="small">Agrega tarjetas para ver este resumen.</td></tr>`;
-    }
+<button class="btn-good" onclick="saveIncome()">Guardar nómina</button>
 
-    // expenses table
-    const expensesTbody = getScoped(container,"expensesTbody");
-    if (expensesTbody && filterMonth){
-      const rows = exp.slice().sort((a,b)=> a.date<b.date?1:-1).map(e=>`
-        <tr>
-          <td class="mono">${e.date}</td>
-          <td>${escapeHtml(cardName(e.cardId))}</td>
-          <td>${escapeHtml(e.category)}</td>
-          <td class="mono">${fmt(e.amount)}</td>
-          <td>${escapeHtml(e.note||"")}</td>
-          <td><button class="secondary" data-del-exp="${e.id}">Eliminar</button></td>
-        </tr>
-      `).join("");
-      expensesTbody.innerHTML = rows || `<tr><td colspan="6" class="small">Aún no hay compras con estos filtros.</td></tr>`;
-      expensesTbody.querySelectorAll("button[data-del-exp]").forEach(btn=>{
-        btn.onclick = ()=>{
-          const id = btn.getAttribute("data-del-exp");
-          state.expenses = state.expenses.filter(x=>x.id!==id);
-          renderAll();
-        };
-      });
-    }
+</div>
 
-    // payments table
-    const paysTbody = getScoped(container,"paysTbody");
-    if (paysTbody && filterMonth){
-      const rows = pay.slice().sort((a,b)=> a.date<b.date?1:-1).map(p=>`
-        <tr>
-          <td class="mono">${p.date}</td>
-          <td>${escapeHtml(cardName(p.cardId))}</td>
-          <td class="mono">${fmt(p.amount)}</td>
-          <td>${escapeHtml(p.note||"")}</td>
-          <td><button class="secondary" data-del-pay="${p.id}">Eliminar</button></td>
-        </tr>
-      `).join("");
-      paysTbody.innerHTML = rows || `<tr><td colspan="5" class="small">Aún no hay pagos con estos filtros.</td></tr>`;
-      paysTbody.querySelectorAll("button[data-del-pay]").forEach(btn=>{
-        btn.onclick = ()=>{
-          const id = btn.getAttribute("data-del-pay");
-          state.payments = state.payments.filter(x=>x.id!==id);
-          renderAll();
-        };
-      });
-    }
+<div class="card">
 
-    // reminders
-    const remindersList = getScoped(container,"remindersList");
-    if (remindersList){
-      if(!state.cards.length){
-        remindersList.innerHTML = `<div class="small">Agrega tarjetas para crear recordatorios.</div>`;
-      } else {
-        const base = new Date();
-        const items = state.cards.map(c=>{
-          const cutD = nextDateForDay(Number(c.cutDay), base);
-          const payD = nextDateForDay(Number(c.payDay), base);
-          return { c, cutD, payD, cutIn:daysUntil(cutD), payIn:daysUntil(payD) };
-        }).sort((a,b)=> Math.min(a.cutIn,a.payIn) - Math.min(b.cutIn,b.payIn));
+<b>Gasto por categoría</b>
 
-        remindersList.innerHTML = items.map(({c, cutD, payD, cutIn, payIn})=>{
-          const cutDot = urgencyDot(cutIn);
-          const payDot = urgencyDot(payIn);
-          return `
-            <div style="border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:10px">
-              <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
-                <div style="font-weight:900">${escapeHtml(c.name)}</div>
-                <button class="secondary" data-ics="${c.id}">Calendario (.ics)</button>
-              </div>
-              <div style="margin-top:8px" class="small">
-                <div class="tag" style="margin-right:6px">
-                  <span class="dot ${cutDot}"></span>
-                  Corte: <span class="mono">${toISODate(cutD)}</span> (en ${cutIn} día(s))
-                </div>
-                <div class="tag" style="margin-top:6px">
-                  <span class="dot ${payDot}"></span>
-                  Pago: <span class="mono">${toISODate(payD)}</span> (en ${payIn} día(s))
-                </div>
-              </div>
-            </div>`;
-        }).join("");
+<table>
 
-        remindersList.querySelectorAll("button[data-ics]").forEach(btn=>{
-          btn.onclick = ()=>{
-            const cardId = btn.getAttribute("data-ics");
-            const card = state.cards.find(x=>x.id===cardId);
-            if(!card) return;
-            const base = new Date();
-            const cutD = nextDateForDay(Number(card.cutDay), base);
-            const payD = nextDateForDay(Number(card.payDay), base);
+${categories.map(c=>`
+<tr>
+<td>${c}</td>
+<td>${money(catTotals[c])}</td>
+</tr>
+`).join("")}
 
-            const ics = buildICS([
-              { title:`Corte tarjeta: ${card.name}`, date: cutD, description:`Día de corte de ${card.name}.` },
-              { title:`Pago tarjeta: ${card.name}`, date: payD, description:`Fecha límite de pago de ${card.name}.` }
-            ]);
-            downloadText(`${safeFile(card.name)}-recordatorios.ics`, ics, "text/calendar");
-          };
-        });
-      }
-    }
-  }
+</table>
 
-  function renderAll(){
-    document.querySelectorAll("#desktopLeft, #desktopRight, #viewResumen, #viewGastos, #viewPagos, #viewTarjetas")
-      .forEach(c=> renderFor(c));
-  }
+</div>
 
-  // ---------- Bind events ----------
-  function bindAll(){
-    const containers = [
-      document.getElementById("desktopLeft"),
-      document.getElementById("desktopRight"),
-      document.getElementById("viewResumen"),
-      document.getElementById("viewGastos"),
-      document.getElementById("viewPagos"),
-      document.getElementById("viewTarjetas"),
-    ].filter(Boolean);
+`;
 
-    containers.forEach(container=>{
-      // Filters + backup
-      const filterMonth = getScoped(container,"filterMonth");
-      const filterCard = getScoped(container,"filterCard");
-      const btnClearFilters = getScoped(container,"btnClearFilters");
-      const btnExportJSON = getScoped(container,"btnExportJSON");
-      const btnImportJSON = getScoped(container,"btnImportJSON");
-      const fileImport = getScoped(container,"fileImport");
+}
 
-      if (filterMonth) filterMonth.onchange = ()=> renderAll();
-      if (filterCard) filterCard.onchange = ()=> renderAll();
+function saveIncome(){
+let v=parseFloat(document.getElementById("incomeInput").value||0);
+state.income["global"]=v;
+render();
+}
 
-      if (btnClearFilters && filterMonth && filterCard){
-        btnClearFilters.onclick = ()=>{
-          filterMonth.value = `${today.getFullYear()}-${pad2(today.getMonth()+1)}`;
-          filterCard.value = "__all__";
-          renderAll();
-        };
-      }
+function renderGastos(){
 
-      if (btnExportJSON){
-        btnExportJSON.onclick = ()=>{
-          downloadText(`vinogastos-respaldo.json`, JSON.stringify(state, null, 2), "application/json");
-        };
-      }
-      if (btnImportJSON && fileImport){
-        btnImportJSON.onclick = ()=> fileImport.click();
-        fileImport.onchange = async (ev)=>{
-          const file = ev.target.files?.[0];
-          if(!file) return;
-          try{
-            const text = await file.text();
-            const data = JSON.parse(text);
-            if(!data || !Array.isArray(data.cards) || !Array.isArray(data.expenses)) throw new Error("Formato inválido");
-            state.cards = data.cards || [];
-            state.expenses = data.expenses || [];
-            state.payments = data.payments || [];
-            state.incomeByMonth = data.incomeByMonth || {};
-            renderAll();
-            alert("Respaldo importado.");
-          }catch(e){
-            alert("No pude importar ese archivo. Asegúrate que sea un respaldo válido.");
-          }finally{
-            fileImport.value = "";
-          }
-        };
-      }
+const view=document.getElementById("viewGastos");
 
-      // Income
-      const btnSaveIncome = getScoped(container,"btnSaveIncome");
-      const btnClearIncome = getScoped(container,"btnClearIncome");
-      const incomeInput = getScoped(container,"incomeInput");
-      if (btnSaveIncome && incomeInput && filterMonth){
-        btnSaveIncome.onclick = ()=>{
-          const mk = filterMonth.value;
-          if(!mk){ alert("Selecciona un mes."); return; }
-          const income = parseMoney(incomeInput.value);
-          if(!Number.isFinite(income) || income < 0){ alert("Nómina inválida."); return; }
-          state.incomeByMonth[mk] = income;
-          renderAll();
-          alert("Nómina guardada para " + mk);
-        };
-      }
-      if (btnClearIncome && filterMonth){
-        btnClearIncome.onclick = ()=>{
-          const mk = filterMonth.value;
-          if(!mk) return;
-          if(confirm("¿Borrar nómina guardada de este mes?")){
-            delete state.incomeByMonth[mk];
-            renderAll();
-          }
-        };
-      }
+view.innerHTML=`
 
-      // Add expense
-      const btnAddExpense = getScoped(container,"btnAddExpense");
-      const btnResetExpense = getScoped(container,"btnResetExpense");
-      if (btnAddExpense){
-        btnAddExpense.onclick = ()=>{
-          if(!state.cards.length){ alert("Primero agrega una tarjeta/departamental."); setTab("Tarjetas"); return; }
+<div class="card">
 
-          const amount = parseMoney(getScoped(container,"gAmount")?.value);
-          const date = getScoped(container,"gDate")?.value;
-          const category = getScoped(container,"gCategory")?.value;
-          const cardId = getScoped(container,"gCard")?.value;
-          const note = (getScoped(container,"gNote")?.value || "").trim();
+<div class="row">
 
-          if(!Number.isFinite(amount) || amount<=0){ alert("Monto inválido."); return; }
-          if(!date){ alert("Selecciona una fecha."); return; }
-          if(!cardId){ alert("Selecciona una tarjeta."); return; }
+<div>
+<label>Monto</label>
+<input id="amount">
+</div>
 
-          state.expenses.push({ id: makeId(), amount, date, category, cardId, note });
-          if (getScoped(container,"gAmount")) getScoped(container,"gAmount").value = "";
-          if (getScoped(container,"gNote")) getScoped(container,"gNote").value = "";
-          renderAll();
-        };
-      }
-      if (btnResetExpense){
-        btnResetExpense.onclick = ()=>{
-          if (getScoped(container,"gAmount")) getScoped(container,"gAmount").value = "";
-          if (getScoped(container,"gNote")) getScoped(container,"gNote").value = "";
-          if (getScoped(container,"gDate")) getScoped(container,"gDate").value = toISODate(new Date());
-        };
-      }
+<div>
+<label>Fecha</label>
+<input id="date" type="date" value="${today()}">
+</div>
 
-      // Add payment
-      const btnAddPay = getScoped(container,"btnAddPay");
-      const btnResetPay = getScoped(container,"btnResetPay");
-      if (btnAddPay){
-        btnAddPay.onclick = ()=>{
-          if(!state.cards.length){ alert("Primero agrega una tarjeta/departamental."); setTab("Tarjetas"); return; }
+</div>
 
-          const amount = parseMoney(getScoped(container,"pAmount")?.value);
-          const date = getScoped(container,"pDate")?.value;
-          const cardId = getScoped(container,"pCard")?.value;
-          const note = (getScoped(container,"pNote")?.value || "").trim();
+<br>
 
-          if(!Number.isFinite(amount) || amount<=0){ alert("Monto inválido."); return; }
-          if(!date){ alert("Selecciona una fecha."); return; }
-          if(!cardId){ alert("Selecciona una tarjeta."); return; }
+<div class="row">
 
-          state.payments.push({ id: makeId(), amount, date, cardId, note });
-          if (getScoped(container,"pAmount")) getScoped(container,"pAmount").value = "";
-          if (getScoped(container,"pNote")) getScoped(container,"pNote").value = "";
-          renderAll();
-        };
-      }
-      if (btnResetPay){
-        btnResetPay.onclick = ()=>{
-          if (getScoped(container,"pAmount")) getScoped(container,"pAmount").value = "";
-          if (getScoped(container,"pNote")) getScoped(container,"pNote").value = "";
-          if (getScoped(container,"pDate")) getScoped(container,"pDate").value = toISODate(new Date());
-        };
-      }
+<div>
+<label>Categoría</label>
+<select id="category">
 
-      // Cards
-      const btnAddCard = getScoped(container,"btnAddCard");
-      const btnResetCard = getScoped(container,"btnResetCard");
-      const btnNuke = getScoped(container,"btnNuke");
+${categories.map(c=>`<option>${c}</option>`).join("")}
 
-      if (btnAddCard){
-        btnAddCard.onclick = ()=>{
-          const name = (getScoped(container,"cName")?.value || "").trim();
-          const bank = (getScoped(container,"cBank")?.value || "").trim();
-          const cut = Number(getScoped(container,"cCut")?.value);
-          const pay = Number(getScoped(container,"cPay")?.value);
+</select>
+</div>
 
-          if(!name){ alert("Pon un nombre para la tarjeta/departamental."); return; }
-          if(!(cut>=1 && cut<=28) || !(pay>=1 && pay<=28)){
-            alert("Día de corte y pago deben ser entre 1 y 28.");
-            return;
-          }
+<div>
+<label>Tarjeta</label>
+<select id="card">
 
-          state.cards.push({ id: makeId(), name, bank, cutDay: cut, payDay: pay });
-          ["cName","cBank","cCut","cPay"].forEach(id=>{ const el=getScoped(container,id); if(el) el.value=""; });
-          renderAll();
-          if (window.matchMedia("(max-width: 919.98px)").matches) setTab("Gastos");
-        };
-      }
-      if (btnResetCard){
-        btnResetCard.onclick = ()=>{
-          ["cName","cBank","cCut","cPay"].forEach(id=>{ const el=getScoped(container,id); if(el) el.value=""; });
-        };
-      }
+${state.cards.map(c=>`<option value="${c.id}">${c.name}</option>`)}
 
-      if (btnNuke){
-        btnNuke.onclick = ()=>{
-          if(confirm("¿Seguro? Esto borrará tarjetas, nóminas, gastos y pagos de este dispositivo.")){
-            localStorage.removeItem(KEY);
-            location.reload();
-          }
-        };
-      }
-    });
-  }
+</select>
+</div>
 
-  // ---------- ICS ----------
-  function safeFile(s){ return String(s||"tarjeta").toLowerCase().replace(/[^a-z0-9]+/gi,"-").replace(/^-+|-+$/g,""); }
-  function downloadText(filename, text, mime){
-    const blob = new Blob([text], {type: mime || "text/plain"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500);
-  }
-  function buildICS(events){
-    const stamp = new Date();
-    const dtstamp = toICSDateTime(stamp);
-    const lines = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//VinoGastos//ES//","CALSCALE:GREGORIAN"];
-    events.forEach(ev=>{
-      const uid = makeId() + "@vinogastos";
-      const dt = toICSDate(ev.date);
-      lines.push("BEGIN:VEVENT",`UID:${uid}`,`DTSTAMP:${dtstamp}`,`DTSTART;VALUE=DATE:${dt}`,
-        `SUMMARY:${icsEscape(ev.title)}`,`DESCRIPTION:${icsEscape(ev.description||"")}`,"END:VEVENT");
-    });
-    lines.push("END:VCALENDAR");
-    return lines.join("\r\n");
-  }
-  function toICSDate(d){ return `${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}`; }
-  function toICSDateTime(d){
-    const x = new Date(d.getTime());
-    return `${x.getUTCFullYear()}${pad2(x.getUTCMonth()+1)}${pad2(x.getUTCDate())}T${pad2(x.getUTCHours())}${pad2(x.getUTCMinutes())}${pad2(x.getUTCSeconds())}Z`;
-  }
-  function icsEscape(s){
-    return String(s||"").replace(/\\/g,"\\\\").replace(/\n/g,"\\n").replace(/,/g,"\\,").replace(/;/g,"\\;");
-  }
+</div>
 
-  // ---------- Start ----------
-  mount();
+<br>
+
+<label>Nota</label>
+<textarea id="note"></textarea>
+
+<br><br>
+
+<button class="btn-primary" onclick="addExpense()">Agregar gasto</button>
+
+</div>
+
+<div class="card">
+
+<table>
+
+<tr>
+<th>Fecha</th>
+<th>Monto</th>
+<th></th>
+</tr>
+
+${state.expenses.map(e=>`
+<tr>
+<td>${e.date}</td>
+<td>${money(e.amount)}</td>
+<td>
+<button class="btn-danger" onclick="delExpense('${e.id}')">X</button>
+</td>
+</tr>
+`).join("")}
+
+</table>
+
+</div>
+
+`;
+
+}
+
+function addExpense(){
+
+let amount=parseFloat(document.getElementById("amount").value);
+
+if(!amount)return;
+
+state.expenses.push({
+
+id:Date.now(),
+
+amount:amount,
+
+date:document.getElementById("date").value,
+
+category:document.getElementById("category").value,
+
+card:document.getElementById("card").value,
+
+note:document.getElementById("note").value
+
+});
+
+render();
+
+}
+
+function delExpense(id){
+
+state.expenses=state.expenses.filter(e=>e.id!=id);
+
+render();
+
+}
+
+function renderTarjetas(){
+
+const view=document.getElementById("viewTarjetas");
+
+view.innerHTML=`
+
+<div class="card">
+
+<label>Nombre tarjeta</label>
+<input id="cardName">
+
+<br><br>
+
+<button class="btn-primary" onclick="addCard()">Agregar tarjeta</button>
+
+</div>
+
+<div class="card">
+
+${state.cards.map(c=>`
+
+<div style="display:flex;justify-content:space-between;margin-bottom:8px">
+
+<div>${c.name}</div>
+
+<button class="btn-danger" onclick="delCard('${c.id}')">X</button>
+
+</div>
+
+`).join("")}
+
+</div>
+
+`;
+
+}
+
+function addCard(){
+
+let name=document.getElementById("cardName").value;
+
+if(!name)return;
+
+state.cards.push({
+id:Date.now(),
+name:name
+});
+
+render();
+
+}
+
+function delCard(id){
+
+state.cards=state.cards.filter(c=>c.id!=id);
+
+render();
+
+}
+
+document.querySelectorAll(".tab").forEach(t=>{
+
+t.onclick=()=>{
+
+document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+t.classList.add("active");
+
+document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+
+document.getElementById("view"+t.dataset.tab).classList.add("active");
+
+};
+
+});
+
+function isStandalone(){
+return window.matchMedia('(display-mode: standalone)').matches 
+|| window.navigator.standalone 
+|| document.referrer.includes('android-app://');
+}
+
+function isTouch(){
+return ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+}
+
+if(isStandalone() && isTouch()){
+document.body.classList.add("pwa-mobile");
+}
+
+render();
+
 </script>
+
 </body>
 </html>
