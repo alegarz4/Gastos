@@ -18,7 +18,7 @@
       --danger:#ef4444;
       --soft:#1b2740;
       --r:16px;
-      --navH:72px;
+      --navH:78px;
     }
 
     *{ box-sizing:border-box; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; }
@@ -119,15 +119,17 @@
       position: fixed;
       left:0; right:0; bottom:0;
       height: var(--navH);
-      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+      padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
       border-top: 1px solid var(--line);
       background: color-mix(in srgb, var(--bg) 86%, transparent);
       backdrop-filter: blur(10px) saturate(160%);
       display:flex;
       gap:10px;
       z-index: 20;
+      overflow-x:auto;
     }
     .tab{
+      min-width: 118px;
       flex:1;
       border:1px solid var(--line);
       border-radius: 14px;
@@ -140,6 +142,7 @@
       gap:8px;
       cursor:pointer;
       user-select:none;
+      white-space:nowrap;
     }
     .tab.active{
       background: linear-gradient(135deg, rgba(59,130,246,.85), rgba(34,197,94,.18));
@@ -178,36 +181,54 @@
   </header>
 
   <main>
-    <section id="vResumen" class="view active"></section>
-    <section id="vGastos" class="view"></section>
+    <!-- Orden de vistas: nómina, tarjetas, gastos, ahorro, resumen -->
+    <section id="vNomina" class="view active"></section>
     <section id="vTarjetas" class="view"></section>
+    <section id="vGastos" class="view"></section>
+    <section id="vAhorro" class="view"></section>
+    <section id="vResumen" class="view"></section>
   </main>
 
   <nav class="bottomNav">
-    <div class="tab active" data-tab="Resumen">☰ Resumen</div>
-    <div class="tab" data-tab="Gastos">＋ Gastos</div>
+    <div class="tab active" data-tab="Nomina">💵 Nómina</div>
     <div class="tab" data-tab="Tarjetas">▦ Tarjetas</div>
+    <div class="tab" data-tab="Gastos">＋ Gastos</div>
+    <div class="tab" data-tab="Ahorro">🐷 Ahorro</div>
+    <div class="tab" data-tab="Resumen">☰ Resumen</div>
   </nav>
 
 <script>
   // =========================
   // Estado / Storage
   // =========================
-  const KEY = "app_gastos_v1";
+  const KEY = "app_gastos_v2";
   const state = JSON.parse(localStorage.getItem(KEY)) || {
     cards: [],        // {id, name, bank, cutDay, payDay}
     expenses: [],     // {id, amount, date, category, cardId, note}
-    incomeByMonth: {} // {"YYYY-MM": { q1:number, q2:number }}  <- ahora es por quincena
+    incomeByMonth: {},// {"YYYY-MM": { q1:number, q2:number }}
+    savings: []       // {id, amount, date, type:"deposit"|"withdraw", note}
   };
 
-  // Normaliza datos viejos (si antes era número mensual)
-  for (const k of Object.keys(state.incomeByMonth || {})) {
-    const v = state.incomeByMonth[k];
-    if (typeof v === "number") state.incomeByMonth[k] = { q1: v, q2: 0 };
-    if (v && typeof v === "object") {
-      state.incomeByMonth[k] = { q1: Number(v.q1 || 0), q2: Number(v.q2 || 0) };
-    }
-  }
+  // Migración simple desde v1 (si existe)
+  (function migrateFromV1(){
+    const oldKey = "app_gastos_v1";
+    if(localStorage.getItem(KEY)) return; // ya está en v2
+    const old = localStorage.getItem(oldKey);
+    if(!old) return;
+    try{
+      const data = JSON.parse(old);
+      if(!data || !Array.isArray(data.cards) || !Array.isArray(data.expenses)) return;
+      state.cards = data.cards || [];
+      state.expenses = data.expenses || [];
+      state.incomeByMonth = data.incomeByMonth || {};
+      // normaliza nómina (mensual -> q1/q2)
+      for(const k of Object.keys(state.incomeByMonth || {})){
+        const v = state.incomeByMonth[k];
+        if(typeof v === "number") state.incomeByMonth[k] = { q1:v, q2:0 };
+        else state.incomeByMonth[k] = { q1:Number(v?.q1||0), q2:Number(v?.q2||0) };
+      }
+    }catch(_){}
+  })();
 
   const CATEGORIES = [
     "Comida","Transporte","Gasolina","Super","Servicios","Salud","Escuela",
@@ -231,18 +252,30 @@
     return Number.isFinite(x) ? x : NaN;
   };
   const cardName = (id)=> state.cards.find(c=>c.id===id)?.name || "—";
+  const uid = ()=> (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random());
+
+  function getIncome(selectedMonth){
+    const inc = state.incomeByMonth[selectedMonth] || { q1:0, q2:0 };
+    return { q1:Number(inc.q1||0), q2:Number(inc.q2||0), total:Number(inc.q1||0)+Number(inc.q2||0) };
+  }
 
   // =========================
   // Tabs
   // =========================
+  const TAB_TO_VIEW = {
+    Nomina: "vNomina",
+    Tarjetas: "vTarjetas",
+    Gastos: "vGastos",
+    Ahorro: "vAhorro",
+    Resumen: "vResumen",
+  };
+
   function setTab(name){
     document.querySelectorAll(".tab").forEach(t=>{
       t.classList.toggle("active", t.dataset.tab === name);
     });
     document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-    document.getElementById(name==="Resumen" ? "vResumen" : name==="Gastos" ? "vGastos" : "vTarjetas")
-      .classList.add("active");
-
+    document.getElementById(TAB_TO_VIEW[name]).classList.add("active");
     render();
   }
 
@@ -254,19 +287,136 @@
   // Render
   // =========================
   function render(){
-    renderResumen();
-    renderGastos();
+    renderNomina();
     renderTarjetas();
+    renderGastos();
+    renderAhorro();
+    renderResumen();
     save();
   }
 
+  // =========================
+  // Nómina (desplegable Q1/Q2)
+  // =========================
+  function renderNomina(){
+    const el = document.getElementById("vNomina");
+    const now = new Date();
+    const mk = `${now.getFullYear()}-${pad2(now.getMonth()+1)}`;
+
+    const selectedMonth = (document.getElementById("nMonth")?.value) || mk;
+    const q = (document.getElementById("nQuincena")?.value) || "q1";
+    const inc = getIncome(selectedMonth);
+
+    el.innerHTML = `
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--muted)">Nómina por quincena</h3>
+        <div class="note">Guarda tu ingreso por quincena: <b>Q1</b> (1ª) y <b>Q2</b> (2ª). Aquí se calcula el total del mes.</div>
+
+        <div style="height:12px"></div>
+
+        <div class="row two">
+          <div>
+            <label>Mes</label>
+            <input type="month" id="nMonth" value="${selectedMonth}">
+          </div>
+          <div>
+            <label>Quincena (desplegable)</label>
+            <select id="nQuincena">
+              <option value="q1">Q1 (1ª quincena)</option>
+              <option value="q2">Q2 (2ª quincena)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="row two">
+          <div>
+            <label>Monto de la quincena seleccionada</label>
+            <input id="nMonto" inputmode="decimal" placeholder="Ej. 9000">
+          </div>
+          <div>
+            <label>Acciones</label>
+            <div class="btns" style="margin:0">
+              <button class="good" id="btnSaveNomina">Guardar</button>
+              <button class="secondary" id="btnClearNomina">Borrar mes</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="kpi">
+          <div class="k">
+            <div class="t">Q1 guardada</div>
+            <div class="v">${fmt(inc.q1)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Q2 guardada</div>
+            <div class="v">${fmt(inc.q2)}</div>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="kpi">
+          <div class="k">
+            <div class="t">Total nómina del mes (Q1 + Q2)</div>
+            <div class="v">${fmt(inc.total)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Tip</div>
+            <div class="v" style="font-size:13px;font-weight:800;color:var(--muted)">Después ve a “Resumen” para ver Disponible.</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Set dropdown + monto prefill
+    const sel = el.querySelector("#nQuincena");
+    sel.value = q;
+
+    const monto = el.querySelector("#nMonto");
+    monto.value = (q==="q1" ? (inc.q1||"") : (inc.q2||"")) || "";
+
+    el.querySelector("#nMonth").onchange = render;
+    el.querySelector("#nQuincena").onchange = render;
+
+    el.querySelector("#btnSaveNomina").onclick = ()=>{
+      const month = el.querySelector("#nMonth").value;
+      const which = el.querySelector("#nQuincena").value;
+      const v = parseMoney(el.querySelector("#nMonto").value);
+
+      if(!month) return alert("Selecciona un mes.");
+      if(!Number.isFinite(v) || v < 0) return alert("Monto inválido.");
+
+      const current = getIncome(month);
+      const next = { q1: current.q1, q2: current.q2 };
+      next[which] = v;
+
+      state.incomeByMonth[month] = next;
+      render();
+    };
+
+    el.querySelector("#btnClearNomina").onclick = ()=>{
+      const month = el.querySelector("#nMonth").value;
+      if(!month) return;
+      if(confirm("¿Borrar nómina (Q1 y Q2) de este mes?")){
+        delete state.incomeByMonth[month];
+        render();
+      }
+    };
+  }
+
+  // =========================
+  // Resumen (ya sin capturar nómina aquí)
+  // =========================
   function renderResumen(){
     const el = document.getElementById("vResumen");
 
     const now = new Date();
     const mk = `${now.getFullYear()}-${pad2(now.getMonth()+1)}`;
 
-    // Mes seleccionado (si el usuario lo cambia, tomamos ese)
     const selectedMonth = (document.getElementById("filterMonth")?.value) || mk;
     const selectedCard = (document.getElementById("filterCard")?.value) || "__all__";
 
@@ -279,13 +429,8 @@
     const monthTotal = filtered.reduce((s,e)=>s+e.amount,0);
     const allTotal = state.expenses.reduce((s,e)=>s+e.amount,0);
 
-    // Ingreso por quincena
-    const incObj = state.incomeByMonth[selectedMonth] || { q1:0, q2:0 };
-    const q1 = Number(incObj.q1 || 0);
-    const q2 = Number(incObj.q2 || 0);
-    const incomeMonth = q1 + q2;
-
-    const available = incomeMonth - monthTotal;
+    const inc = getIncome(selectedMonth);
+    const available = inc.total - monthTotal;
 
     // Totales por categoría del mes
     const catMap = new Map(CATEGORIES.map(c=>[c,0]));
@@ -302,44 +447,26 @@
       <div class="card">
         <div class="kpi">
           <div class="k">
+            <div class="t">Nómina del mes (Q1 + Q2)</div>
+            <div class="v">${fmt(inc.total)}</div>
+          </div>
+          <div class="k">
             <div class="t">Total del mes (gastos)</div>
             <div class="v">${fmt(monthTotal)}</div>
           </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="kpi">
           <div class="k">
-            <div class="t">Total general</div>
+            <div class="t">Disponible del mes (Nómina - Gastos)</div>
+            <div class="v">${fmt(available)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Total general (todos los meses)</div>
             <div class="v">${fmt(allTotal)}</div>
           </div>
-        </div>
-
-        <div style="height:10px"></div>
-
-        <div class="row two">
-          <div>
-            <label>Nómina Q1 (1ª quincena)</label>
-            <input id="incomeQ1" inputmode="decimal" placeholder="Ej. 9000" value="${q1 ? q1 : ""}">
-          </div>
-          <div>
-            <label>Nómina Q2 (2ª quincena)</label>
-            <input id="incomeQ2" inputmode="decimal" placeholder="Ej. 9000" value="${q2 ? q2 : ""}">
-          </div>
-        </div>
-
-        <div style="height:10px"></div>
-
-        <div class="row two">
-          <div>
-            <label>Total nómina del mes (Q1 + Q2)</label>
-            <input readonly value="${fmt(incomeMonth)}">
-          </div>
-          <div>
-            <label>Disponible del mes (Nómina - Gastos)</label>
-            <input readonly value="${fmt(available)}">
-          </div>
-        </div>
-
-        <div class="btns">
-          <button class="good" id="btnSaveIncome">Guardar nómina (Q1 y Q2)</button>
-          <button class="secondary" id="btnClearIncome">Borrar nómina de este mes</button>
         </div>
 
         <div style="height:12px"></div>
@@ -387,26 +514,6 @@
     const fc = el.querySelector("#filterCard");
     if (fc) fc.value = selectedCard;
 
-    // Bind events
-    el.querySelector("#btnSaveIncome").onclick = ()=>{
-      const v1 = parseMoney(el.querySelector("#incomeQ1").value);
-      const v2 = parseMoney(el.querySelector("#incomeQ2").value);
-      const q1v = Number.isFinite(v1) ? v1 : 0;
-      const q2v = Number.isFinite(v2) ? v2 : 0;
-
-      if(q1v < 0 || q2v < 0) return alert("Nómina inválida (no puede ser negativa).");
-
-      state.incomeByMonth[selectedMonth] = { q1: q1v, q2: q2v };
-      render();
-    };
-
-    el.querySelector("#btnClearIncome").onclick = ()=>{
-      if(confirm("¿Borrar nómina guardada (Q1 y Q2) de este mes?")){
-        delete state.incomeByMonth[selectedMonth];
-        render();
-      }
-    };
-
     el.querySelector("#filterMonth").onchange = render;
     el.querySelector("#filterCard").onchange = render;
 
@@ -429,15 +536,17 @@
         const txt = await f.text();
         const data = JSON.parse(txt);
         if(!data || !Array.isArray(data.cards) || !Array.isArray(data.expenses)) throw new Error("Formato inválido");
+
         state.cards = data.cards || [];
         state.expenses = data.expenses || [];
-
-        // Import robusto (acepta viejo mensual y nuevo quincenal)
+        state.savings = Array.isArray(data.savings) ? data.savings : [];
         state.incomeByMonth = data.incomeByMonth || {};
-        for (const k of Object.keys(state.incomeByMonth || {})) {
+
+        // normaliza income
+        for(const k of Object.keys(state.incomeByMonth || {})){
           const v = state.incomeByMonth[k];
-          if (typeof v === "number") state.incomeByMonth[k] = { q1: v, q2: 0 };
-          if (v && typeof v === "object") state.incomeByMonth[k] = { q1: Number(v.q1 || 0), q2: Number(v.q2 || 0) };
+          if(typeof v === "number") state.incomeByMonth[k] = { q1:v, q2:0 };
+          else state.incomeByMonth[k] = { q1:Number(v?.q1||0), q2:Number(v?.q2||0) };
         }
 
         render();
@@ -450,6 +559,9 @@
     };
   }
 
+  // =========================
+  // Gastos
+  // =========================
   function renderGastos(){
     const el = document.getElementById("vGastos");
 
@@ -536,7 +648,6 @@
       </div>
     `;
 
-    // Bind
     el.querySelector("#btnAddExpense").onclick = ()=>{
       if(!state.cards.length){
         alert("Primero agrega una tarjeta.");
@@ -553,10 +664,7 @@
       if(!date) return alert("Selecciona una fecha.");
       if(!cardId) return alert("Selecciona una tarjeta.");
 
-      state.expenses.push({
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
-        amount, date, category, cardId, note
-      });
+      state.expenses.push({ id: uid(), amount, date, category, cardId, note });
 
       render();
       setTab("Gastos");
@@ -579,6 +687,9 @@
     });
   }
 
+  // =========================
+  // Tarjetas
+  // =========================
   function renderTarjetas(){
     const el = document.getElementById("vTarjetas");
 
@@ -640,11 +751,10 @@
 
         <div style="height:10px"></div>
         <button class="danger" id="btnNuke">Borrar TODO</button>
-        <div class="note" style="margin-top:8px">⚠️ Borra tarjetas, gastos y nóminas de este dispositivo.</div>
+        <div class="note" style="margin-top:8px">⚠️ Borra tarjetas, gastos, nóminas y ahorro de este dispositivo.</div>
       </div>
     `;
 
-    // Bind
     el.querySelector("#btnAddCard").onclick = ()=>{
       const name = el.querySelector("#cName").value.trim();
       const bank = el.querySelector("#cBank").value.trim();
@@ -654,10 +764,7 @@
       if(!name) return alert("Pon un nombre para la tarjeta.");
       if(!(cut>=1 && cut<=28) || !(pay>=1 && pay<=28)) return alert("Corte y pago deben ser entre 1 y 28.");
 
-      state.cards.push({
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
-        name, bank, cutDay: cut, payDay: pay
-      });
+      state.cards.push({ id: uid(), name, bank, cutDay: cut, payDay: pay });
 
       render();
       setTab("Gastos");
@@ -684,9 +791,155 @@
     el.querySelector("#btnNuke").onclick = ()=>{
       if(confirm("¿Seguro? Se borrará TODO del dispositivo.")){
         localStorage.removeItem(KEY);
+        localStorage.removeItem("app_gastos_v1");
         location.reload();
       }
     };
+  }
+
+  // =========================
+  // Ahorro (registro independiente)
+  // =========================
+  function renderAhorro(){
+    const el = document.getElementById("vAhorro");
+    const now = new Date();
+    const mk = `${now.getFullYear()}-${pad2(now.getMonth()+1)}`;
+    const selectedMonth = (document.getElementById("sMonth")?.value) || mk;
+
+    const list = state.savings
+      .filter(s=> monthKey(s.date) === selectedMonth)
+      .slice()
+      .sort((a,b)=> (a.date < b.date ? 1 : -1));
+
+    const net = list.reduce((sum,s)=> sum + (s.type==="deposit" ? s.amount : -s.amount), 0);
+    const deposits = list.filter(s=>s.type==="deposit").reduce((a,s)=>a+s.amount,0);
+    const withdrawals = list.filter(s=>s.type==="withdraw").reduce((a,s)=>a+s.amount,0);
+
+    el.innerHTML = `
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--muted)">Ahorro</h3>
+        <div class="note">Registra depósitos o retiros de tu ahorro (independiente de “Gastos”).</div>
+
+        <div style="height:12px"></div>
+
+        <div class="row two">
+          <div>
+            <label>Mes</label>
+            <input type="month" id="sMonth" value="${selectedMonth}">
+          </div>
+          <div>
+            <label>Tipo</label>
+            <select id="sType">
+              <option value="deposit">Depósito (ahorrar)</option>
+              <option value="withdraw">Retiro</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="row two">
+          <div>
+            <label>Monto</label>
+            <input id="sAmount" inputmode="decimal" placeholder="Ej. 500">
+          </div>
+          <div>
+            <label>Fecha</label>
+            <input id="sDate" type="date" value="${todayISO()}">
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <label>Nota (opcional)</label>
+        <textarea id="sNote" placeholder="Ej. Ahorro para viaje / Emergencias / etc."></textarea>
+
+        <div class="btns">
+          <button class="good" id="btnAddSaving">Agregar</button>
+          <button class="secondary" id="btnClearSaving">Limpiar</button>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="kpi">
+          <div class="k">
+            <div class="t">Depósitos del mes</div>
+            <div class="v">${fmt(deposits)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Retiros del mes</div>
+            <div class="v">${fmt(withdrawals)}</div>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="kpi">
+          <div class="k" style="grid-column:1/-1">
+            <div class="t">Ahorro neto del mes (depósitos - retiros)</div>
+            <div class="v">${fmt(net)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--muted)">Movimientos de ahorro</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Monto</th>
+              <th>Nota</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list.length ? list.map(s=>`
+              <tr>
+                <td>${s.date}</td>
+                <td>${s.type==="deposit" ? "Depósito" : "Retiro"}</td>
+                <td>${fmt(s.amount)}</td>
+                <td>${(s.note||"").replaceAll("<","&lt;")}</td>
+                <td><button class="danger" data-dels="${s.id}">X</button></td>
+              </tr>
+            `).join("") : `<tr><td colspan="5" class="note">Aún no hay movimientos de ahorro en este mes.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    el.querySelector("#sMonth").onchange = render;
+
+    el.querySelector("#btnAddSaving").onclick = ()=>{
+      const amount = parseMoney(el.querySelector("#sAmount").value);
+      const date = el.querySelector("#sDate").value;
+      const type = el.querySelector("#sType").value;
+      const note = el.querySelector("#sNote").value.trim();
+
+      if(!Number.isFinite(amount) || amount<=0) return alert("Monto inválido.");
+      if(!date) return alert("Selecciona una fecha.");
+
+      state.savings.push({ id: uid(), amount, date, type, note });
+      render();
+      setTab("Ahorro");
+    };
+
+    el.querySelector("#btnClearSaving").onclick = ()=>{
+      el.querySelector("#sAmount").value = "";
+      el.querySelector("#sNote").value = "";
+      el.querySelector("#sDate").value = todayISO();
+      el.querySelector("#sType").value = "deposit";
+    };
+
+    el.querySelectorAll("button[data-dels]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.getAttribute("data-dels");
+        state.savings = state.savings.filter(x=>x.id !== id);
+        render();
+        setTab("Ahorro");
+      };
+    });
   }
 
   // =========================
