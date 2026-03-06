@@ -3,23 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Gastos v4.1</title>
-  <meta name="theme-color" content="#0b1220" />
+  <title>Gastos v4.2</title>
+  <meta name="theme-color" content="#2a0b14" />
   <style>
     :root{
-  --bg:#2a0b14;          /* fondo tinto oscuro */
-  --card:#3a0f1c;        /* tarjetas */
-  --fg:#ffffff;          /* texto blanco */
-  --muted:#e6c8d0;       /* texto secundario */
-  --line:#5c1a2b;        /* bordes */
-  --accent:#b91c3c;      /* botones principales */
-  --accent2:#ef476f;     /* acento secundario */
-  --good:#16a34a;
-  --danger:#dc2626;
-  --soft:#4a1423;
-  --warn:#f59e0b;
-  --violet:#8b5cf6;
-}
+      --bg:#2a0b14;
+      --card:#3a0f1c;
+      --fg:#ffffff;
+      --muted:#e6c8d0;
+      --line:#5c1a2b;
+      --accent:#b91c3c;
+      --accent2:#ef476f;
+      --good:#16a34a;
+      --danger:#dc2626;
+      --soft:#4a1423;
+      --warn:#f59e0b;
+      --violet:#8b5cf6;
+      --r:16px;
+      --navH:82px;
+      --shadow:0 12px 28px rgba(0,0,0,.28);
+    }
 
     *{ box-sizing:border-box; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
     html{ scroll-behavior:smooth; }
@@ -28,15 +31,15 @@
       margin:0;
       color:var(--fg);
       background:
-        radial-gradient(900px 500px at 15% -10%, rgba(59,130,246,.18), transparent 55%),
-        radial-gradient(900px 500px at 90% 0%, rgba(34,197,94,.10), transparent 55%),
-        linear-gradient(180deg, var(--bg), #0e1628);
+        radial-gradient(900px 500px at 15% -10%, rgba(185,28,60,.18), transparent 55%),
+        radial-gradient(900px 500px at 90% 0%, rgba(239,71,111,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg), #220811);
       min-height:100vh;
     }
 
     header{
       position:sticky; top:0; z-index:20;
-      background:#0b1220;
+      background:#2a0b14;
       background:color-mix(in srgb, var(--bg) 86%, transparent);
       backdrop-filter:blur(10px) saturate(160%);
       border-bottom:1px solid var(--line);
@@ -54,21 +57,22 @@
     .topRight{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
 
     .pill{
-      font-size:12px; color:var(--muted);
+      font-size:12px;
+      color:var(--muted);
       border:1px solid var(--line);
       padding:6px 10px;
       border-radius:999px;
       white-space:nowrap;
-      background:#0f172a;
+      background:#32101c;
     }
 
     .versionBadge{
       font-size:12px;
-      color:#dbeafe;
-      border:1px solid rgba(96,165,250,.4);
+      color:#fff1f4;
+      border:1px solid rgba(239,71,111,.35);
       padding:6px 10px;
       border-radius:999px;
-      background:linear-gradient(135deg, rgba(59,130,246,.28), rgba(139,92,246,.24));
+      background:linear-gradient(135deg, rgba(185,28,60,.38), rgba(139,92,246,.18));
       white-space:nowrap;
     }
 
@@ -79,8 +83,8 @@
     }
 
     .card{
-      background:#121a2c;
-      background:color-mix(in srgb, var(--card) 92%, rgba(59,130,246,.06));
+      background:#3a0f1c;
+      background:color-mix(in srgb, var(--card) 92%, rgba(239,71,111,.05));
       border:1px solid var(--line);
       border-radius:var(--r);
       padding:14px;
@@ -107,14 +111,14 @@
       padding:10px 12px;
       border-radius:12px;
       border:1px solid var(--line);
-      background:#0f172a;
+      background:#32101c;
       color:var(--fg);
       outline:none;
     }
 
     input:focus, select:focus, textarea:focus{
-      border-color:rgba(96,165,250,.7);
-      box-shadow:0 0 0 3px rgba(59,130,246,.15);
+      border-color:rgba(239,71,111,.6);
+      box-shadow:0 0 0 3px rgba(185,28,60,.16);
     }
 
     textarea{min-height:70px; resize:vertical;}
@@ -164,20 +168,20 @@
       padding:12px;
       border-radius:14px;
       border:1px solid var(--line);
-      background:#0f172a;
+      background:#32101c;
     }
 
     .k .t{font-size:12px; color:var(--muted);}
     .k .v{font-size:18px; font-weight:900; margin-top:6px;}
 
     .k.negative{
-      border-color:rgba(239,68,68,.45);
-      background:color-mix(in srgb, var(--danger) 12%, #0f172a);
+      border-color:rgba(220,38,38,.45);
+      background:color-mix(in srgb, var(--danger) 10%, #32101c);
     }
 
     .k.positive{
-      border-color:rgba(34,197,94,.45);
-      background:color-mix(in srgb, var(--good) 10%, #0f172a);
+      border-color:rgba(22,163,74,.45);
+      background:color-mix(in srgb, var(--good) 10%, #32101c);
     }
 
     .view{display:none;}
@@ -189,7 +193,7 @@
       height:var(--navH);
       padding:10px 10px calc(10px + env(safe-area-inset-bottom));
       border-top:1px solid var(--line);
-      background:#0b1220;
+      background:#2a0b14;
       background:color-mix(in srgb, var(--bg) 86%, transparent);
       backdrop-filter:blur(10px) saturate(160%);
       display:flex;
@@ -217,8 +221,8 @@
     }
 
     .tab.active{
-      background:linear-gradient(135deg, rgba(59,130,246,.85), rgba(34,197,94,.18));
-      border-color:color-mix(in srgb, var(--accent) 60%, var(--line));
+      background:linear-gradient(135deg, rgba(185,28,60,.9), rgba(239,71,111,.22));
+      border-color:rgba(239,71,111,.4);
     }
 
     .tableWrap{
@@ -244,8 +248,7 @@
     th{
       color:var(--muted);
       text-align:left;
-      background:#172033;
-      background:color-mix(in srgb, var(--card) 60%, var(--line));
+      background:#441522;
       position:sticky;
       top:0;
       z-index:1;
@@ -264,7 +267,7 @@
       background:color-mix(in srgb, var(--danger) 10%, var(--card));
       padding:10px 12px;
       border-radius:12px;
-      color:color-mix(in srgb, var(--fg) 92%, var(--muted));
+      color:#fff2f2;
       font-size:12px;
       margin-top:10px;
     }
@@ -274,17 +277,17 @@
       background:color-mix(in srgb, var(--good) 10%, var(--card));
       padding:10px 12px;
       border-radius:12px;
-      color:color-mix(in srgb, var(--fg) 92%, var(--muted));
+      color:#f0fff4;
       font-size:12px;
       margin-top:10px;
     }
 
     .infoBox{
-      border:1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
-      background:color-mix(in srgb, var(--accent) 10%, var(--card));
+      border:1px solid color-mix(in srgb, var(--accent2) 40%, var(--line));
+      background:color-mix(in srgb, var(--accent2) 8%, var(--card));
       padding:10px 12px;
       border-radius:12px;
-      color:color-mix(in srgb, var(--fg) 92%, var(--muted));
+      color:#fff3f6;
       font-size:12px;
       margin-top:10px;
     }
@@ -324,9 +327,9 @@
       align-items:center;
       gap:6px;
       font-size:12px;
-      color:#dbeafe;
-      border:1px solid rgba(96,165,250,.28);
-      background:rgba(59,130,246,.12);
+      color:#fff1f4;
+      border:1px solid rgba(239,71,111,.28);
+      background:rgba(185,28,60,.18);
       border-radius:999px;
       padding:5px 9px;
     }
@@ -337,8 +340,49 @@
       flex-wrap:wrap;
     }
 
-    .rightText{ text-align:right; }
-    .mono{ font-variant-numeric:tabular-nums; }
+    .alertGrid{
+      display:grid;
+      gap:10px;
+    }
+
+    @media(min-width:760px){
+      .alertGrid.two{grid-template-columns:1fr 1fr;}
+    }
+
+    .alertItem{
+      border:1px solid rgba(239,71,111,.28);
+      background:rgba(185,28,60,.10);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .alertTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:6px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:5px 9px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .badge.today{ background:#dc2626; color:#fff; }
+    .badge.tomorrow{ background:#f59e0b; color:#111827; }
+    .badge.soon{ background:#b91c3c; color:#fff; }
+    .badge.later{ background:#4a1423; color:#fff; border:1px solid var(--line); }
+
+    .rightText{text-align:right;}
+    .mono{font-variant-numeric:tabular-nums;}
 
     @media(max-width:640px){
       table{ min-width:680px; }
@@ -350,10 +394,10 @@
   <header>
     <div class="title">
       <h1>Gastos</h1>
-      <div class="sub">Control personal • Offline • Sin datos sensibles</div>
+      <div class="sub">Control personal • Offline • Alertas de pago</div>
     </div>
     <div class="topRight">
-      <div class="versionBadge" id="versionText">v4.1</div>
+      <div class="versionBadge" id="versionText">v4.2</div>
       <div class="pill" id="fechaHoy">—</div>
     </div>
   </header>
@@ -373,9 +417,9 @@
   </nav>
 
 <script>
-  const APP_VERSION = "v4.1";
-  const KEY = "app_gastos_final_v41";
-  const LEGACY_KEYS = ["app_gastos_final_v4", "app_gastos_final_v3"];
+  const APP_VERSION = "v4.2";
+  const KEY = "app_gastos_final_v42";
+  const LEGACY_KEYS = ["app_gastos_final_v41","app_gastos_final_v4","app_gastos_final_v3"];
 
   const emptyState = {
     cards: [],
@@ -429,7 +473,6 @@
 
   function parseMoney(v){
     let s = String(v ?? "").trim();
-
     if(!s) return NaN;
 
     s = s.replace(/\s+/g, "");
@@ -790,6 +833,104 @@
       .reduce((s,e)=>s+Number(e.amount||0),0);
   }
 
+  function getNextPaymentDate(card){
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const y = today.getFullYear();
+    const m = today.getMonth();
+    const payDay = Number(card.payDay || 1);
+
+    let target;
+    const dayThisMonth = clampDay(y, m, payDay);
+
+    if(today.getDate() <= dayThisMonth){
+      target = new Date(y, m, dayThisMonth);
+    } else {
+      const nextMonth = new Date(y, m + 1, 1);
+      target = new Date(
+        nextMonth.getFullYear(),
+        nextMonth.getMonth(),
+        clampDay(nextMonth.getFullYear(), nextMonth.getMonth(), payDay)
+      );
+    }
+
+    return target;
+  }
+
+  function daysUntil(dateObj){
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const target = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+    return Math.round((target - start) / 86400000);
+  }
+
+  function paymentBadgeClass(days){
+    if(days <= 0) return "today";
+    if(days === 1) return "tomorrow";
+    if(days <= 7) return "soon";
+    return "later";
+  }
+
+  function paymentBadgeText(days){
+    if(days <= 0) return "Hoy";
+    if(days === 1) return "Mañana";
+    if(days <= 7) return `En ${days} días`;
+    return `En ${days} días`;
+  }
+
+  function getUpcomingPayments(){
+    return state.cards
+      .map(card=>{
+        const nextDate = getNextPaymentDate(card);
+        const debt = getCardDebt(card.id);
+        const cycle = cardTotals(card.id).cycleTotal;
+        return {
+          card,
+          debt,
+          cycle,
+          nextDate,
+          nextDateISO: isoFromDate(nextDate),
+          daysLeft: daysUntil(nextDate)
+        };
+      })
+      .filter(x=>x.debt > 0)
+      .sort((a,b)=>{
+        if(a.daysLeft !== b.daysLeft) return a.daysLeft - b.daysLeft;
+        return b.debt - a.debt;
+      });
+  }
+
+  function renderUpcomingPaymentsBlock(list, emptyText = "No tienes pagos pendientes por ahora."){
+    if(!list.length){
+      return `<div class="okBox">${esc(emptyText)}</div>`;
+    }
+
+    return `
+      <div class="alertGrid two">
+        ${list.map(item=>`
+          <div class="alertItem">
+            <div class="alertTop">
+              <strong>${esc(item.card.name)}</strong>
+              <span class="badge ${paymentBadgeClass(item.daysLeft)}">${paymentBadgeText(item.daysLeft)}</span>
+            </div>
+            <div class="note">Fecha de pago: <b>${esc(item.nextDateISO)}</b> • Día ${item.card.payDay}</div>
+            <div style="height:6px"></div>
+            <div class="row two">
+              <div class="k">
+                <div class="t">Deuda actual</div>
+                <div class="v">${fmt(item.debt)}</div>
+              </div>
+              <div class="k">
+                <div class="t">Monto del ciclo</div>
+                <div class="v">${fmt(item.cycle)}</div>
+              </div>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
   function render(){
     document.getElementById("versionText").textContent = APP_VERSION;
     renderTarjetas();
@@ -844,8 +985,20 @@
   function renderTarjetas(){
     const el = document.getElementById("vTarjetas");
     const editingCard = state.cards.find(c => c.id === ui.editingCardId) || null;
+    const upcoming = getUpcomingPayments();
+    const urgent = upcoming.filter(x=>x.daysLeft <= 7);
 
     el.innerHTML = `
+      <div class="card">
+        <h3 class="sectionTitle">Alertas de pago</h3>
+        <div class="note">Aquí verás las tarjetas con deuda y su próxima fecha de pago.</div>
+        <div style="height:10px"></div>
+        ${renderUpcomingPaymentsBlock(
+          urgent.length ? urgent : upcoming.slice(0, 4),
+          "No tienes pagos urgentes durante los próximos 7 días."
+        )}
+      </div>
+
       <div class="card">
         <div class="toolbar">
           <div class="left">
@@ -909,9 +1062,8 @@
                   <th>Tarjeta</th>
                   <th>Corte</th>
                   <th>Pago</th>
+                  <th>Próximo pago</th>
                   <th>Saldo total</th>
-                  <th>Total comprado</th>
-                  <th>Total pagado</th>
                   <th>Deuda actual</th>
                   <th>Disponible</th>
                   <th>Monto del ciclo</th>
@@ -921,14 +1073,18 @@
               <tbody>
                 ${state.cards.map(card=>{
                   const t = cardTotals(card.id);
+                  const nextDate = getNextPaymentDate(card);
+                  const dLeft = daysUntil(nextDate);
                   return `
                     <tr>
                       <td>${esc(card.name)}</td>
                       <td>Día ${card.cutDay}</td>
                       <td>Día ${card.payDay}</td>
+                      <td>
+                        <div>${isoFromDate(nextDate)}</div>
+                        <div class="note">${paymentBadgeText(dLeft)}</div>
+                      </td>
                       <td>${fmt(card.creditLimit)}</td>
-                      <td>${fmt(t.totalPurchases)}</td>
-                      <td>${fmt(t.totalPayments)}</td>
                       <td>${fmt(t.currentDebt)}</td>
                       <td>${fmt(t.available)}</td>
                       <td>${fmt(t.cycleTotal)}</td>
@@ -1741,6 +1897,7 @@
 
     const incomesMonth = state.incomes.filter(i=>monthKey(i.date) === selectedMonth);
     const expensesMonth = state.expenses.filter(e=>monthKey(e.date) === selectedMonth);
+    const upcoming = getUpcomingPayments();
 
     const totalIncome = incomesMonth.reduce((s,i)=>s+Number(i.amount||0),0);
 
@@ -1777,6 +1934,13 @@
     });
 
     el.innerHTML = `
+      <div class="card">
+        <h3 class="sectionTitle">Alertas de pago</h3>
+        <div class="note">Estas alertas se calculan con la fecha de pago de cada tarjeta y tu deuda actual.</div>
+        <div style="height:10px"></div>
+        ${renderUpcomingPaymentsBlock(upcoming.slice(0, 6))}
+      </div>
+
       <div class="card">
         <h3 class="sectionTitle">Resumen mensual</h3>
 
