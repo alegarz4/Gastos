@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Gastos v4.0</title>
+  <title>Gastos v4.1</title>
   <meta name="theme-color" content="#0b1220" />
   <style>
     :root{
@@ -25,7 +25,6 @@
     }
 
     *{ box-sizing:border-box; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
-
     html{ scroll-behavior:smooth; }
 
     body{
@@ -40,6 +39,7 @@
 
     header{
       position:sticky; top:0; z-index:20;
+      background:#0b1220;
       background:color-mix(in srgb, var(--bg) 86%, transparent);
       backdrop-filter:blur(10px) saturate(160%);
       border-bottom:1px solid var(--line);
@@ -55,6 +55,7 @@
     h1{margin:0; font-size:18px; letter-spacing:.2px;}
     .sub{font-size:12px; color:var(--muted);}
     .topRight{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+
     .pill{
       font-size:12px; color:var(--muted);
       border:1px solid var(--line);
@@ -63,6 +64,7 @@
       white-space:nowrap;
       background:#0f172a;
     }
+
     .versionBadge{
       font-size:12px;
       color:#dbeafe;
@@ -80,6 +82,7 @@
     }
 
     .card{
+      background:#121a2c;
       background:color-mix(in srgb, var(--card) 92%, rgba(59,130,246,.06));
       border:1px solid var(--line);
       border-radius:var(--r);
@@ -135,6 +138,7 @@
       color:#fff;
       background:var(--accent);
     }
+
     button.secondary{background:var(--soft); border:1px solid var(--line);}
     button.good{background:var(--good);}
     button.danger{background:var(--danger);}
@@ -152,6 +156,7 @@
       grid-template-columns:1fr 1fr;
       gap:10px;
     }
+
     @media(min-width:760px){
       .kpi.four{grid-template-columns:repeat(4,1fr);}
       .kpi.five{grid-template-columns:repeat(5,1fr);}
@@ -164,12 +169,15 @@
       border:1px solid var(--line);
       background:#0f172a;
     }
+
     .k .t{font-size:12px; color:var(--muted);}
     .k .v{font-size:18px; font-weight:900; margin-top:6px;}
+
     .k.negative{
       border-color:rgba(239,68,68,.45);
       background:color-mix(in srgb, var(--danger) 12%, #0f172a);
     }
+
     .k.positive{
       border-color:rgba(34,197,94,.45);
       background:color-mix(in srgb, var(--good) 10%, #0f172a);
@@ -184,6 +192,7 @@
       height:var(--navH);
       padding:10px 10px calc(10px + env(safe-area-inset-bottom));
       border-top:1px solid var(--line);
+      background:#0b1220;
       background:color-mix(in srgb, var(--bg) 86%, transparent);
       backdrop-filter:blur(10px) saturate(160%);
       display:flex;
@@ -224,7 +233,7 @@
     table{
       width:100%;
       border-collapse:collapse;
-      min-width:780px;
+      min-width:760px;
       background:transparent;
     }
 
@@ -238,6 +247,7 @@
     th{
       color:var(--muted);
       text-align:left;
+      background:#172033;
       background:color-mix(in srgb, var(--card) 60%, var(--line));
       position:sticky;
       top:0;
@@ -305,9 +315,7 @@
       align-items:center;
     }
 
-    .searchInput{
-      min-width:220px;
-    }
+    .searchInput{ min-width:220px; }
 
     .muted{
       color:var(--muted);
@@ -332,12 +340,12 @@
       flex-wrap:wrap;
     }
 
-    .rightText{
-      text-align:right;
-    }
+    .rightText{ text-align:right; }
+    .mono{ font-variant-numeric:tabular-nums; }
 
-    .mono{
-      font-variant-numeric:tabular-nums;
+    @media(max-width:640px){
+      table{ min-width:680px; }
+      .tab{ min-width:110px; }
     }
   </style>
 </head>
@@ -348,7 +356,7 @@
       <div class="sub">Control personal • Offline • Sin datos sensibles</div>
     </div>
     <div class="topRight">
-      <div class="versionBadge" id="versionText">v4.0</div>
+      <div class="versionBadge" id="versionText">v4.1</div>
       <div class="pill" id="fechaHoy">—</div>
     </div>
   </header>
@@ -368,9 +376,9 @@
   </nav>
 
 <script>
-  const APP_VERSION = "v4.0";
-  const KEY = "app_gastos_final_v4";
-  const LEGACY_KEYS = ["app_gastos_final_v3"];
+  const APP_VERSION = "v4.1";
+  const KEY = "app_gastos_final_v41";
+  const LEGACY_KEYS = ["app_gastos_final_v4", "app_gastos_final_v3"];
 
   const emptyState = {
     cards: [],
@@ -378,33 +386,92 @@
     expenses: []
   };
 
-  function loadState(){
-    let current = localStorage.getItem(KEY);
-    if(current){
-      try{
-        const parsed = JSON.parse(current);
-        return normalizeState(parsed);
-      }catch{
-        return structuredCloneSafe(emptyState);
-      }
-    }
-
-    for(const oldKey of LEGACY_KEYS){
-      const legacy = localStorage.getItem(oldKey);
-      if(legacy){
-        try{
-          const parsed = JSON.parse(legacy);
-          const normalized = normalizeState(parsed);
-          localStorage.setItem(KEY, JSON.stringify(normalized));
-          return normalized;
-        }catch{}
-      }
-    }
-    return structuredCloneSafe(emptyState);
-  }
-
   function structuredCloneSafe(obj){
     return JSON.parse(JSON.stringify(obj));
+  }
+
+  function pad2(n){
+    return String(n).padStart(2,"0");
+  }
+
+  function todayISO(){
+    const d = new Date();
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  }
+
+  function uid(){
+    return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random();
+  }
+
+  function validISO(v){
+    return /^\d{4}-\d{2}-\d{2}$/.test(String(v || ""));
+  }
+
+  function monthKey(iso){
+    return String(iso || "").slice(0,7);
+  }
+
+  function esc(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;");
+  }
+
+  function normalizeText(v){
+    return String(v ?? "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+  }
+
+  function includesText(...values){
+    return normalizeText(values.join(" "));
+  }
+
+  function parseMoney(v){
+    let s = String(v ?? "").trim();
+
+    if(!s) return NaN;
+
+    s = s.replace(/\s+/g, "");
+    s = s.replace(/[^\d,.-]/g, "");
+
+    const hasComma = s.includes(",");
+    const hasDot = s.includes(".");
+
+    if(hasComma && hasDot){
+      if(s.lastIndexOf(",") > s.lastIndexOf(".")){
+        s = s.replace(/\./g, "");
+        s = s.replace(",", ".");
+      } else {
+        s = s.replace(/,/g, "");
+      }
+    } else if(hasComma && !hasDot){
+      s = s.replace(",", ".");
+    }
+
+    s = s.replace(/(?!^)-/g, "");
+
+    const x = Number(s);
+    return Number.isFinite(x) ? x : NaN;
+  }
+
+  function fmt(n){
+    return new Intl.NumberFormat("es-MX", {
+      style:"currency",
+      currency:"MXN"
+    }).format(Number(n || 0));
+  }
+
+  function isoFromDate(d){
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  }
+
+  function clampDay(year, monthIndex, day){
+    const last = new Date(year, monthIndex + 1, 0).getDate();
+    return Math.min(day, last);
   }
 
   function normalizeState(raw){
@@ -452,6 +519,30 @@
     return state;
   }
 
+  function loadState(){
+    const current = localStorage.getItem(KEY);
+    if(current){
+      try{
+        return normalizeState(JSON.parse(current));
+      }catch{
+        return structuredCloneSafe(emptyState);
+      }
+    }
+
+    for(const oldKey of LEGACY_KEYS){
+      const legacy = localStorage.getItem(oldKey);
+      if(legacy){
+        try{
+          const normalized = normalizeState(JSON.parse(legacy));
+          localStorage.setItem(KEY, JSON.stringify(normalized));
+          return normalized;
+        }catch{}
+      }
+    }
+
+    return structuredCloneSafe(emptyState);
+  }
+
   const state = loadState();
 
   const INCOME_TYPES = [
@@ -490,54 +581,87 @@
     editingExpenseId: null
   };
 
+  const TAB_TO_VIEW = {
+    Tarjetas: "vTarjetas",
+    Ingresos: "vIngresos",
+    Egresos: "vEgresos",
+    Resumen: "vResumen"
+  };
+
   function save(){
     localStorage.setItem(KEY, JSON.stringify(state));
-  }
-
-  const fmt = (n)=> new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(Number(n||0));
-  const pad2 = (n)=> String(n).padStart(2,"0");
-
-  function todayISO(){
-    const d = new Date();
-    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-  }
-
-  function monthKey(iso){
-    return (iso || "").slice(0,7);
-  }
-
-  function parseMoney(v){
-    const x = Number(String(v).replace(/[^0-9.]/g,""));
-    return Number.isFinite(x) ? x : NaN;
-  }
-
-  function uid(){
-    return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random();
-  }
-
-  function validISO(v){
-    return /^\d{4}-\d{2}-\d{2}$/.test(String(v || ""));
   }
 
   function cardName(id){
     return state.cards.find(c=>c.id===id)?.name || "—";
   }
 
-  function esc(s){
-    return String(s ?? "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;");
+  function sumNominaIncomesForMonth(month, ignoreIncomeId = null){
+    return state.incomes
+      .filter(i =>
+        monthKey(i.date) === month &&
+        i.type === "Nómina" &&
+        i.id !== ignoreIncomeId
+      )
+      .reduce((s,i)=>s + Number(i.amount || 0), 0);
   }
 
-  function isoFromDate(d){
-    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  function sumNominaPaymentsForMonth(month, ignoreExpenseId = null){
+    return state.expenses
+      .filter(e =>
+        monthKey(e.date) === month &&
+        e.mode === "payment" &&
+        e.sourceIncomeType === "Nómina" &&
+        e.id !== ignoreExpenseId
+      )
+      .reduce((s,e)=>s + Number(e.amount || 0), 0);
   }
 
-  function clampDay(year, monthIndex, day){
-    const last = new Date(year, monthIndex + 1, 0).getDate();
-    return Math.min(day, last);
+  function getNominaDisponibleMonth(selectedMonth, ignoreExpenseId = null){
+    const total = sumNominaIncomesForMonth(selectedMonth);
+    const used = sumNominaPaymentsForMonth(selectedMonth, ignoreExpenseId);
+    return Math.max(0, total - used);
   }
+
+  function wouldIncomeChangeBreakNominaRules({ originalIncomeId = null, newType, newDate, newAmount }){
+    const original = originalIncomeId
+      ? state.incomes.find(i => i.id === originalIncomeId)
+      : null;
+
+    const monthsToCheck = new Set();
+    if(original && original.type === "Nómina") monthsToCheck.add(monthKey(original.date));
+    if(newType === "Nómina") monthsToCheck.add(monthKey(newDate));
+
+    for(const month of monthsToCheck){
+      const baseNomina = sumNominaIncomesForMonth(month, originalIncomeId);
+
+      let simulatedNomina = baseNomina;
+      if(newType === "Nómina" && monthKey(newDate) === month){
+        simulatedNomina += Number(newAmount || 0);
+      }
+
+      const usedNomina = sumNominaPaymentsForMonth(month);
+      if(usedNomina > simulatedNomina){
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function setTab(name){
+    ui.activeTab = name;
+    document.querySelectorAll(".tab").forEach(t=>{
+      t.classList.toggle("active", t.dataset.tab === name);
+    });
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.getElementById(TAB_TO_VIEW[name]).classList.add("active");
+    render();
+  }
+
+  document.querySelectorAll(".tab").forEach(tab=>{
+    tab.addEventListener("click", ()=> setTab(tab.dataset.tab));
+  });
 
   function getCurrentCycle(card){
     const now = new Date();
@@ -669,44 +793,6 @@
       .reduce((s,e)=>s+Number(e.amount||0),0);
   }
 
-  function getNominaDisponibleMonth(selectedMonth, ignoreExpenseId = null){
-    const total = getNominaTotalMonth(selectedMonth);
-    const used = state.expenses
-      .filter(e =>
-        monthKey(e.date) === selectedMonth &&
-        e.mode === "payment" &&
-        e.sourceIncomeType === "Nómina" &&
-        e.id !== ignoreExpenseId
-      )
-      .reduce((s,e)=>s+Number(e.amount||0),0);
-    return Math.max(0, total - used);
-  }
-
-  function includesText(...values){
-    return values.join(" ").toLowerCase();
-  }
-
-  const TAB_TO_VIEW = {
-    Tarjetas: "vTarjetas",
-    Ingresos: "vIngresos",
-    Egresos: "vEgresos",
-    Resumen: "vResumen"
-  };
-
-  function setTab(name){
-    ui.activeTab = name;
-    document.querySelectorAll(".tab").forEach(t=>{
-      t.classList.toggle("active", t.dataset.tab === name);
-    });
-    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-    document.getElementById(TAB_TO_VIEW[name]).classList.add("active");
-    render();
-  }
-
-  document.querySelectorAll(".tab").forEach(tab=>{
-    tab.addEventListener("click", ()=> setTab(tab.dataset.tab));
-  });
-
   function render(){
     document.getElementById("versionText").textContent = APP_VERSION;
     renderTarjetas();
@@ -723,6 +809,7 @@
       exportedAt: new Date().toISOString(),
       data: state
     };
+
     const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -738,12 +825,15 @@
       try{
         const parsed = JSON.parse(reader.result);
         const imported = normalizeState(parsed.data || parsed);
+
         state.cards = imported.cards;
         state.incomes = imported.incomes;
         state.expenses = imported.expenses;
+
         ui.editingCardId = null;
         ui.editingIncomeId = null;
         ui.editingExpenseId = null;
+
         save();
         render();
         alert("Respaldo importado correctamente.");
@@ -866,6 +956,7 @@
     `;
 
     el.querySelector("#btnExportJson").onclick = exportBackup;
+
     el.querySelector("#importFile").onchange = (ev)=>{
       const file = ev.target.files?.[0];
       if(file) importBackup(file);
@@ -879,9 +970,15 @@
       const creditLimit = parseMoney(el.querySelector("#cLimit").value);
 
       if(!name) return alert("Escribe el nombre de la tarjeta.");
-      if(!(cutDay>=1 && cutDay<=31)) return alert("Fecha de corte inválida.");
-      if(!(payDay>=1 && payDay<=31)) return alert("Fecha de pago inválida.");
+      if(!(cutDay >= 1 && cutDay <= 31)) return alert("Fecha de corte inválida.");
+      if(!(payDay >= 1 && payDay <= 31)) return alert("Fecha de pago inválida.");
       if(!Number.isFinite(creditLimit) || creditLimit <= 0) return alert("Saldo total inválido.");
+
+      const duplicate = state.cards.some(c =>
+        normalizeText(c.name) === normalizeText(name) &&
+        c.id !== ui.editingCardId
+      );
+      if(duplicate) return alert("Ya existe una tarjeta con ese nombre.");
 
       if(ui.editingCardId){
         const i = state.cards.findIndex(c=>c.id===ui.editingCardId);
@@ -927,9 +1024,11 @@
       btn.onclick = ()=>{
         const id = btn.getAttribute("data-delcard");
         const hasLinkedExpenses = state.expenses.some(e=>e.cardId === id);
+
         if(hasLinkedExpenses){
           return alert("No puedes eliminar esta tarjeta porque tiene egresos ligados. Elimina primero esos movimientos.");
         }
+
         if(confirm("¿Eliminar esta tarjeta?")){
           state.cards = state.cards.filter(c=>c.id !== id);
           if(ui.editingCardId === id) ui.editingCardId = null;
@@ -949,10 +1048,10 @@
 
   function renderIngresos(){
     const el = document.getElementById("vIngresos");
-    const selectedMonth = (document.getElementById("inMonth")?.value) || monthKey(todayISO());
-    const selectedType = (document.getElementById("inFilterType")?.value) || "__all__";
-    const selectedFortnight = (document.getElementById("inFilterQ")?.value) || "__all__";
-    const search = ui.incomeSearch.trim().toLowerCase();
+    const selectedMonth = document.getElementById("inMonth")?.value || monthKey(todayISO());
+    const selectedType = document.getElementById("inFilterType")?.value || "__all__";
+    const selectedFortnight = document.getElementById("inFilterQ")?.value || "__all__";
+    const search = normalizeText(ui.incomeSearch);
     const editingIncome = state.incomes.find(i => i.id === ui.editingIncomeId) || null;
 
     const filtered = state.incomes.filter(i=>{
@@ -1139,6 +1238,17 @@
       if(!date) return alert("Selecciona una fecha.");
       if(!Number.isFinite(amount) || amount <= 0) return alert("Monto inválido.");
 
+      const breaksNomina = wouldIncomeChangeBreakNominaRules({
+        originalIncomeId: ui.editingIncomeId,
+        newType: type,
+        newDate: date,
+        newAmount: amount
+      });
+
+      if(breaksNomina){
+        return alert("Ese cambio dejaría pagos de tarjeta con origen Nómina sin respaldo suficiente en uno o más meses.");
+      }
+
       if(ui.editingIncomeId){
         const idx = state.incomes.findIndex(x=>x.id===ui.editingIncomeId);
         if(idx >= 0){
@@ -1191,15 +1301,13 @@
     el.querySelectorAll("[data-delincome]").forEach(btn=>{
       btn.onclick = ()=>{
         const id = btn.getAttribute("data-delincome");
-
         const income = state.incomes.find(x=>x.id===id);
-        const isNomina = income?.type === "Nómina";
-        if(isNomina){
+
+        if(income?.type === "Nómina"){
           const selectedM = monthKey(income.date);
-          const totalNominaAfterDelete = state.incomes
-            .filter(i=>i.id !== id && monthKey(i.date) === selectedM && i.type === "Nómina")
-            .reduce((s,i)=>s+Number(i.amount||0),0);
-          const nominaUsed = getCardPaymentsFromNomina(selectedM);
+          const totalNominaAfterDelete = sumNominaIncomesForMonth(selectedM, id);
+          const nominaUsed = sumNominaPaymentsForMonth(selectedM);
+
           if(nominaUsed > totalNominaAfterDelete){
             return alert("No puedes eliminar este ingreso de nómina porque dejaría pagos de tarjeta sin respaldo de nómina en ese mes.");
           }
@@ -1217,10 +1325,10 @@
 
   function renderEgresos(){
     const el = document.getElementById("vEgresos");
-    const selectedMonth = (document.getElementById("egMonth")?.value) || monthKey(todayISO());
-    const selectedCard = (document.getElementById("egFilterCard")?.value) || "__all__";
-    const selectedType = (document.getElementById("egFilterType")?.value) || "__all__";
-    const search = ui.expenseSearch.trim().toLowerCase();
+    const selectedMonth = document.getElementById("egMonth")?.value || monthKey(todayISO());
+    const selectedCard = document.getElementById("egFilterCard")?.value || "__all__";
+    const selectedType = document.getElementById("egFilterType")?.value || "__all__";
+    const search = normalizeText(ui.expenseSearch);
     const editingExpense = state.expenses.find(e => e.id === ui.editingExpenseId) || null;
 
     const filtered = state.expenses.filter(e=>{
@@ -1491,6 +1599,7 @@
             .reduce((s,e)=>s+Number(e.amount||0),0);
 
         const simulatedDebt = Math.max(0, currentPurchaseTotalExcludingEdited + amount - currentPaymentTotalExcludingEdited);
+
         if(simulatedDebt > Number(card.creditLimit || 0)){
           return alert("Esa compra supera el saldo disponible actual de la tarjeta.");
         }
@@ -1540,6 +1649,7 @@
           .reduce((s,e)=>s+Number(e.amount||0),0);
 
         const simulatedDebt = Math.max(0, simulatedPurchases - simulatedPayments);
+
         if(amount > simulatedDebt){
           return alert("El pago no puede ser mayor que la deuda actual de la tarjeta.");
         }
@@ -1547,6 +1657,7 @@
         if(sourceIncomeType === "Nómina"){
           const selectedM = monthKey(date);
           const nominaDisponible = getNominaDisponibleMonth(selectedM, ui.editingExpenseId);
+
           if(amount > nominaDisponible){
             return alert("Ese pago supera la nómina disponible del mes.");
           }
@@ -1616,6 +1727,7 @@
     el.querySelectorAll("[data-delexpense]").forEach(btn=>{
       btn.onclick = ()=>{
         const id = btn.getAttribute("data-delexpense");
+
         if(confirm("¿Eliminar este egreso?")){
           state.expenses = state.expenses.filter(x=>x.id !== id);
           if(ui.editingExpenseId === id) ui.editingExpenseId = null;
@@ -1628,14 +1740,20 @@
 
   function renderResumen(){
     const el = document.getElementById("vResumen");
-    const selectedMonth = (document.getElementById("rMonth")?.value) || monthKey(todayISO());
+    const selectedMonth = document.getElementById("rMonth")?.value || monthKey(todayISO());
 
     const incomesMonth = state.incomes.filter(i=>monthKey(i.date) === selectedMonth);
     const expensesMonth = state.expenses.filter(e=>monthKey(e.date) === selectedMonth);
 
     const totalIncome = incomesMonth.reduce((s,i)=>s+Number(i.amount||0),0);
-    const totalExpense = expensesMonth.reduce((s,e)=>s+Number(e.amount||0),0);
-    const balance = totalIncome - totalExpense;
+
+    const totalPurchasesMonth = expensesMonth
+      .filter(e=>e.mode === "purchase")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const totalPaymentsMonth = expensesMonth
+      .filter(e=>e.mode === "payment")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
 
     const totalQ1 = incomesMonth
       .filter(i=>i.fortnight==="Q1")
@@ -1649,22 +1767,17 @@
     const nominaUsada = getCardPaymentsFromNomina(selectedMonth);
     const nominaDisponible = getNominaDisponibleMonth(selectedMonth);
 
-    const totalPurchasesMonth = expensesMonth
-      .filter(e=>e.mode === "purchase")
-      .reduce((s,e)=>s+Number(e.amount||0),0);
+    const totalDebtAllCards = state.cards.reduce((s,card)=>s + getCardDebt(card.id), 0);
+    const totalAvailableAllCards = state.cards.reduce((s,card)=>s + getCardAvailable(card), 0);
 
-    const totalPaymentsMonth = expensesMonth
-      .filter(e=>e.mode === "payment")
-      .reduce((s,e)=>s+Number(e.amount||0),0);
+    const cashFlowBalance = totalIncome - totalPaymentsMonth;
 
     const expenseByCategory = {};
     for(const c of PURCHASE_CATEGORIES) expenseByCategory[c] = 0;
+
     expensesMonth.filter(e=>e.mode === "purchase").forEach(e=>{
       expenseByCategory[e.category] = (expenseByCategory[e.category] || 0) + Number(e.amount||0);
     });
-
-    const totalDebtAllCards = state.cards.reduce((s,card)=>s + getCardDebt(card.id), 0);
-    const totalAvailableAllCards = state.cards.reduce((s,card)=>s + getCardAvailable(card), 0);
 
     el.innerHTML = `
       <div class="card">
@@ -1702,7 +1815,7 @@
             <div class="v">${fmt(totalIncome)}</div>
           </div>
           <div class="k">
-            <div class="t">Compras del mes</div>
+            <div class="t">Compras con tarjeta</div>
             <div class="v">${fmt(totalPurchasesMonth)}</div>
           </div>
           <div class="k">
@@ -1726,9 +1839,9 @@
             <div class="t">Nómina disponible</div>
             <div class="v">${fmt(nominaDisponible)}</div>
           </div>
-          <div class="k ${balance < 0 ? "negative" : "positive"}">
-            <div class="t">Balance del mes</div>
-            <div class="v">${fmt(balance)}</div>
+          <div class="k ${cashFlowBalance < 0 ? "negative" : "positive"}">
+            <div class="t">Balance de flujo del mes</div>
+            <div class="v">${fmt(cashFlowBalance)}</div>
           </div>
         </div>
 
@@ -1745,9 +1858,14 @@
           </div>
         </div>
 
-        ${balance < 0
-          ? `<div class="warnBox">Tu balance del mes está en negativo. Eso significa que tus egresos del mes superan tus ingresos registrados para este periodo.</div>`
-          : `<div class="okBox">Tu balance del mes está en positivo. Vas bien mientras tus registros sean completos.</div>`
+        <div class="infoBox">
+          <b>Nota del resumen:</b> el <b>balance de flujo del mes</b> se calcula con ingresos menos <b>pagos a tarjeta</b>. 
+          Las <b>compras con tarjeta</b> se muestran aparte para no contar doble el mismo dinero.
+        </div>
+
+        ${cashFlowBalance < 0
+          ? `<div class="warnBox">Tu balance de flujo del mes está en negativo. Eso significa que tus pagos a tarjeta del mes superan tus ingresos registrados para este periodo.</div>`
+          : `<div class="okBox">Tu balance de flujo del mes está en positivo. Vas bien mientras tus registros sean completos.</div>`
         }
       </div>
 
