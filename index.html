@@ -1,543 +1,680 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gastos</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Gastos</title>
+  <meta name="theme-color" content="#0b1220" />
 
-<style>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#121a2c;
+      --fg:#e8f0ff;
+      --muted:#93a4c7;
+      --line:#1f2a40;
+      --accent:#3b82f6;
+      --good:#22c55e;
+      --danger:#ef4444;
+      --soft:#1b2740;
+      --r:16px;
+      --navH:72px;
+    }
 
-:root{
---bg:#0b1220;
---card:#121a2c;
---text:#e8f0ff;
---muted:#93a4c7;
---line:#1f2a40;
---accent:#3b82f6;
---good:#22c55e;
---danger:#ef4444;
---radius:14px;
---navH:70px;
-}
+    *{ box-sizing:border-box; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; }
+    body{
+      margin:0;
+      color:var(--fg);
+      background:
+        radial-gradient(900px 500px at 15% -10%, rgba(59,130,246,.18), transparent 55%),
+        radial-gradient(900px 500px at 90% 0%, rgba(34,197,94,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg), #0e1628);
+    }
 
-*{box-sizing:border-box;font-family:system-ui;}
+    header{
+      position: sticky; top:0; z-index: 10;
+      background: color-mix(in srgb, var(--bg) 86%, transparent);
+      backdrop-filter: blur(10px) saturate(160%);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
 
-body{
-margin:0;
-background:linear-gradient(180deg,#0b1220,#0e1628);
-color:var(--text);
-}
+    .title{display:flex; flex-direction:column; gap:2px;}
+    h1{margin:0; font-size:18px; letter-spacing:.2px;}
+    .sub{font-size:12px; color:var(--muted);}
+    .pill{
+      font-size:12px; color:var(--muted);
+      border:1px solid var(--line);
+      padding:6px 10px; border-radius:999px;
+      white-space:nowrap;
+    }
 
-header{
-padding:14px;
-border-bottom:1px solid var(--line);
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
+    main{
+      padding: 14px 14px calc(var(--navH) + 18px);
+      max-width: 980px;
+      margin: 0 auto;
+    }
 
-h1{
-margin:0;
-font-size:18px;
-}
+    .card{
+      background: color-mix(in srgb, var(--card) 92%, rgba(59,130,246,.06));
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      padding: 14px;
+      box-shadow: 0 12px 28px rgba(0,0,0,.25);
+      margin-bottom: 12px;
+    }
 
-.small{
-font-size:12px;
-color:var(--muted);
-}
+    .row{ display:grid; gap:10px; }
+    @media(min-width:560px){ .row.two{ grid-template-columns:1fr 1fr; } }
 
-.wrap{
-padding:14px;
-}
+    label{ font-size:12px; color: var(--muted); display:block; margin-bottom:6px; }
+    input, select, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0f172a;
+      color: var(--fg);
+      outline: none;
+    }
+    textarea{ min-height: 70px; resize: vertical; }
 
-.card{
-background:var(--card);
-border:1px solid var(--line);
-border-radius:var(--radius);
-padding:14px;
-margin-bottom:14px;
-}
+    .btns{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;}
+    button{
+      border:0;
+      border-radius: 12px;
+      padding:10px 12px;
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+      background: var(--accent);
+    }
+    button.secondary{ background: var(--soft); border:1px solid var(--line); }
+    button.good{ background: var(--good); }
+    button.danger{ background: var(--danger); }
+    button:active{ transform: translateY(1px); }
 
-label{
-font-size:12px;
-color:var(--muted);
-}
+    .kpi{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .k{
+      padding:12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background:#0f172a;
+    }
+    .k .t{ font-size:12px; color:var(--muted); }
+    .k .v{ font-size:18px; font-weight: 900; margin-top:6px; }
 
-input,select,textarea{
-width:100%;
-padding:10px;
-margin-top:4px;
-border-radius:10px;
-border:1px solid var(--line);
-background:#0f172a;
-color:white;
-}
+    .view{ display:none; }
+    .view.active{ display:block; }
 
-textarea{
-min-height:70px;
-}
+    .bottomNav{
+      position: fixed;
+      left:0; right:0; bottom:0;
+      height: var(--navH);
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: color-mix(in srgb, var(--bg) 86%, transparent);
+      backdrop-filter: blur(10px) saturate(160%);
+      display:flex;
+      gap:10px;
+      z-index: 20;
+    }
+    .tab{
+      flex:1;
+      border:1px solid var(--line);
+      border-radius: 14px;
+      background: var(--soft);
+      color: var(--fg);
+      font-weight: 900;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .tab.active{
+      background: linear-gradient(135deg, rgba(59,130,246,.85), rgba(34,197,94,.18));
+      border-color: color-mix(in srgb, var(--accent) 60%, var(--line));
+    }
 
-.row{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-}
+    table{ width:100%; border-collapse: collapse; overflow:hidden; border-radius: 14px; border:1px solid var(--line); }
+    th,td{ padding:10px; border-bottom:1px solid var(--line); font-size:13px; }
+    th{ color:var(--muted); text-align:left; background: color-mix(in srgb, var(--card) 60%, var(--line)); }
+    tr:last-child td{ border-bottom:0; }
 
-button{
-padding:10px 14px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-font-weight:600;
-}
+    .note{ font-size:12px; color:var(--muted); line-height:1.35; }
+    .warnBox{
+      border:1px solid color-mix(in srgb, var(--danger) 40%, var(--line));
+      background: color-mix(in srgb, var(--danger) 10%, var(--card));
+      padding:10px 12px;
+      border-radius: 12px;
+      color: color-mix(in srgb, var(--fg) 92%, var(--muted));
+      font-size:12px;
+      margin-top:10px;
+    }
 
-.btn-primary{
-background:var(--accent);
-color:white;
-}
-
-.btn-good{
-background:var(--good);
-}
-
-.btn-danger{
-background:var(--danger);
-}
-
-.btn-secondary{
-background:#2b3550;
-color:white;
-}
-
-.kpi{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-}
-
-.k{
-background:#0f172a;
-padding:10px;
-border-radius:10px;
-border:1px solid var(--line);
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-font-size:13px;
-}
-
-td,th{
-padding:8px;
-border-bottom:1px solid var(--line);
-}
-
-.bottomNav{
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-height:var(--navH);
-background:#0b1220;
-border-top:1px solid var(--line);
-display:flex;
-}
-
-.tab{
-flex:1;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:600;
-cursor:pointer;
-}
-
-.tab.active{
-background:#1e293b;
-}
-
-.view{
-display:none;
-}
-
-.view.active{
-display:block;
-}
-
-body.pwa-mobile .desktopGrid{
-display:none;
-}
-
-body.pwa-mobile .bottomNav{
-display:flex;
-}
-
-</style>
+    /* Forzar móvil cuando está instalada (PWA) */
+    body.pwa-mobile .view{ display:none; }
+    body.pwa-mobile .view.active{ display:block; }
+  </style>
 </head>
 
 <body>
+  <header>
+    <div class="title">
+      <h1>Gastos</h1>
+      <div class="sub">Control personal • Offline • Sin datos sensibles</div>
+    </div>
+    <div class="pill" id="fechaHoy">—</div>
+  </header>
 
-<header>
-<div>
-<h1>Gastos</h1>
-<div class="small">Control personal de gastos</div>
-</div>
+  <main>
+    <section id="vResumen" class="view active"></section>
+    <section id="vGastos" class="view"></section>
+    <section id="vTarjetas" class="view"></section>
+  </main>
 
-<div id="fechaHoy" class="small"></div>
-</header>
-
-<div class="wrap">
-
-<div id="viewResumen" class="view active"></div>
-<div id="viewGastos" class="view"></div>
-<div id="viewTarjetas" class="view"></div>
-
-</div>
-
-<div class="bottomNav">
-
-<div class="tab active" data-tab="Resumen">Resumen</div>
-<div class="tab" data-tab="Gastos">Gastos</div>
-<div class="tab" data-tab="Tarjetas">Tarjetas</div>
-
-</div>
+  <nav class="bottomNav">
+    <div class="tab active" data-tab="Resumen">☰ Resumen</div>
+    <div class="tab" data-tab="Gastos">＋ Gastos</div>
+    <div class="tab" data-tab="Tarjetas">▦ Tarjetas</div>
+  </nav>
 
 <script>
-
-const KEY="gastos_app";
-
-const state=JSON.parse(localStorage.getItem(KEY)) || {
-cards:[],
-expenses:[],
-income:{}
-};
-
-const categories=[
-"Comida",
-"Transporte",
-"Gasolina",
-"Super",
-"Servicios",
-"Salud",
-"Escuela",
-"Viajes",
-"Ahorro",
-"Gastos generales",
-"Entretenimiento",
-"Compras",
-"Otro"
-];
-
-function save(){
-localStorage.setItem(KEY,JSON.stringify(state));
-}
-
-function money(n){
-return new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(n||0);
-}
-
-function today(){
-return new Date().toISOString().split("T")[0];
-}
-
-document.getElementById("fechaHoy").innerText=
-new Date().toLocaleDateString("es-MX",{dateStyle:"full"});
-
-function render(){
-
-renderResumen();
-renderGastos();
-renderTarjetas();
-
-save();
-}
-
-function renderResumen(){
-
-const view=document.getElementById("viewResumen");
-
-let month=state.expenses.reduce((s,e)=>s+e.amount,0);
-
-let income=state.income["global"]||0;
-
-let disponible=income-month;
-
-let catTotals={};
-
-categories.forEach(c=>catTotals[c]=0);
-
-state.expenses.forEach(e=>{
-catTotals[e.category]+=e.amount;
-});
-
-view.innerHTML=`
-
-<div class="card">
-
-<div class="kpi">
-
-<div class="k">
-<div class="small">Total gastos</div>
-<b>${money(month)}</b>
-</div>
-
-<div class="k">
-<div class="small">Disponible</div>
-<b>${money(disponible)}</b>
-</div>
-
-</div>
-
-<br>
-
-<label>Nómina</label>
-<input id="incomeInput" placeholder="Ej 18000">
-
-<br><br>
-
-<button class="btn-good" onclick="saveIncome()">Guardar nómina</button>
-
-</div>
-
-<div class="card">
-
-<b>Gasto por categoría</b>
-
-<table>
-
-${categories.map(c=>`
-<tr>
-<td>${c}</td>
-<td>${money(catTotals[c])}</td>
-</tr>
-`).join("")}
-
-</table>
-
-</div>
-
-`;
-
-}
-
-function saveIncome(){
-let v=parseFloat(document.getElementById("incomeInput").value||0);
-state.income["global"]=v;
-render();
-}
-
-function renderGastos(){
-
-const view=document.getElementById("viewGastos");
-
-view.innerHTML=`
-
-<div class="card">
-
-<div class="row">
-
-<div>
-<label>Monto</label>
-<input id="amount">
-</div>
-
-<div>
-<label>Fecha</label>
-<input id="date" type="date" value="${today()}">
-</div>
-
-</div>
-
-<br>
-
-<div class="row">
-
-<div>
-<label>Categoría</label>
-<select id="category">
-
-${categories.map(c=>`<option>${c}</option>`).join("")}
-
-</select>
-</div>
-
-<div>
-<label>Tarjeta</label>
-<select id="card">
-
-${state.cards.map(c=>`<option value="${c.id}">${c.name}</option>`)}
-
-</select>
-</div>
-
-</div>
-
-<br>
-
-<label>Nota</label>
-<textarea id="note"></textarea>
-
-<br><br>
-
-<button class="btn-primary" onclick="addExpense()">Agregar gasto</button>
-
-</div>
-
-<div class="card">
-
-<table>
-
-<tr>
-<th>Fecha</th>
-<th>Monto</th>
-<th></th>
-</tr>
-
-${state.expenses.map(e=>`
-<tr>
-<td>${e.date}</td>
-<td>${money(e.amount)}</td>
-<td>
-<button class="btn-danger" onclick="delExpense('${e.id}')">X</button>
-</td>
-</tr>
-`).join("")}
-
-</table>
-
-</div>
-
-`;
-
-}
-
-function addExpense(){
-
-let amount=parseFloat(document.getElementById("amount").value);
-
-if(!amount)return;
-
-state.expenses.push({
-
-id:Date.now(),
-
-amount:amount,
-
-date:document.getElementById("date").value,
-
-category:document.getElementById("category").value,
-
-card:document.getElementById("card").value,
-
-note:document.getElementById("note").value
-
-});
-
-render();
-
-}
-
-function delExpense(id){
-
-state.expenses=state.expenses.filter(e=>e.id!=id);
-
-render();
-
-}
-
-function renderTarjetas(){
-
-const view=document.getElementById("viewTarjetas");
-
-view.innerHTML=`
-
-<div class="card">
-
-<label>Nombre tarjeta</label>
-<input id="cardName">
-
-<br><br>
-
-<button class="btn-primary" onclick="addCard()">Agregar tarjeta</button>
-
-</div>
-
-<div class="card">
-
-${state.cards.map(c=>`
-
-<div style="display:flex;justify-content:space-between;margin-bottom:8px">
-
-<div>${c.name}</div>
-
-<button class="btn-danger" onclick="delCard('${c.id}')">X</button>
-
-</div>
-
-`).join("")}
-
-</div>
-
-`;
-
-}
-
-function addCard(){
-
-let name=document.getElementById("cardName").value;
-
-if(!name)return;
-
-state.cards.push({
-id:Date.now(),
-name:name
-});
-
-render();
-
-}
-
-function delCard(id){
-
-state.cards=state.cards.filter(c=>c.id!=id);
-
-render();
-
-}
-
-document.querySelectorAll(".tab").forEach(t=>{
-
-t.onclick=()=>{
-
-document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
-t.classList.add("active");
-
-document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-
-document.getElementById("view"+t.dataset.tab).classList.add("active");
-
-};
-
-});
-
-function isStandalone(){
-return window.matchMedia('(display-mode: standalone)').matches 
-|| window.navigator.standalone 
-|| document.referrer.includes('android-app://');
-}
-
-function isTouch(){
-return ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-}
-
-if(isStandalone() && isTouch()){
-document.body.classList.add("pwa-mobile");
-}
-
-render();
-
+  // =========================
+  // Estado / Storage
+  // =========================
+  const KEY = "app_gastos_v1";
+  const state = JSON.parse(localStorage.getItem(KEY)) || {
+    cards: [],        // {id, name, bank, cutDay, payDay}
+    expenses: [],     // {id, amount, date, category, cardId, note}
+    incomeByMonth: {} // {"YYYY-MM": number}
+  };
+
+  const CATEGORIES = [
+    "Comida","Transporte","Gasolina","Super","Servicios","Salud","Escuela",
+    "Viajes","Ahorro","Gastos generales","Entretenimiento","Compras","Otro"
+  ];
+
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+  // =========================
+  // Utilidades
+  // =========================
+  const fmt = (n)=> new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(n||0);
+  const pad2 = (n)=> String(n).padStart(2,"0");
+  const todayISO = ()=> {
+    const d = new Date();
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  };
+  const monthKey = (iso)=> (iso||"").slice(0,7);
+  const parseMoney = (s)=>{
+    const x = Number(String(s).replace(/[^0-9.]/g,""));
+    return Number.isFinite(x) ? x : NaN;
+  };
+  const cardName = (id)=> state.cards.find(c=>c.id===id)?.name || "—";
+
+  // =========================
+  // Tabs
+  // =========================
+  function setTab(name){
+    document.querySelectorAll(".tab").forEach(t=>{
+      t.classList.toggle("active", t.dataset.tab === name);
+    });
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.getElementById(name==="Resumen" ? "vResumen" : name==="Gastos" ? "vGastos" : "vTarjetas")
+      .classList.add("active");
+
+    // Re-render al cambiar de pestaña para que “abra” la sección correcta
+    render();
+  }
+
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.addEventListener("click", ()=> setTab(t.dataset.tab));
+  });
+
+  // =========================
+  // Render
+  // =========================
+  function render(){
+    renderResumen();
+    renderGastos();
+    renderTarjetas();
+    save();
+  }
+
+  function renderResumen(){
+    const el = document.getElementById("vResumen");
+
+    const now = new Date();
+    const mk = `${now.getFullYear()}-${pad2(now.getMonth()+1)}`;
+
+    // Mes seleccionado (si el usuario lo cambia, tomamos ese)
+    const selectedMonth = (document.getElementById("filterMonth")?.value) || mk;
+    const selectedCard = (document.getElementById("filterCard")?.value) || "__all__";
+
+    const filtered = state.expenses.filter(e=>{
+      const okM = monthKey(e.date) === selectedMonth;
+      const okC = (selectedCard==="__all__") || (e.cardId === selectedCard);
+      return okM && okC;
+    });
+
+    const monthTotal = filtered.reduce((s,e)=>s+e.amount,0);
+    const allTotal = state.expenses.reduce((s,e)=>s+e.amount,0);
+
+    const income = Number(state.incomeByMonth[selectedMonth] || 0);
+    const available = income - monthTotal;
+
+    // Totales por categoría del mes
+    const catMap = new Map(CATEGORIES.map(c=>[c,0]));
+    filtered.forEach(e=>{
+      catMap.set(e.category, (catMap.get(e.category)||0) + e.amount);
+    });
+
+    const cardOptions = [
+      `<option value="__all__">Todas</option>`,
+      ...state.cards.map(c=> `<option value="${c.id}">${c.name}</option>`)
+    ].join("");
+
+    el.innerHTML = `
+      <div class="card">
+        <div class="kpi">
+          <div class="k">
+            <div class="t">Total del mes (gastos)</div>
+            <div class="v">${fmt(monthTotal)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Total general</div>
+            <div class="v">${fmt(allTotal)}</div>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="row two">
+          <div>
+            <label>Nómina del mes (ingreso)</label>
+            <input id="incomeInput" inputmode="decimal" placeholder="Ej. 18000" value="${income ? income : ""}">
+          </div>
+          <div>
+            <label>Disponible del mes (Nómina - Gastos)</label>
+            <input readonly value="${fmt(available)}">
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="good" id="btnSaveIncome">Guardar nómina del mes</button>
+          <button class="secondary" id="btnClearIncome">Borrar nómina de este mes</button>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="row two">
+          <div>
+            <label>Filtrar por mes</label>
+            <input type="month" id="filterMonth" value="${selectedMonth}">
+          </div>
+          <div>
+            <label>Filtrar por tarjeta/departamental</label>
+            <select id="filterCard">${cardOptions}</select>
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="secondary" id="btnExport">Exportar respaldo (.json)</button>
+          <button class="secondary" id="btnImport">Importar respaldo</button>
+          <input type="file" id="fileImport" accept="application/json" style="display:none">
+        </div>
+
+        ${state.cards.length ? "" : `<div class="warnBox">Aún no tienes tarjetas. Ve a <b>Tarjetas</b> para agregar una (por ejemplo: Nu, BBVA, Liverpool, Suburbia).</div>`}
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--muted)">Gasto del mes por categoría</h3>
+        <div class="note">Respeta el filtro de mes y tarjeta.</div>
+        <div style="height:10px"></div>
+
+        <table>
+          <thead><tr><th>Categoría</th><th>Total</th></tr></thead>
+          <tbody>
+            ${CATEGORIES.map(c=>`
+              <tr>
+                <td>${c}</td>
+                <td>${fmt(catMap.get(c)||0)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    // Set selected card after render
+    const fc = el.querySelector("#filterCard");
+    if (fc) fc.value = selectedCard;
+
+    // Bind events
+    el.querySelector("#btnSaveIncome").onclick = ()=>{
+      const v = parseMoney(el.querySelector("#incomeInput").value);
+      if(!Number.isFinite(v) || v < 0) return alert("Nómina inválida.");
+      state.incomeByMonth[selectedMonth] = v;
+      render();
+    };
+    el.querySelector("#btnClearIncome").onclick = ()=>{
+      if(confirm("¿Borrar nómina guardada de este mes?")){
+        delete state.incomeByMonth[selectedMonth];
+        render();
+      }
+    };
+    el.querySelector("#filterMonth").onchange = render;
+    el.querySelector("#filterCard").onchange = render;
+
+    el.querySelector("#btnExport").onclick = ()=>{
+      const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "gastos-respaldo.json";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    };
+
+    const file = el.querySelector("#fileImport");
+    el.querySelector("#btnImport").onclick = ()=> file.click();
+    file.onchange = async (ev)=>{
+      const f = ev.target.files?.[0];
+      if(!f) return;
+      try{
+        const txt = await f.text();
+        const data = JSON.parse(txt);
+        if(!data || !Array.isArray(data.cards) || !Array.isArray(data.expenses)) throw new Error("Formato inválido");
+        state.cards = data.cards || [];
+        state.expenses = data.expenses || [];
+        state.incomeByMonth = data.incomeByMonth || {};
+        render();
+        alert("Respaldo importado.");
+      }catch(e){
+        alert("No pude importar el archivo. Asegúrate que sea un respaldo válido.");
+      }finally{
+        file.value = "";
+      }
+    };
+  }
+
+  function renderGastos(){
+    const el = document.getElementById("vGastos");
+
+    el.innerHTML = `
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--muted)">Registrar gasto</h3>
+        <div class="note">Categorías son desplegables. Si no tienes tarjetas, primero agrega una en “Tarjetas”.</div>
+
+        ${state.cards.length ? "" : `<div class="warnBox">No hay tarjetas todavía. Ve a <b>Tarjetas</b> para agregar una y luego registra gastos.</div>`}
+
+        <div style="height:10px"></div>
+
+        <div class="row two">
+          <div>
+            <label>Monto</label>
+            <input id="gAmount" inputmode="decimal" placeholder="Ej. 350.50">
+          </div>
+          <div>
+            <label>Fecha</label>
+            <input id="gDate" type="date" value="${todayISO()}">
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="row two">
+          <div>
+            <label>Categoría</label>
+            <select id="gCategory">
+              ${CATEGORIES.map(c=>`<option>${c}</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <label>Tarjeta / Departamental</label>
+            <select id="gCard">
+              ${state.cards.length
+                ? state.cards.map(c=>`<option value="${c.id}">${c.name}</option>`).join("")
+                : `<option value="">Primero agrega una tarjeta</option>`
+              }
+            </select>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <label>Nota (opcional)</label>
+        <textarea id="gNote" placeholder="Ej. Gasolina / Uber / Liverpool / etc."></textarea>
+
+        <div class="btns">
+          <button id="btnAddExpense">Agregar gasto</button>
+          <button class="secondary" id="btnClearExpense">Limpiar</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--muted)">Lista de gastos</h3>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tarjeta</th>
+              <th>Categoría</th>
+              <th>Monto</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${state.expenses.length ? state.expenses
+              .slice()
+              .sort((a,b)=> (a.date < b.date ? 1 : -1))
+              .map(e=>`
+                <tr>
+                  <td>${e.date}</td>
+                  <td>${cardName(e.cardId)}</td>
+                  <td>${e.category}</td>
+                  <td>${fmt(e.amount)}</td>
+                  <td><button class="danger" data-del="${e.id}">X</button></td>
+                </tr>
+              `).join("") : `<tr><td colspan="5" class="note">Aún no hay gastos.</td></tr>`
+            }
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    // Bind
+    el.querySelector("#btnAddExpense").onclick = ()=>{
+      if(!state.cards.length){
+        alert("Primero agrega una tarjeta.");
+        setTab("Tarjetas");
+        return;
+      }
+      const amount = parseMoney(el.querySelector("#gAmount").value);
+      const date = el.querySelector("#gDate").value;
+      const category = el.querySelector("#gCategory").value;
+      const cardId = el.querySelector("#gCard").value;
+      const note = el.querySelector("#gNote").value.trim();
+
+      if(!Number.isFinite(amount) || amount<=0) return alert("Monto inválido.");
+      if(!date) return alert("Selecciona una fecha.");
+      if(!cardId) return alert("Selecciona una tarjeta.");
+
+      state.expenses.push({
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
+        amount, date, category, cardId, note
+      });
+
+      render();
+      // para registrar rápido:
+      setTab("Gastos");
+      // limpiar
+      // (se re-renderiza, pero queda limpio por default)
+    };
+
+    el.querySelector("#btnClearExpense").onclick = ()=>{
+      el.querySelector("#gAmount").value = "";
+      el.querySelector("#gNote").value = "";
+      el.querySelector("#gDate").value = todayISO();
+      el.querySelector("#gCategory").selectedIndex = 0;
+    };
+
+    el.querySelectorAll("button[data-del]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.getAttribute("data-del");
+        state.expenses = state.expenses.filter(x=>x.id !== id);
+        render();
+        setTab("Gastos");
+      };
+    });
+  }
+
+  function renderTarjetas(){
+    const el = document.getElementById("vTarjetas");
+
+    el.innerHTML = `
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--muted)">Agregar tarjeta / departamental</h3>
+        <div class="note">Ejemplos: Nu, BBVA, Santander, Liverpool, Suburbia, Coppel… (sin números).</div>
+
+        <div style="height:10px"></div>
+
+        <div class="row two">
+          <div>
+            <label>Nombre</label>
+            <input id="cName" placeholder="Ej. Liverpool / Suburbia / Nu / BBVA Azul">
+          </div>
+          <div>
+            <label>Banco/Tienda (opcional)</label>
+            <input id="cBank" placeholder="Ej. Liverpool">
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="row two">
+          <div>
+            <label>Día de corte (1–28)</label>
+            <input id="cCut" type="number" min="1" max="28" placeholder="Ej. 15">
+          </div>
+          <div>
+            <label>Día límite de pago (1–28)</label>
+            <input id="cPay" type="number" min="1" max="28" placeholder="Ej. 5">
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="good" id="btnAddCard">Guardar tarjeta</button>
+          <button class="secondary" id="btnClearCard">Limpiar</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--muted)">Mis tarjetas</h3>
+
+        ${state.cards.length ? `
+          <table>
+            <thead><tr><th>Nombre</th><th>Corte</th><th>Pago</th><th></th></tr></thead>
+            <tbody>
+              ${state.cards.map(c=>`
+                <tr>
+                  <td>${c.name}</td>
+                  <td>${c.cutDay}</td>
+                  <td>${c.payDay}</td>
+                  <td><button class="danger" data-delcard="${c.id}">X</button></td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        ` : `<div class="note">Aún no agregas tarjetas. Usa el formulario de arriba.</div>`}
+
+        <div style="height:10px"></div>
+        <button class="danger" id="btnNuke">Borrar TODO</button>
+        <div class="note" style="margin-top:8px">⚠️ Borra tarjetas, gastos y nóminas de este dispositivo.</div>
+      </div>
+    `;
+
+    // Bind
+    el.querySelector("#btnAddCard").onclick = ()=>{
+      const name = el.querySelector("#cName").value.trim();
+      const bank = el.querySelector("#cBank").value.trim();
+      const cut = Number(el.querySelector("#cCut").value);
+      const pay = Number(el.querySelector("#cPay").value);
+
+      if(!name) return alert("Pon un nombre para la tarjeta.");
+      if(!(cut>=1 && cut<=28) || !(pay>=1 && pay<=28)) return alert("Corte y pago deben ser entre 1 y 28.");
+
+      state.cards.push({
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random(),
+        name, bank, cutDay: cut, payDay: pay
+      });
+
+      render();
+      // Te mando a Gastos para que registres
+      setTab("Gastos");
+    };
+
+    el.querySelector("#btnClearCard").onclick = ()=>{
+      el.querySelector("#cName").value = "";
+      el.querySelector("#cBank").value = "";
+      el.querySelector("#cCut").value = "";
+      el.querySelector("#cPay").value = "";
+    };
+
+    el.querySelectorAll("button[data-delcard]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.getAttribute("data-delcard");
+        // Evitar borrar si hay gastos asociados: los dejamos, pero ya no tendrán nombre (—).
+        if(confirm("¿Eliminar esta tarjeta?")){
+          state.cards = state.cards.filter(c=>c.id !== id);
+          render();
+          setTab("Tarjetas");
+        }
+      };
+    });
+
+    el.querySelector("#btnNuke").onclick = ()=>{
+      if(confirm("¿Seguro? Se borrará TODO del dispositivo.")){
+        localStorage.removeItem(KEY);
+        location.reload();
+      }
+    };
+  }
+
+  // =========================
+  // PWA instalada: forzar modo móvil
+  // =========================
+  function isStandalone(){
+    return window.matchMedia("(display-mode: standalone)").matches
+      || window.navigator.standalone
+      || document.referrer.includes("android-app://");
+  }
+  function isTouch(){
+    return ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
+  }
+  if(isStandalone() && isTouch()){
+    document.body.classList.add("pwa-mobile");
+  }
+
+  // =========================
+  // Init
+  // =========================
+  document.getElementById("fechaHoy").textContent =
+    new Date().toLocaleDateString("es-MX", { dateStyle:"full" });
+
+  render();
 </script>
-
 </body>
 </html>
