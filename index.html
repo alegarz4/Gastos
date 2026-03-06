@@ -1,12 +1,1826 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Prueba GitHub Pages</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Gastos v4.0</title>
+  <meta name="theme-color" content="#0b1220" />
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#121a2c;
+      --fg:#e8f0ff;
+      --muted:#93a4c7;
+      --line:#1f2a40;
+      --accent:#3b82f6;
+      --accent2:#60a5fa;
+      --good:#22c55e;
+      --danger:#ef4444;
+      --soft:#1b2740;
+      --warn:#f59e0b;
+      --violet:#8b5cf6;
+      --r:16px;
+      --navH:82px;
+      --shadow:0 12px 28px rgba(0,0,0,.25);
+    }
+
+    *{ box-sizing:border-box; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+
+    html{ scroll-behavior:smooth; }
+
+    body{
+      margin:0;
+      color:var(--fg);
+      background:
+        radial-gradient(900px 500px at 15% -10%, rgba(59,130,246,.18), transparent 55%),
+        radial-gradient(900px 500px at 90% 0%, rgba(34,197,94,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg), #0e1628);
+      min-height:100vh;
+    }
+
+    header{
+      position:sticky; top:0; z-index:20;
+      background:color-mix(in srgb, var(--bg) 86%, transparent);
+      backdrop-filter:blur(10px) saturate(160%);
+      border-bottom:1px solid var(--line);
+      padding:12px 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .title{display:flex; flex-direction:column; gap:2px;}
+    h1{margin:0; font-size:18px; letter-spacing:.2px;}
+    .sub{font-size:12px; color:var(--muted);}
+    .topRight{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+    .pill{
+      font-size:12px; color:var(--muted);
+      border:1px solid var(--line);
+      padding:6px 10px;
+      border-radius:999px;
+      white-space:nowrap;
+      background:#0f172a;
+    }
+    .versionBadge{
+      font-size:12px;
+      color:#dbeafe;
+      border:1px solid rgba(96,165,250,.4);
+      padding:6px 10px;
+      border-radius:999px;
+      background:linear-gradient(135deg, rgba(59,130,246,.28), rgba(139,92,246,.24));
+      white-space:nowrap;
+    }
+
+    main{
+      padding:14px 14px calc(var(--navH) + 22px);
+      max-width:1120px;
+      margin:0 auto;
+    }
+
+    .card{
+      background:color-mix(in srgb, var(--card) 92%, rgba(59,130,246,.06));
+      border:1px solid var(--line);
+      border-radius:var(--r);
+      padding:14px;
+      box-shadow:var(--shadow);
+      margin-bottom:12px;
+    }
+
+    .row{display:grid; gap:10px;}
+    @media(min-width:640px){
+      .row.two{grid-template-columns:1fr 1fr;}
+      .row.three{grid-template-columns:1fr 1fr 1fr;}
+      .row.four{grid-template-columns:1fr 1fr 1fr 1fr;}
+    }
+
+    label{
+      display:block;
+      margin-bottom:6px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    input, select, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#0f172a;
+      color:var(--fg);
+      outline:none;
+    }
+
+    input:focus, select:focus, textarea:focus{
+      border-color:rgba(96,165,250,.7);
+      box-shadow:0 0 0 3px rgba(59,130,246,.15);
+    }
+
+    textarea{min-height:70px; resize:vertical;}
+
+    .btns{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    button{
+      border:0;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:800;
+      cursor:pointer;
+      color:#fff;
+      background:var(--accent);
+    }
+    button.secondary{background:var(--soft); border:1px solid var(--line);}
+    button.good{background:var(--good);}
+    button.danger{background:var(--danger);}
+    button.warn{background:var(--warn); color:#111827;}
+    button.violet{background:var(--violet);}
+    button:active{transform:translateY(1px);}
+    button.small{
+      padding:7px 10px;
+      font-size:12px;
+      border-radius:10px;
+    }
+
+    .kpi{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    @media(min-width:760px){
+      .kpi.four{grid-template-columns:repeat(4,1fr);}
+      .kpi.five{grid-template-columns:repeat(5,1fr);}
+      .kpi.six{grid-template-columns:repeat(6,1fr);}
+    }
+
+    .k{
+      padding:12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#0f172a;
+    }
+    .k .t{font-size:12px; color:var(--muted);}
+    .k .v{font-size:18px; font-weight:900; margin-top:6px;}
+    .k.negative{
+      border-color:rgba(239,68,68,.45);
+      background:color-mix(in srgb, var(--danger) 12%, #0f172a);
+    }
+    .k.positive{
+      border-color:rgba(34,197,94,.45);
+      background:color-mix(in srgb, var(--good) 10%, #0f172a);
+    }
+
+    .view{display:none;}
+    .view.active{display:block;}
+
+    .bottomNav{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      height:var(--navH);
+      padding:10px 10px calc(10px + env(safe-area-inset-bottom));
+      border-top:1px solid var(--line);
+      background:color-mix(in srgb, var(--bg) 86%, transparent);
+      backdrop-filter:blur(10px) saturate(160%);
+      display:flex;
+      gap:10px;
+      z-index:30;
+      overflow-x:auto;
+    }
+
+    .tab{
+      min-width:120px;
+      flex:1;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:var(--soft);
+      color:var(--fg);
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      white-space:nowrap;
+      padding:0 10px;
+      text-align:center;
+    }
+
+    .tab.active{
+      background:linear-gradient(135deg, rgba(59,130,246,.85), rgba(34,197,94,.18));
+      border-color:color-mix(in srgb, var(--accent) 60%, var(--line));
+    }
+
+    .tableWrap{
+      overflow:auto;
+      border-radius:14px;
+      border:1px solid var(--line);
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:780px;
+      background:transparent;
+    }
+
+    th,td{
+      padding:10px;
+      border-bottom:1px solid var(--line);
+      font-size:13px;
+      vertical-align:top;
+    }
+
+    th{
+      color:var(--muted);
+      text-align:left;
+      background:color-mix(in srgb, var(--card) 60%, var(--line));
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+
+    tr:last-child td{border-bottom:0;}
+
+    .note{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+
+    .warnBox{
+      border:1px solid color-mix(in srgb, var(--danger) 40%, var(--line));
+      background:color-mix(in srgb, var(--danger) 10%, var(--card));
+      padding:10px 12px;
+      border-radius:12px;
+      color:color-mix(in srgb, var(--fg) 92%, var(--muted));
+      font-size:12px;
+      margin-top:10px;
+    }
+
+    .okBox{
+      border:1px solid color-mix(in srgb, var(--good) 40%, var(--line));
+      background:color-mix(in srgb, var(--good) 10%, var(--card));
+      padding:10px 12px;
+      border-radius:12px;
+      color:color-mix(in srgb, var(--fg) 92%, var(--muted));
+      font-size:12px;
+      margin-top:10px;
+    }
+
+    .infoBox{
+      border:1px solid color-mix(in srgb, var(--accent) 40%, var(--line));
+      background:color-mix(in srgb, var(--accent) 10%, var(--card));
+      padding:10px 12px;
+      border-radius:12px;
+      color:color-mix(in srgb, var(--fg) 92%, var(--muted));
+      font-size:12px;
+      margin-top:10px;
+    }
+
+    .sectionTitle{
+      margin:0 0 10px;
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .hidden{ display:none !important; }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .toolbar .left, .toolbar .right{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .searchInput{
+      min-width:220px;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:12px;
+      color:#dbeafe;
+      border:1px solid rgba(96,165,250,.28);
+      background:rgba(59,130,246,.12);
+      border-radius:999px;
+      padding:5px 9px;
+    }
+
+    .actions{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+
+    .rightText{
+      text-align:right;
+    }
+
+    .mono{
+      font-variant-numeric:tabular-nums;
+    }
+  </style>
 </head>
-<body style="background:#0b1220;color:white;font-family:Arial,sans-serif;padding:30px;">
-  <h1>Prueba GitHub Pages</h1>
-  <p>Si ves esto, GitHub sí está leyendo tu index.html correcto.</p>
+<body>
+  <header>
+    <div class="title">
+      <h1>Gastos</h1>
+      <div class="sub">Control personal • Offline • Sin datos sensibles</div>
+    </div>
+    <div class="topRight">
+      <div class="versionBadge" id="versionText">v4.0</div>
+      <div class="pill" id="fechaHoy">—</div>
+    </div>
+  </header>
+
+  <main>
+    <section id="vTarjetas" class="view active"></section>
+    <section id="vIngresos" class="view"></section>
+    <section id="vEgresos" class="view"></section>
+    <section id="vResumen" class="view"></section>
+  </main>
+
+  <nav class="bottomNav">
+    <div class="tab active" data-tab="Tarjetas">▦ Tarjetas</div>
+    <div class="tab" data-tab="Ingresos">💵 Ingresos</div>
+    <div class="tab" data-tab="Egresos">－ Egresos</div>
+    <div class="tab" data-tab="Resumen">☰ Resumen</div>
+  </nav>
+
+<script>
+  const APP_VERSION = "v4.0";
+  const KEY = "app_gastos_final_v4";
+  const LEGACY_KEYS = ["app_gastos_final_v3"];
+
+  const emptyState = {
+    cards: [],
+    incomes: [],
+    expenses: []
+  };
+
+  function loadState(){
+    let current = localStorage.getItem(KEY);
+    if(current){
+      try{
+        const parsed = JSON.parse(current);
+        return normalizeState(parsed);
+      }catch{
+        return structuredCloneSafe(emptyState);
+      }
+    }
+
+    for(const oldKey of LEGACY_KEYS){
+      const legacy = localStorage.getItem(oldKey);
+      if(legacy){
+        try{
+          const parsed = JSON.parse(legacy);
+          const normalized = normalizeState(parsed);
+          localStorage.setItem(KEY, JSON.stringify(normalized));
+          return normalized;
+        }catch{}
+      }
+    }
+    return structuredCloneSafe(emptyState);
+  }
+
+  function structuredCloneSafe(obj){
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  function normalizeState(raw){
+    const base = raw || {};
+    const state = {
+      cards: Array.isArray(base.cards) ? base.cards : [],
+      incomes: Array.isArray(base.incomes) ? base.incomes : [],
+      expenses: Array.isArray(base.expenses) ? base.expenses : []
+    };
+
+    state.cards = state.cards.map(c => ({
+      id: c.id || uid(),
+      name: String(c.name || "").trim(),
+      cutDay: Number(c.cutDay || 1),
+      payDay: Number(c.payDay || 1),
+      creditLimit: Number(c.creditLimit || 0)
+    }));
+
+    state.incomes = state.incomes.map(i => ({
+      id: i.id || uid(),
+      type: String(i.type || "Otro"),
+      fortnight: i.fortnight === "Q2" ? "Q2" : "Q1",
+      amount: Number(i.amount || 0),
+      date: validISO(i.date) ? i.date : todayISO(),
+      note: String(i.note || "")
+    }));
+
+    state.expenses = state.expenses.map(e => {
+      let mode = e.mode;
+      if(!mode){
+        mode = e.category === "Pago de tarjeta de crédito" ? "payment" : "purchase";
+      }
+      return {
+        id: e.id || uid(),
+        mode,
+        category: String(e.category || (mode === "payment" ? "Pago de tarjeta de crédito" : "Otro")),
+        cardId: String(e.cardId || ""),
+        amount: Number(e.amount || 0),
+        date: validISO(e.date) ? e.date : todayISO(),
+        note: String(e.note || ""),
+        sourceIncomeType: String(e.sourceIncomeType || "")
+      };
+    });
+
+    return state;
+  }
+
+  const state = loadState();
+
+  const INCOME_TYPES = [
+    "Nómina",
+    "Préstamo",
+    "Venta",
+    "Transferencia",
+    "Devolución",
+    "Apoyo familiar",
+    "Ingreso extra",
+    "Otro"
+  ];
+
+  const PURCHASE_CATEGORIES = [
+    "Comida",
+    "Transporte",
+    "Gasolina",
+    "Super",
+    "Servicios",
+    "Salud",
+    "Escuela",
+    "Viajes",
+    "Ahorro",
+    "Gastos generales",
+    "Entretenimiento",
+    "Compras",
+    "Otro"
+  ];
+
+  const ui = {
+    activeTab: "Tarjetas",
+    incomeSearch: "",
+    expenseSearch: "",
+    editingCardId: null,
+    editingIncomeId: null,
+    editingExpenseId: null
+  };
+
+  function save(){
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+
+  const fmt = (n)=> new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(Number(n||0));
+  const pad2 = (n)=> String(n).padStart(2,"0");
+
+  function todayISO(){
+    const d = new Date();
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  }
+
+  function monthKey(iso){
+    return (iso || "").slice(0,7);
+  }
+
+  function parseMoney(v){
+    const x = Number(String(v).replace(/[^0-9.]/g,""));
+    return Number.isFinite(x) ? x : NaN;
+  }
+
+  function uid(){
+    return crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random();
+  }
+
+  function validISO(v){
+    return /^\d{4}-\d{2}-\d{2}$/.test(String(v || ""));
+  }
+
+  function cardName(id){
+    return state.cards.find(c=>c.id===id)?.name || "—";
+  }
+
+  function esc(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;");
+  }
+
+  function isoFromDate(d){
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  }
+
+  function clampDay(year, monthIndex, day){
+    const last = new Date(year, monthIndex + 1, 0).getDate();
+    return Math.min(day, last);
+  }
+
+  function getCurrentCycle(card){
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = now.getMonth();
+    const today = now.getDate();
+    const cutDay = Number(card.cutDay);
+
+    let start, end;
+
+    if(today > cutDay){
+      start = new Date(y, m, clampDay(y, m, cutDay) + 1);
+      const nextMonth = new Date(y, m + 1, 1);
+      end = new Date(
+        nextMonth.getFullYear(),
+        nextMonth.getMonth(),
+        clampDay(nextMonth.getFullYear(), nextMonth.getMonth(), cutDay)
+      );
+    } else {
+      const prevMonth = new Date(y, m - 1, 1);
+      start = new Date(
+        prevMonth.getFullYear(),
+        prevMonth.getMonth(),
+        clampDay(prevMonth.getFullYear(), prevMonth.getMonth(), cutDay) + 1
+      );
+      end = new Date(y, m, clampDay(y, m, cutDay));
+    }
+
+    return {
+      startISO: isoFromDate(start),
+      endISO: isoFromDate(end)
+    };
+  }
+
+  function isDateBetween(iso, startISO, endISO){
+    return iso >= startISO && iso <= endISO;
+  }
+
+  function getCardPurchases(cardId){
+    return state.expenses
+      .filter(e => e.cardId === cardId && e.mode === "purchase")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+  }
+
+  function getCardPayments(cardId){
+    return state.expenses
+      .filter(e => e.cardId === cardId && e.mode === "payment")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+  }
+
+  function getCardDebt(cardId){
+    return Math.max(0, getCardPurchases(cardId) - getCardPayments(cardId));
+  }
+
+  function getCardAvailable(card){
+    return Math.max(0, Number(card.creditLimit||0) - getCardDebt(card.id));
+  }
+
+  function getCardCyclePurchases(card){
+    const range = getCurrentCycle(card);
+    return state.expenses
+      .filter(e =>
+        e.cardId === card.id &&
+        e.mode === "purchase" &&
+        isDateBetween(e.date, range.startISO, range.endISO)
+      )
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+  }
+
+  function getCardCyclePayments(card){
+    const range = getCurrentCycle(card);
+    return state.expenses
+      .filter(e =>
+        e.cardId === card.id &&
+        e.mode === "payment" &&
+        isDateBetween(e.date, range.startISO, range.endISO)
+      )
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+  }
+
+  function cardTotals(cardId){
+    const card = state.cards.find(c=>c.id===cardId);
+    const totalPurchases = getCardPurchases(cardId);
+    const totalPayments = getCardPayments(cardId);
+    const currentDebt = getCardDebt(cardId);
+
+    let cycleTotal = 0;
+    let cycleRange = null;
+
+    if(card){
+      cycleRange = getCurrentCycle(card);
+      cycleTotal = getCardCyclePurchases(card) - getCardCyclePayments(card);
+      if(cycleTotal < 0) cycleTotal = 0;
+    }
+
+    return {
+      totalPurchases,
+      totalPayments,
+      currentDebt,
+      cycleTotal,
+      cycleRange,
+      available: card ? getCardAvailable(card) : 0
+    };
+  }
+
+  function getIncomeTotalByMonth(selectedMonth){
+    return state.incomes
+      .filter(i=>monthKey(i.date) === selectedMonth)
+      .reduce((s,i)=>s+Number(i.amount||0),0);
+  }
+
+  function getIncomeByTypeMonth(type, selectedMonth){
+    return state.incomes
+      .filter(i=>monthKey(i.date) === selectedMonth && i.type === type)
+      .reduce((s,i)=>s+Number(i.amount||0),0);
+  }
+
+  function getNominaTotalMonth(selectedMonth){
+    return getIncomeByTypeMonth("Nómina", selectedMonth);
+  }
+
+  function getCardPaymentsFromNomina(selectedMonth){
+    return state.expenses
+      .filter(e =>
+        monthKey(e.date) === selectedMonth &&
+        e.mode === "payment" &&
+        e.sourceIncomeType === "Nómina"
+      )
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+  }
+
+  function getNominaDisponibleMonth(selectedMonth, ignoreExpenseId = null){
+    const total = getNominaTotalMonth(selectedMonth);
+    const used = state.expenses
+      .filter(e =>
+        monthKey(e.date) === selectedMonth &&
+        e.mode === "payment" &&
+        e.sourceIncomeType === "Nómina" &&
+        e.id !== ignoreExpenseId
+      )
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+    return Math.max(0, total - used);
+  }
+
+  function includesText(...values){
+    return values.join(" ").toLowerCase();
+  }
+
+  const TAB_TO_VIEW = {
+    Tarjetas: "vTarjetas",
+    Ingresos: "vIngresos",
+    Egresos: "vEgresos",
+    Resumen: "vResumen"
+  };
+
+  function setTab(name){
+    ui.activeTab = name;
+    document.querySelectorAll(".tab").forEach(t=>{
+      t.classList.toggle("active", t.dataset.tab === name);
+    });
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.getElementById(TAB_TO_VIEW[name]).classList.add("active");
+    render();
+  }
+
+  document.querySelectorAll(".tab").forEach(tab=>{
+    tab.addEventListener("click", ()=> setTab(tab.dataset.tab));
+  });
+
+  function render(){
+    document.getElementById("versionText").textContent = APP_VERSION;
+    renderTarjetas();
+    renderIngresos();
+    renderEgresos();
+    renderResumen();
+    save();
+  }
+
+  function exportBackup(){
+    const payload = {
+      app: "Gastos",
+      version: APP_VERSION,
+      exportedAt: new Date().toISOString(),
+      data: state
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `gastos_respaldo_${todayISO()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importBackup(file){
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const parsed = JSON.parse(reader.result);
+        const imported = normalizeState(parsed.data || parsed);
+        state.cards = imported.cards;
+        state.incomes = imported.incomes;
+        state.expenses = imported.expenses;
+        ui.editingCardId = null;
+        ui.editingIncomeId = null;
+        ui.editingExpenseId = null;
+        save();
+        render();
+        alert("Respaldo importado correctamente.");
+      }catch{
+        alert("El archivo no es un respaldo válido.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function renderTarjetas(){
+    const el = document.getElementById("vTarjetas");
+    const editingCard = state.cards.find(c => c.id === ui.editingCardId) || null;
+
+    el.innerHTML = `
+      <div class="card">
+        <div class="toolbar">
+          <div class="left">
+            <h3 class="sectionTitle" style="margin:0">${editingCard ? "Editar tarjeta" : "Agregar tarjeta"}</h3>
+            <span class="chip">${APP_VERSION}</span>
+          </div>
+          <div class="right">
+            <button class="secondary small" id="btnExportJson">Exportar respaldo</button>
+            <label class="secondary small" style="display:inline-flex;align-items:center;cursor:pointer;padding:10px 12px;border-radius:12px">
+              Importar respaldo
+              <input id="importFile" type="file" accept=".json,application/json" class="hidden">
+            </label>
+          </div>
+        </div>
+
+        <div class="note">Aquí registras nombre de tarjeta, fecha de corte, fecha de pago y saldo total.</div>
+
+        <div style="height:10px"></div>
+
+        <div class="row four">
+          <div>
+            <label>Nombre de tarjeta</label>
+            <input id="cName" placeholder="Ej. Nu / BBVA / Liverpool / Suburbia" value="${esc(editingCard?.name || "")}">
+          </div>
+          <div>
+            <label>Fecha de corte (día)</label>
+            <select id="cCut">
+              ${Array.from({length:31},(_,i)=>`<option value="${i+1}" ${Number(editingCard?.cutDay || 1)===i+1?"selected":""}>${i+1}</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <label>Fecha de pago (día)</label>
+            <select id="cPay">
+              ${Array.from({length:31},(_,i)=>`<option value="${i+1}" ${Number(editingCard?.payDay || 1)===i+1?"selected":""}>${i+1}</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <label>Saldo total de la tarjeta</label>
+            <input id="cLimit" inputmode="decimal" placeholder="Ej. 15000" value="${editingCard ? esc(String(editingCard.creditLimit)) : ""}">
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="good" id="btnSaveCard">${editingCard ? "Actualizar tarjeta" : "Guardar tarjeta"}</button>
+          <button class="secondary" id="btnClearCard">Limpiar</button>
+          ${editingCard ? `<button class="warn" id="btnCancelEditCard">Cancelar edición</button>` : ""}
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="sectionTitle">Mis tarjetas</h3>
+        <div class="note">El saldo disponible se reduce con las compras y vuelve a subir con los pagos a tarjeta.</div>
+
+        <div style="height:10px"></div>
+
+        ${state.cards.length ? `
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tarjeta</th>
+                  <th>Corte</th>
+                  <th>Pago</th>
+                  <th>Saldo total</th>
+                  <th>Total comprado</th>
+                  <th>Total pagado</th>
+                  <th>Deuda actual</th>
+                  <th>Disponible</th>
+                  <th>Monto del ciclo</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${state.cards.map(card=>{
+                  const t = cardTotals(card.id);
+                  return `
+                    <tr>
+                      <td>${esc(card.name)}</td>
+                      <td>Día ${card.cutDay}</td>
+                      <td>Día ${card.payDay}</td>
+                      <td>${fmt(card.creditLimit)}</td>
+                      <td>${fmt(t.totalPurchases)}</td>
+                      <td>${fmt(t.totalPayments)}</td>
+                      <td>${fmt(t.currentDebt)}</td>
+                      <td>${fmt(t.available)}</td>
+                      <td>${fmt(t.cycleTotal)}</td>
+                      <td>
+                        <div class="actions">
+                          <button class="secondary small" data-editcard="${card.id}">Editar</button>
+                          <button class="danger small" data-delcard="${card.id}">Eliminar</button>
+                        </div>
+                      </td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        ` : `<div class="warnBox">Aún no has agregado tarjetas.</div>`}
+
+        <div style="height:12px"></div>
+        <button class="danger" id="btnNuke">Borrar TODO</button>
+        <div class="note" style="margin-top:8px">Esto borra tarjetas, ingresos y egresos del dispositivo.</div>
+      </div>
+    `;
+
+    el.querySelector("#btnExportJson").onclick = exportBackup;
+    el.querySelector("#importFile").onchange = (ev)=>{
+      const file = ev.target.files?.[0];
+      if(file) importBackup(file);
+      ev.target.value = "";
+    };
+
+    el.querySelector("#btnSaveCard").onclick = ()=>{
+      const name = el.querySelector("#cName").value.trim();
+      const cutDay = Number(el.querySelector("#cCut").value);
+      const payDay = Number(el.querySelector("#cPay").value);
+      const creditLimit = parseMoney(el.querySelector("#cLimit").value);
+
+      if(!name) return alert("Escribe el nombre de la tarjeta.");
+      if(!(cutDay>=1 && cutDay<=31)) return alert("Fecha de corte inválida.");
+      if(!(payDay>=1 && payDay<=31)) return alert("Fecha de pago inválida.");
+      if(!Number.isFinite(creditLimit) || creditLimit <= 0) return alert("Saldo total inválido.");
+
+      if(ui.editingCardId){
+        const i = state.cards.findIndex(c=>c.id===ui.editingCardId);
+        if(i >= 0){
+          state.cards[i] = { ...state.cards[i], name, cutDay, payDay, creditLimit };
+        }
+        ui.editingCardId = null;
+      } else {
+        state.cards.push({
+          id: uid(),
+          name,
+          cutDay,
+          payDay,
+          creditLimit
+        });
+      }
+
+      render();
+      setTab("Tarjetas");
+    };
+
+    el.querySelector("#btnClearCard").onclick = ()=>{
+      ui.editingCardId = null;
+      render();
+    };
+
+    if(el.querySelector("#btnCancelEditCard")){
+      el.querySelector("#btnCancelEditCard").onclick = ()=>{
+        ui.editingCardId = null;
+        render();
+      };
+    }
+
+    el.querySelectorAll("[data-editcard]").forEach(btn=>{
+      btn.onclick = ()=>{
+        ui.editingCardId = btn.getAttribute("data-editcard");
+        render();
+        window.scrollTo({top:0, behavior:"smooth"});
+      };
+    });
+
+    el.querySelectorAll("[data-delcard]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.getAttribute("data-delcard");
+        const hasLinkedExpenses = state.expenses.some(e=>e.cardId === id);
+        if(hasLinkedExpenses){
+          return alert("No puedes eliminar esta tarjeta porque tiene egresos ligados. Elimina primero esos movimientos.");
+        }
+        if(confirm("¿Eliminar esta tarjeta?")){
+          state.cards = state.cards.filter(c=>c.id !== id);
+          if(ui.editingCardId === id) ui.editingCardId = null;
+          render();
+          setTab("Tarjetas");
+        }
+      };
+    });
+
+    el.querySelector("#btnNuke").onclick = ()=>{
+      if(confirm("¿Seguro? Se borrará TODO.")){
+        localStorage.removeItem(KEY);
+        location.reload();
+      }
+    };
+  }
+
+  function renderIngresos(){
+    const el = document.getElementById("vIngresos");
+    const selectedMonth = (document.getElementById("inMonth")?.value) || monthKey(todayISO());
+    const selectedType = (document.getElementById("inFilterType")?.value) || "__all__";
+    const selectedFortnight = (document.getElementById("inFilterQ")?.value) || "__all__";
+    const search = ui.incomeSearch.trim().toLowerCase();
+    const editingIncome = state.incomes.find(i => i.id === ui.editingIncomeId) || null;
+
+    const filtered = state.incomes.filter(i=>{
+      const okMonth = monthKey(i.date) === selectedMonth;
+      const okType = selectedType === "__all__" || i.type === selectedType;
+      const okQ = selectedFortnight === "__all__" || i.fortnight === selectedFortnight;
+      const hay = includesText(i.date, i.type, i.fortnight, i.note, i.amount);
+      const okSearch = !search || hay.includes(search);
+      return okMonth && okType && okQ && okSearch;
+    });
+
+    const totalMonth = getIncomeTotalByMonth(selectedMonth);
+    const totalFiltered = filtered.reduce((s,i)=>s+Number(i.amount||0),0);
+
+    const totalQ1 = state.incomes
+      .filter(i=>monthKey(i.date) === selectedMonth && i.fortnight === "Q1")
+      .reduce((s,i)=>s+Number(i.amount||0),0);
+
+    const totalQ2 = state.incomes
+      .filter(i=>monthKey(i.date) === selectedMonth && i.fortnight === "Q2")
+      .reduce((s,i)=>s+Number(i.amount||0),0);
+
+    const totalNomina = getNominaTotalMonth(selectedMonth);
+    const nominaUsada = getCardPaymentsFromNomina(selectedMonth);
+    const nominaDisponible = getNominaDisponibleMonth(selectedMonth);
+
+    el.innerHTML = `
+      <div class="card">
+        <h3 class="sectionTitle">${editingIncome ? "Editar ingreso" : "Registrar ingreso"}</h3>
+        <div class="note">Los ingresos están en lista desplegable y se separan por quincena.</div>
+
+        <div style="height:10px"></div>
+
+        <div class="row three">
+          <div>
+            <label>Tipo de ingreso</label>
+            <select id="iType">
+              ${INCOME_TYPES.map(t=>`<option ${editingIncome?.type===t?"selected":""}>${t}</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <label>Quincena</label>
+            <select id="iFortnight">
+              <option value="Q1" ${editingIncome?.fortnight!=="Q2"?"selected":""}>Q1</option>
+              <option value="Q2" ${editingIncome?.fortnight==="Q2"?"selected":""}>Q2</option>
+            </select>
+          </div>
+          <div>
+            <label>Fecha</label>
+            <input id="iDate" type="date" value="${editingIncome?.date || todayISO()}">
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="row two">
+          <div>
+            <label>Monto percibido</label>
+            <input id="iAmount" inputmode="decimal" placeholder="Ej. 8500" value="${editingIncome ? esc(String(editingIncome.amount)) : ""}">
+          </div>
+          <div>
+            <label>Nota (opcional)</label>
+            <input id="iNote" placeholder="Ej. nómina, préstamo familiar, venta, etc." value="${esc(editingIncome?.note || "")}">
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="good" id="btnSaveIncome">${editingIncome ? "Actualizar ingreso" : "Guardar ingreso"}</button>
+          <button class="secondary" id="btnClearIncome">Limpiar</button>
+          ${editingIncome ? `<button class="warn" id="btnCancelEditIncome">Cancelar edición</button>` : ""}
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="sectionTitle">Filtro de ingresos</h3>
+
+        <div class="row four">
+          <div>
+            <label>Mes</label>
+            <input type="month" id="inMonth" value="${selectedMonth}">
+          </div>
+          <div>
+            <label>Tipo</label>
+            <select id="inFilterType">
+              <option value="__all__">Todos</option>
+              ${INCOME_TYPES.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <label>Quincena</label>
+            <select id="inFilterQ">
+              <option value="__all__">Todas</option>
+              <option value="Q1">Q1</option>
+              <option value="Q2">Q2</option>
+            </select>
+          </div>
+          <div>
+            <label>Buscar</label>
+            <input id="inSearch" class="searchInput" placeholder="Buscar por nota, tipo, fecha..." value="${esc(ui.incomeSearch)}">
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="kpi six">
+          <div class="k">
+            <div class="t">Total Q1</div>
+            <div class="v">${fmt(totalQ1)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Total Q2</div>
+            <div class="v">${fmt(totalQ2)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Total del mes</div>
+            <div class="v">${fmt(totalMonth)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Total filtrado</div>
+            <div class="v">${fmt(totalFiltered)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Nómina usada en pagos</div>
+            <div class="v">${fmt(nominaUsada)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Nómina disponible</div>
+            <div class="v">${fmt(nominaDisponible)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="sectionTitle">Lista de ingresos</h3>
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Quincena</th>
+                <th>Monto</th>
+                <th>Nota</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.length ? filtered
+                .slice()
+                .sort((a,b)=>a.date < b.date ? 1 : -1)
+                .map(i=>`
+                  <tr>
+                    <td>${i.date}</td>
+                    <td>${esc(i.type)}</td>
+                    <td>${i.fortnight}</td>
+                    <td>${fmt(i.amount)}</td>
+                    <td>${esc(i.note || "")}</td>
+                    <td>
+                      <div class="actions">
+                        <button class="secondary small" data-editincome="${i.id}">Editar</button>
+                        <button class="danger small" data-delincome="${i.id}">Eliminar</button>
+                      </div>
+                    </td>
+                  </tr>
+                `).join("")
+                : `<tr><td colspan="6" class="note">No hay ingresos para ese filtro.</td></tr>`
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    el.querySelector("#inFilterType").value = selectedType;
+    el.querySelector("#inFilterQ").value = selectedFortnight;
+
+    el.querySelector("#btnSaveIncome").onclick = ()=>{
+      const type = el.querySelector("#iType").value;
+      const fortnight = el.querySelector("#iFortnight").value;
+      const date = el.querySelector("#iDate").value;
+      const amount = parseMoney(el.querySelector("#iAmount").value);
+      const note = el.querySelector("#iNote").value.trim();
+
+      if(!date) return alert("Selecciona una fecha.");
+      if(!Number.isFinite(amount) || amount <= 0) return alert("Monto inválido.");
+
+      if(ui.editingIncomeId){
+        const idx = state.incomes.findIndex(x=>x.id===ui.editingIncomeId);
+        if(idx >= 0){
+          state.incomes[idx] = { ...state.incomes[idx], type, fortnight, date, amount, note };
+        }
+        ui.editingIncomeId = null;
+      } else {
+        state.incomes.push({
+          id: uid(),
+          type,
+          fortnight,
+          date,
+          amount,
+          note
+        });
+      }
+
+      render();
+      setTab("Ingresos");
+    };
+
+    el.querySelector("#btnClearIncome").onclick = ()=>{
+      ui.editingIncomeId = null;
+      render();
+    };
+
+    if(el.querySelector("#btnCancelEditIncome")){
+      el.querySelector("#btnCancelEditIncome").onclick = ()=>{
+        ui.editingIncomeId = null;
+        render();
+      };
+    }
+
+    el.querySelector("#inMonth").onchange = render;
+    el.querySelector("#inFilterType").onchange = render;
+    el.querySelector("#inFilterQ").onchange = render;
+    el.querySelector("#inSearch").oninput = (ev)=>{
+      ui.incomeSearch = ev.target.value;
+      render();
+    };
+
+    el.querySelectorAll("[data-editincome]").forEach(btn=>{
+      btn.onclick = ()=>{
+        ui.editingIncomeId = btn.getAttribute("data-editincome");
+        render();
+        window.scrollTo({top:0, behavior:"smooth"});
+      };
+    });
+
+    el.querySelectorAll("[data-delincome]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.getAttribute("data-delincome");
+
+        const income = state.incomes.find(x=>x.id===id);
+        const isNomina = income?.type === "Nómina";
+        if(isNomina){
+          const selectedM = monthKey(income.date);
+          const totalNominaAfterDelete = state.incomes
+            .filter(i=>i.id !== id && monthKey(i.date) === selectedM && i.type === "Nómina")
+            .reduce((s,i)=>s+Number(i.amount||0),0);
+          const nominaUsed = getCardPaymentsFromNomina(selectedM);
+          if(nominaUsed > totalNominaAfterDelete){
+            return alert("No puedes eliminar este ingreso de nómina porque dejaría pagos de tarjeta sin respaldo de nómina en ese mes.");
+          }
+        }
+
+        if(confirm("¿Eliminar este ingreso?")){
+          state.incomes = state.incomes.filter(x=>x.id !== id);
+          if(ui.editingIncomeId === id) ui.editingIncomeId = null;
+          render();
+          setTab("Ingresos");
+        }
+      };
+    });
+  }
+
+  function renderEgresos(){
+    const el = document.getElementById("vEgresos");
+    const selectedMonth = (document.getElementById("egMonth")?.value) || monthKey(todayISO());
+    const selectedCard = (document.getElementById("egFilterCard")?.value) || "__all__";
+    const selectedType = (document.getElementById("egFilterType")?.value) || "__all__";
+    const search = ui.expenseSearch.trim().toLowerCase();
+    const editingExpense = state.expenses.find(e => e.id === ui.editingExpenseId) || null;
+
+    const filtered = state.expenses.filter(e=>{
+      const okMonth = monthKey(e.date) === selectedMonth;
+      const okCard = selectedCard === "__all__" || e.cardId === selectedCard;
+      const okType = selectedType === "__all__" || e.mode === selectedType;
+      const hay = includesText(e.date, cardName(e.cardId), e.mode, e.category, e.note, e.sourceIncomeType, e.amount);
+      const okSearch = !search || hay.includes(search);
+      return okMonth && okCard && okType && okSearch;
+    });
+
+    const totalMonth = state.expenses
+      .filter(e=>monthKey(e.date) === selectedMonth)
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const totalFiltered = filtered.reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const totalPurchasesMonth = state.expenses
+      .filter(e=>monthKey(e.date) === selectedMonth && e.mode === "purchase")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const totalPaymentsMonth = state.expenses
+      .filter(e=>monthKey(e.date) === selectedMonth && e.mode === "payment")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    el.innerHTML = `
+      <div class="card">
+        <h3 class="sectionTitle">${editingExpense ? "Editar egreso" : "Registrar egreso"}</h3>
+        <div class="note">Está separado en dos modos: <b>Compra con tarjeta</b> y <b>Pago a tarjeta</b>.</div>
+
+        ${state.cards.length ? "" : `<div class="warnBox">Primero agrega al menos una tarjeta en la pestaña Tarjetas.</div>`}
+
+        <div style="height:10px"></div>
+
+        <div class="row two">
+          <div>
+            <label>Tipo de egreso</label>
+            <select id="eMode">
+              <option value="purchase" ${editingExpense?.mode !== "payment" ? "selected" : ""}>Compra con tarjeta</option>
+              <option value="payment" ${editingExpense?.mode === "payment" ? "selected" : ""}>Pago a tarjeta</option>
+            </select>
+          </div>
+          <div>
+            <label>Tarjeta</label>
+            <select id="eCard">
+              ${state.cards.length
+                ? state.cards.map(c=>`<option value="${c.id}" ${editingExpense?.cardId===c.id?"selected":""}>${esc(c.name)}</option>`).join("")
+                : `<option value="">Primero agrega una tarjeta</option>`
+              }
+            </select>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div id="purchaseFields">
+          <div class="row three">
+            <div>
+              <label>Categoría de compra</label>
+              <select id="eCategory">
+                ${PURCHASE_CATEGORIES.map(c=>`<option ${editingExpense?.mode==="purchase" && editingExpense?.category===c ? "selected":""}>${c}</option>`).join("")}
+              </select>
+            </div>
+            <div>
+              <label>Fecha de compra</label>
+              <input id="eDatePurchase" type="date" value="${editingExpense?.mode==="purchase" ? editingExpense.date : todayISO()}">
+            </div>
+            <div>
+              <label>Monto de compra</label>
+              <input id="eAmountPurchase" inputmode="decimal" placeholder="Ej. 450.75" value="${editingExpense?.mode==="purchase" ? esc(String(editingExpense.amount)) : ""}">
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="row two">
+            <div>
+              <label>Nota (opcional)</label>
+              <input id="eNotePurchase" placeholder="Ej. súper, gasolina, comida, etc." value="${editingExpense?.mode==="purchase" ? esc(editingExpense.note || "") : ""}">
+            </div>
+            <div>
+              <label>Información</label>
+              <div class="okBox">Las compras aumentan la deuda de la tarjeta y reducen el saldo disponible.</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="paymentFields" class="hidden">
+          <div class="row three">
+            <div>
+              <label>Fecha de pago</label>
+              <input id="eDatePayment" type="date" value="${editingExpense?.mode==="payment" ? editingExpense.date : todayISO()}">
+            </div>
+            <div>
+              <label>Monto de pago</label>
+              <input id="eAmountPayment" inputmode="decimal" placeholder="Ej. 1200" value="${editingExpense?.mode==="payment" ? esc(String(editingExpense.amount)) : ""}">
+            </div>
+            <div>
+              <label>Origen del dinero</label>
+              <select id="eSourceIncomeType">
+                <option value="">No aplica</option>
+                ${INCOME_TYPES.map(t=>`<option ${editingExpense?.mode==="payment" && editingExpense?.sourceIncomeType===t?"selected":""}>${t}</option>`).join("")}
+              </select>
+            </div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="row two">
+            <div>
+              <label>Nota (opcional)</label>
+              <input id="eNotePayment" placeholder="Ej. pago mínimo, pago total, abono, etc." value="${editingExpense?.mode==="payment" ? esc(editingExpense.note || "") : ""}">
+            </div>
+            <div>
+              <label>Información</label>
+              <div class="okBox">Los pagos reducen la deuda de la tarjeta. Si eliges origen <b>Nómina</b>, también se descuenta de la nómina disponible del mes.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="btns">
+          <button id="btnSaveExpense">${editingExpense ? "Actualizar egreso" : "Guardar egreso"}</button>
+          <button class="secondary" id="btnClearExpense">Limpiar</button>
+          ${editingExpense ? `<button class="warn" id="btnCancelEditExpense">Cancelar edición</button>` : ""}
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="sectionTitle">Filtro de egresos</h3>
+        <div class="row four">
+          <div>
+            <label>Mes</label>
+            <input type="month" id="egMonth" value="${selectedMonth}">
+          </div>
+          <div>
+            <label>Tarjeta</label>
+            <select id="egFilterCard">
+              <option value="__all__">Todas</option>
+              ${state.cards.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <label>Tipo de egreso</label>
+            <select id="egFilterType">
+              <option value="__all__">Todos</option>
+              <option value="purchase">Compras con tarjeta</option>
+              <option value="payment">Pagos a tarjeta</option>
+            </select>
+          </div>
+          <div>
+            <label>Buscar</label>
+            <input id="egSearch" class="searchInput" placeholder="Buscar por tarjeta, nota, categoría..." value="${esc(ui.expenseSearch)}">
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="kpi four">
+          <div class="k">
+            <div class="t">Compras del mes</div>
+            <div class="v">${fmt(totalPurchasesMonth)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Pagos del mes</div>
+            <div class="v">${fmt(totalPaymentsMonth)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Total egresos del mes</div>
+            <div class="v">${fmt(totalMonth)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Total filtrado</div>
+            <div class="v">${fmt(totalFiltered)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="sectionTitle">Lista de egresos</h3>
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Tarjeta</th>
+                <th>Tipo</th>
+                <th>Categoría / Origen</th>
+                <th>Monto</th>
+                <th>Nota</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.length ? filtered
+                .slice()
+                .sort((a,b)=>a.date < b.date ? 1 : -1)
+                .map(e=>`
+                  <tr>
+                    <td>${e.date}</td>
+                    <td>${esc(cardName(e.cardId))}</td>
+                    <td>${e.mode === "purchase" ? "Compra" : "Pago a tarjeta"}</td>
+                    <td>${e.mode === "purchase" ? esc(e.category) : esc(e.sourceIncomeType || "—")}</td>
+                    <td>${fmt(e.amount)}</td>
+                    <td>${esc(e.note || "")}</td>
+                    <td>
+                      <div class="actions">
+                        <button class="secondary small" data-editexpense="${e.id}">Editar</button>
+                        <button class="danger small" data-delexpense="${e.id}">Eliminar</button>
+                      </div>
+                    </td>
+                  </tr>
+                `).join("")
+                : `<tr><td colspan="7" class="note">No hay egresos para ese filtro.</td></tr>`
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    const modeSelect = el.querySelector("#eMode");
+    const purchaseFields = el.querySelector("#purchaseFields");
+    const paymentFields = el.querySelector("#paymentFields");
+
+    function syncExpenseModeUI(){
+      const mode = modeSelect.value;
+      purchaseFields.classList.toggle("hidden", mode !== "purchase");
+      paymentFields.classList.toggle("hidden", mode !== "payment");
+    }
+
+    modeSelect.onchange = syncExpenseModeUI;
+    syncExpenseModeUI();
+
+    el.querySelector("#egFilterCard").value = selectedCard;
+    el.querySelector("#egFilterType").value = selectedType;
+
+    el.querySelector("#btnSaveExpense").onclick = ()=>{
+      if(!state.cards.length){
+        alert("Primero agrega una tarjeta.");
+        setTab("Tarjetas");
+        return;
+      }
+
+      const mode = el.querySelector("#eMode").value;
+      const cardId = el.querySelector("#eCard").value;
+      const card = state.cards.find(c=>c.id === cardId);
+
+      if(!cardId) return alert("Selecciona una tarjeta.");
+      if(!card) return alert("Tarjeta no encontrada.");
+
+      if(mode === "purchase"){
+        const category = el.querySelector("#eCategory").value;
+        const date = el.querySelector("#eDatePurchase").value;
+        const amount = parseMoney(el.querySelector("#eAmountPurchase").value);
+        const note = el.querySelector("#eNotePurchase").value.trim();
+
+        if(!date) return alert("Selecciona una fecha de compra.");
+        if(!Number.isFinite(amount) || amount <= 0) return alert("Monto inválido.");
+
+        const currentPurchaseTotalExcludingEdited =
+          state.expenses
+            .filter(e => e.cardId === cardId && e.mode === "purchase" && e.id !== ui.editingExpenseId)
+            .reduce((s,e)=>s+Number(e.amount||0),0);
+
+        const currentPaymentTotalExcludingEdited =
+          state.expenses
+            .filter(e => e.cardId === cardId && e.mode === "payment" && e.id !== ui.editingExpenseId)
+            .reduce((s,e)=>s+Number(e.amount||0),0);
+
+        const simulatedDebt = Math.max(0, currentPurchaseTotalExcludingEdited + amount - currentPaymentTotalExcludingEdited);
+        if(simulatedDebt > Number(card.creditLimit || 0)){
+          return alert("Esa compra supera el saldo disponible actual de la tarjeta.");
+        }
+
+        if(ui.editingExpenseId){
+          const idx = state.expenses.findIndex(x=>x.id===ui.editingExpenseId);
+          if(idx >= 0){
+            state.expenses[idx] = {
+              ...state.expenses[idx],
+              mode: "purchase",
+              category,
+              cardId,
+              date,
+              amount,
+              note,
+              sourceIncomeType: ""
+            };
+          }
+          ui.editingExpenseId = null;
+        } else {
+          state.expenses.push({
+            id: uid(),
+            mode: "purchase",
+            category,
+            cardId,
+            date,
+            amount,
+            note,
+            sourceIncomeType: ""
+          });
+        }
+      } else {
+        const date = el.querySelector("#eDatePayment").value;
+        const amount = parseMoney(el.querySelector("#eAmountPayment").value);
+        const note = el.querySelector("#eNotePayment").value.trim();
+        const sourceIncomeType = el.querySelector("#eSourceIncomeType").value || "";
+
+        if(!date) return alert("Selecciona una fecha de pago.");
+        if(!Number.isFinite(amount) || amount <= 0) return alert("Monto inválido.");
+
+        const simulatedPurchases = state.expenses
+          .filter(e => e.cardId === cardId && e.mode === "purchase" && e.id !== ui.editingExpenseId)
+          .reduce((s,e)=>s+Number(e.amount||0),0);
+
+        const simulatedPayments = state.expenses
+          .filter(e => e.cardId === cardId && e.mode === "payment" && e.id !== ui.editingExpenseId)
+          .reduce((s,e)=>s+Number(e.amount||0),0);
+
+        const simulatedDebt = Math.max(0, simulatedPurchases - simulatedPayments);
+        if(amount > simulatedDebt){
+          return alert("El pago no puede ser mayor que la deuda actual de la tarjeta.");
+        }
+
+        if(sourceIncomeType === "Nómina"){
+          const selectedM = monthKey(date);
+          const nominaDisponible = getNominaDisponibleMonth(selectedM, ui.editingExpenseId);
+          if(amount > nominaDisponible){
+            return alert("Ese pago supera la nómina disponible del mes.");
+          }
+        }
+
+        if(ui.editingExpenseId){
+          const idx = state.expenses.findIndex(x=>x.id===ui.editingExpenseId);
+          if(idx >= 0){
+            state.expenses[idx] = {
+              ...state.expenses[idx],
+              mode: "payment",
+              category: "Pago de tarjeta de crédito",
+              cardId,
+              date,
+              amount,
+              note,
+              sourceIncomeType
+            };
+          }
+          ui.editingExpenseId = null;
+        } else {
+          state.expenses.push({
+            id: uid(),
+            mode: "payment",
+            category: "Pago de tarjeta de crédito",
+            cardId,
+            date,
+            amount,
+            note,
+            sourceIncomeType
+          });
+        }
+      }
+
+      render();
+      setTab("Egresos");
+    };
+
+    el.querySelector("#btnClearExpense").onclick = ()=>{
+      ui.editingExpenseId = null;
+      render();
+    };
+
+    if(el.querySelector("#btnCancelEditExpense")){
+      el.querySelector("#btnCancelEditExpense").onclick = ()=>{
+        ui.editingExpenseId = null;
+        render();
+      };
+    }
+
+    el.querySelector("#egMonth").onchange = render;
+    el.querySelector("#egFilterCard").onchange = render;
+    el.querySelector("#egFilterType").onchange = render;
+    el.querySelector("#egSearch").oninput = (ev)=>{
+      ui.expenseSearch = ev.target.value;
+      render();
+    };
+
+    el.querySelectorAll("[data-editexpense]").forEach(btn=>{
+      btn.onclick = ()=>{
+        ui.editingExpenseId = btn.getAttribute("data-editexpense");
+        render();
+        window.scrollTo({top:0, behavior:"smooth"});
+      };
+    });
+
+    el.querySelectorAll("[data-delexpense]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const id = btn.getAttribute("data-delexpense");
+        if(confirm("¿Eliminar este egreso?")){
+          state.expenses = state.expenses.filter(x=>x.id !== id);
+          if(ui.editingExpenseId === id) ui.editingExpenseId = null;
+          render();
+          setTab("Egresos");
+        }
+      };
+    });
+  }
+
+  function renderResumen(){
+    const el = document.getElementById("vResumen");
+    const selectedMonth = (document.getElementById("rMonth")?.value) || monthKey(todayISO());
+
+    const incomesMonth = state.incomes.filter(i=>monthKey(i.date) === selectedMonth);
+    const expensesMonth = state.expenses.filter(e=>monthKey(e.date) === selectedMonth);
+
+    const totalIncome = incomesMonth.reduce((s,i)=>s+Number(i.amount||0),0);
+    const totalExpense = expensesMonth.reduce((s,e)=>s+Number(e.amount||0),0);
+    const balance = totalIncome - totalExpense;
+
+    const totalQ1 = incomesMonth
+      .filter(i=>i.fortnight==="Q1")
+      .reduce((s,i)=>s+Number(i.amount||0),0);
+
+    const totalQ2 = incomesMonth
+      .filter(i=>i.fortnight==="Q2")
+      .reduce((s,i)=>s+Number(i.amount||0),0);
+
+    const totalNomina = getNominaTotalMonth(selectedMonth);
+    const nominaUsada = getCardPaymentsFromNomina(selectedMonth);
+    const nominaDisponible = getNominaDisponibleMonth(selectedMonth);
+
+    const totalPurchasesMonth = expensesMonth
+      .filter(e=>e.mode === "purchase")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const totalPaymentsMonth = expensesMonth
+      .filter(e=>e.mode === "payment")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const expenseByCategory = {};
+    for(const c of PURCHASE_CATEGORIES) expenseByCategory[c] = 0;
+    expensesMonth.filter(e=>e.mode === "purchase").forEach(e=>{
+      expenseByCategory[e.category] = (expenseByCategory[e.category] || 0) + Number(e.amount||0);
+    });
+
+    const totalDebtAllCards = state.cards.reduce((s,card)=>s + getCardDebt(card.id), 0);
+    const totalAvailableAllCards = state.cards.reduce((s,card)=>s + getCardAvailable(card), 0);
+
+    el.innerHTML = `
+      <div class="card">
+        <h3 class="sectionTitle">Resumen mensual</h3>
+
+        <div class="row two">
+          <div>
+            <label>Mes</label>
+            <input type="month" id="rMonth" value="${selectedMonth}">
+          </div>
+          <div>
+            <label>Ir a sección</label>
+            <select id="rJump">
+              <option value="Resumen">Resumen</option>
+              <option value="Tarjetas">Tarjetas</option>
+              <option value="Ingresos">Ingresos</option>
+              <option value="Egresos">Egresos</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="kpi five">
+          <div class="k">
+            <div class="t">Ingresos Q1</div>
+            <div class="v">${fmt(totalQ1)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Ingresos Q2</div>
+            <div class="v">${fmt(totalQ2)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Total percibido</div>
+            <div class="v">${fmt(totalIncome)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Compras del mes</div>
+            <div class="v">${fmt(totalPurchasesMonth)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Pagos a tarjeta del mes</div>
+            <div class="v">${fmt(totalPaymentsMonth)}</div>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="kpi four">
+          <div class="k">
+            <div class="t">Nómina del mes</div>
+            <div class="v">${fmt(totalNomina)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Nómina usada en pagos</div>
+            <div class="v">${fmt(nominaUsada)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Nómina disponible</div>
+            <div class="v">${fmt(nominaDisponible)}</div>
+          </div>
+          <div class="k ${balance < 0 ? "negative" : "positive"}">
+            <div class="t">Balance del mes</div>
+            <div class="v">${fmt(balance)}</div>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="kpi two">
+          <div class="k">
+            <div class="t">Deuda total en tarjetas</div>
+            <div class="v">${fmt(totalDebtAllCards)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Disponible total en tarjetas</div>
+            <div class="v">${fmt(totalAvailableAllCards)}</div>
+          </div>
+        </div>
+
+        ${balance < 0
+          ? `<div class="warnBox">Tu balance del mes está en negativo. Eso significa que tus egresos del mes superan tus ingresos registrados para este periodo.</div>`
+          : `<div class="okBox">Tu balance del mes está en positivo. Vas bien mientras tus registros sean completos.</div>`
+        }
+      </div>
+
+      <div class="card">
+        <h3 class="sectionTitle">Compras por categoría</h3>
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Categoría</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${PURCHASE_CATEGORIES.map(c=>`
+                <tr>
+                  <td>${esc(c)}</td>
+                  <td>${fmt(expenseByCategory[c] || 0)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="sectionTitle">Resumen por tarjeta</h3>
+        ${state.cards.length ? `
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tarjeta</th>
+                  <th>Saldo total</th>
+                  <th>Total comprado</th>
+                  <th>Total pagado</th>
+                  <th>Deuda actual</th>
+                  <th>Disponible</th>
+                  <th>Monto del ciclo</th>
+                  <th>Periodo del ciclo</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${state.cards.map(card=>{
+                  const t = cardTotals(card.id);
+                  return `
+                    <tr>
+                      <td>${esc(card.name)}</td>
+                      <td>${fmt(card.creditLimit)}</td>
+                      <td>${fmt(t.totalPurchases)}</td>
+                      <td>${fmt(t.totalPayments)}</td>
+                      <td>${fmt(t.currentDebt)}</td>
+                      <td>${fmt(t.available)}</td>
+                      <td>${fmt(t.cycleTotal)}</td>
+                      <td>${t.cycleRange ? `${t.cycleRange.startISO} a ${t.cycleRange.endISO}` : "—"}</td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        ` : `<div class="warnBox">No hay tarjetas registradas todavía.</div>`}
+      </div>
+    `;
+
+    el.querySelector("#rMonth").onchange = render;
+    el.querySelector("#rJump").onchange = (ev)=> setTab(ev.target.value);
+  }
+
+  document.getElementById("fechaHoy").textContent =
+    new Date().toLocaleDateString("es-MX", { dateStyle:"full" });
+
+  render();
+</script>
 </body>
 </html>
