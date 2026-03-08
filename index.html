@@ -167,8 +167,18 @@ header{
   grid-template-columns:repeat(3,1fr);
 }
 
+.grid4{
+  grid-template-columns:repeat(4,1fr);
+}
+
+@media(max-width:900px){
+  .grid4{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
 @media(max-width:760px){
-  .grid2,.grid3{
+  .grid2,.grid3,.grid4{
     grid-template-columns:1fr;
   }
 }
@@ -349,6 +359,87 @@ tr:last-child td{
   min-width:220px;
 }
 
+.dashboardBlock{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+}
+
+.dashboardTitle{
+  font-size:13px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.miniList{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.miniItem{
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--card);
+}
+
+.miniTop{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+}
+
+.miniSub{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.alert{
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--card);
+  margin-bottom:10px;
+}
+
+.alert.good{
+  border-color:rgba(22,163,74,.25);
+}
+
+.alert.warn{
+  border-color:rgba(217,119,6,.25);
+}
+
+.alert.danger{
+  border-color:rgba(185,28,28,.25);
+}
+
+.filterPills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.filterPill{
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card2);
+  cursor:pointer;
+  font-size:12px;
+  font-weight:700;
+}
+
+.filterPill.active{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;
+  border-color:transparent;
+}
+
 @media(max-width:640px){
   .toastWrap{
     left:10px;
@@ -368,17 +459,52 @@ tr:last-child td{
 <header>
   <div class="headerLeft">
     <div class="headerTitle">Gastos</div>
-    <div class="headerSub">Control personal • Tarjetas • Presupuestos • Tema claro/oscuro</div>
+    <div class="headerSub">Control personal • Tarjetas • Presupuestos • Dashboard</div>
   </div>
 
   <div class="headerRight">
     <button id="themeToggle" class="secondary">☀️ Tema claro</button>
-    <div class="pill" id="versionText">v6.0</div>
+    <div class="pill" id="versionText">v6.1</div>
     <div class="pill" id="fechaHoy">—</div>
   </div>
 </header>
 
 <div class="container">
+
+  <div class="card">
+    <div class="toolbar">
+      <div>
+        <h2>Dashboard</h2>
+        <div class="note">Vista rápida de cómo va tu dinero en el periodo actual.</div>
+      </div>
+      <div class="filterPills" id="periodFilters">
+        <div class="filterPill active" data-period="month">Mes</div>
+        <div class="filterPill" data-period="q1">Quincena 1</div>
+        <div class="filterPill" data-period="q2">Quincena 2</div>
+      </div>
+    </div>
+
+    <div class="summary" id="dashboardSummary"></div>
+
+    <div style="height:12px"></div>
+
+    <div class="grid grid3">
+      <div class="dashboardBlock">
+        <div class="dashboardTitle">Alertas importantes</div>
+        <div id="alertsBox"></div>
+      </div>
+
+      <div class="dashboardBlock">
+        <div class="dashboardTitle">Top 3 categorías</div>
+        <div id="topCategories"></div>
+      </div>
+
+      <div class="dashboardBlock">
+        <div class="dashboardTitle">Movimientos recientes</div>
+        <div id="recentMoves"></div>
+      </div>
+    </div>
+  </div>
 
   <div class="card">
     <div class="toolbar">
@@ -471,7 +597,7 @@ tr:last-child td{
   </div>
 
   <div class="card">
-    <h2>Resumen</h2>
+    <h2>Resumen general</h2>
     <div class="summary" id="summary"></div>
   </div>
 
@@ -506,14 +632,16 @@ tr:last-child td{
 </div>
 
 <script>
-const STORAGE_KEY_CARDS = "gastos_cards_v6";
-const STORAGE_KEY_EXPENSES = "gastos_expenses_v6";
-const STORAGE_KEY_BUDGETS = "gastos_budgets_v6";
-const STORAGE_KEY_THEME = "gastos_theme_v6";
+const STORAGE_KEY_CARDS = "gastos_cards_v61";
+const STORAGE_KEY_EXPENSES = "gastos_expenses_v61";
+const STORAGE_KEY_BUDGETS = "gastos_budgets_v61";
+const STORAGE_KEY_THEME = "gastos_theme_v61";
+const STORAGE_KEY_PERIOD = "gastos_period_v61";
 
-let cards = JSON.parse(localStorage.getItem(STORAGE_KEY_CARDS) || "[]");
-let expenses = JSON.parse(localStorage.getItem(STORAGE_KEY_EXPENSES) || "[]");
-let budgets = JSON.parse(localStorage.getItem(STORAGE_KEY_BUDGETS) || "[]");
+let cards = JSON.parse(localStorage.getItem(STORAGE_KEY_CARDS) || localStorage.getItem("gastos_cards_v6") || "[]");
+let expenses = JSON.parse(localStorage.getItem(STORAGE_KEY_EXPENSES) || localStorage.getItem("gastos_expenses_v6") || "[]");
+let budgets = JSON.parse(localStorage.getItem(STORAGE_KEY_BUDGETS) || localStorage.getItem("gastos_budgets_v6") || "[]");
+let activePeriod = localStorage.getItem(STORAGE_KEY_PERIOD) || "month";
 
 function save(){
   localStorage.setItem(STORAGE_KEY_CARDS, JSON.stringify(cards));
@@ -542,15 +670,11 @@ function applyTheme(theme){
   localStorage.setItem(STORAGE_KEY_THEME, theme);
 
   const btn = document.getElementById("themeToggle");
-  if(theme === "dark"){
-    btn.textContent = "☀️ Tema claro";
-  } else {
-    btn.textContent = "🌙 Tema oscuro";
-  }
+  btn.textContent = theme === "dark" ? "☀️ Tema claro" : "🌙 Tema oscuro";
 }
 
 function initTheme(){
-  const saved = localStorage.getItem(STORAGE_KEY_THEME) || "dark";
+  const saved = localStorage.getItem(STORAGE_KEY_THEME) || localStorage.getItem("gastos_theme_v6") || "dark";
   applyTheme(saved);
 }
 
@@ -833,6 +957,180 @@ function renderSummary(){
   `;
 }
 
+function isExpenseInActivePeriod(expense){
+  const d = new Date(expense.date);
+  const day = d.getDate();
+
+  if(activePeriod === "month") return true;
+  if(activePeriod === "q1") return day >= 1 && day <= 15;
+  if(activePeriod === "q2") return day >= 16 && day <= 31;
+  return true;
+}
+
+function getPeriodExpenses(){
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  return expenses.filter(e=>{
+    const d = new Date(e.date);
+    const sameMonth = d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    return sameMonth && isExpenseInActivePeriod(e);
+  });
+}
+
+function renderDashboard(){
+  const periodExpenses = getPeriodExpenses();
+  const totalSpent = periodExpenses.reduce((a,b)=>a + Number(b.amount || 0), 0);
+  const totalBudget = budgets.reduce((a,b)=>a + Number(b.amount || 0), 0);
+  const remainingBudget = totalBudget - totalSpent;
+  const totalDebt = cards.reduce((a,c)=>a + getCardDebt(c.id), 0);
+  const totalAvailable = cards.reduce((a,c)=>a + Math.max(0, c.limit - getCardDebt(c.id)), 0);
+
+  document.getElementById("dashboardSummary").innerHTML = `
+    <div class="stat">
+      <div class="t">Gasto del periodo</div>
+      <div class="v">${money(totalSpent)}</div>
+    </div>
+    <div class="stat">
+      <div class="t">Presupuesto restante</div>
+      <div class="v ${remainingBudget < 0 ? "dangerText" : "goodText"}">${money(remainingBudget)}</div>
+    </div>
+    <div class="stat">
+      <div class="t">Deuda total en tarjetas</div>
+      <div class="v">${money(totalDebt)}</div>
+    </div>
+    <div class="stat">
+      <div class="t">Disponible total</div>
+      <div class="v">${money(totalAvailable)}</div>
+    </div>
+  `;
+
+  renderAlerts(periodExpenses, totalSpent, remainingBudget);
+  renderTopCategories(periodExpenses);
+  renderRecentMoves(periodExpenses);
+  renderPeriodPills();
+}
+
+function renderAlerts(periodExpenses, totalSpent, remainingBudget){
+  const box = document.getElementById("alertsBox");
+  const alerts = [];
+
+  if(!cards.length){
+    alerts.push(`<div class="alert warn">Aún no has agregado tarjetas.</div>`);
+  }
+
+  if(!periodExpenses.length){
+    alerts.push(`<div class="alert good">No hay gastos registrados en este periodo.</div>`);
+  }
+
+  if(remainingBudget < 0){
+    alerts.push(`<div class="alert danger">Ya superaste tu presupuesto total del periodo.</div>`);
+  }
+
+  const highUsageCards = cards.filter(c => usagePercent(c.limit, getCardDebt(c.id)) >= 80);
+  highUsageCards.forEach(c=>{
+    alerts.push(`<div class="alert warn">${escapeHtml(c.name)} está arriba del 80% de uso.</div>`);
+  });
+
+  const grouped = {};
+  periodExpenses.forEach(e=>{
+    const key = e.category.toLowerCase();
+    grouped[key] = (grouped[key] || 0) + Number(e.amount || 0);
+  });
+
+  budgets.forEach(b=>{
+    const spent = grouped[b.category.toLowerCase()] || 0;
+    if(spent > b.amount){
+      alerts.push(`<div class="alert danger">La categoría ${escapeHtml(b.category)} ya excedió su presupuesto.</div>`);
+    } else if(b.amount > 0 && spent >= b.amount * 0.8){
+      alerts.push(`<div class="alert warn">La categoría ${escapeHtml(b.category)} ya va arriba del 80%.</div>`);
+    }
+  });
+
+  if(totalSpent > 0 && remainingBudget >= 0){
+    alerts.push(`<div class="alert good">Vas registrando ${money(totalSpent)} en este periodo.</div>`);
+  }
+
+  box.innerHTML = alerts.length ? alerts.join("") : `<div class="emptyBox">Sin alertas por ahora.</div>`;
+}
+
+function renderTopCategories(periodExpenses){
+  const box = document.getElementById("topCategories");
+  if(!periodExpenses.length){
+    box.innerHTML = `<div class="emptyBox">Sin movimientos en este periodo.</div>`;
+    return;
+  }
+
+  const grouped = {};
+  periodExpenses.forEach(e=>{
+    grouped[e.category] = (grouped[e.category] || 0) + Number(e.amount || 0);
+  });
+
+  const top = Object.entries(grouped)
+    .sort((a,b)=>b[1] - a[1])
+    .slice(0,3);
+
+  box.innerHTML = `
+    <div class="miniList">
+      ${top.map(([cat,total])=>`
+        <div class="miniItem">
+          <div class="miniTop">
+            <strong>${escapeHtml(cat)}</strong>
+            <strong>${money(total)}</strong>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderRecentMoves(periodExpenses){
+  const box = document.getElementById("recentMoves");
+  if(!periodExpenses.length){
+    box.innerHTML = `<div class="emptyBox">Sin movimientos recientes.</div>`;
+    return;
+  }
+
+  const recent = periodExpenses
+    .slice()
+    .sort((a,b)=>new Date(b.date) - new Date(a.date))
+    .slice(0,5);
+
+  box.innerHTML = `
+    <div class="miniList">
+      ${recent.map(e=>{
+        const cardName = cards.find(c=>c.id === e.card)?.name || "—";
+        return `
+          <div class="miniItem">
+            <div class="miniTop">
+              <strong>${escapeHtml(e.category)}</strong>
+              <strong>${money(e.amount)}</strong>
+            </div>
+            <div class="miniSub">
+              ${new Date(e.date).toLocaleDateString("es-MX")} • ${escapeHtml(capitalize(e.method))}${e.method === "tarjeta" ? " • " + escapeHtml(cardName) : ""}
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderPeriodPills(){
+  document.querySelectorAll(".filterPill").forEach(p=>{
+    p.classList.toggle("active", p.dataset.period === activePeriod);
+  });
+}
+
+document.querySelectorAll(".filterPill").forEach(p=>{
+  p.addEventListener("click", ()=>{
+    activePeriod = p.dataset.period;
+    localStorage.setItem(STORAGE_KEY_PERIOD, activePeriod);
+    renderDashboard();
+  });
+});
+
 function exportJSON(){
   const data = { cards, expenses, budgets };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
@@ -892,6 +1190,7 @@ function render(){
   renderExpenses();
   renderBudgets();
   renderSummary();
+  renderDashboard();
 }
 
 initTheme();
