@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Gastos v4.2</title>
+  <title>Gastos v4.3</title>
   <meta name="theme-color" content="#2a0b14" />
   <style>
     :root{
@@ -356,6 +356,12 @@
       padding:12px;
     }
 
+    .alertUrgent{
+      border:1px solid rgba(245,158,11,.45);
+      background:linear-gradient(135deg, rgba(245,158,11,.18), rgba(185,28,60,.14));
+      box-shadow:0 0 0 1px rgba(245,158,11,.12) inset;
+    }
+
     .alertTop{
       display:flex;
       align-items:center;
@@ -397,7 +403,7 @@
       <div class="sub">Control personal • Offline • Alertas de pago</div>
     </div>
     <div class="topRight">
-      <div class="versionBadge" id="versionText">v4.2</div>
+      <div class="versionBadge" id="versionText">v4.3</div>
       <div class="pill" id="fechaHoy">—</div>
     </div>
   </header>
@@ -417,9 +423,9 @@
   </nav>
 
 <script>
-  const APP_VERSION = "v4.2";
-  const KEY = "app_gastos_final_v42";
-  const LEGACY_KEYS = ["app_gastos_final_v41","app_gastos_final_v4","app_gastos_final_v3"];
+  const APP_VERSION = "v4.3";
+  const KEY = "app_gastos_final_v43";
+  const LEGACY_KEYS = ["app_gastos_final_v42","app_gastos_final_v41","app_gastos_final_v4","app_gastos_final_v3"];
 
   const emptyState = {
     cards: [],
@@ -874,7 +880,6 @@
   function paymentBadgeText(days){
     if(days <= 0) return "Hoy";
     if(days === 1) return "Mañana";
-    if(days <= 7) return `En ${days} días`;
     return `En ${days} días`;
   }
 
@@ -900,6 +905,10 @@
       });
   }
 
+  function getUrgentPayments(){
+    return getUpcomingPayments().filter(x => x.daysLeft <= 7);
+  }
+
   function renderUpcomingPaymentsBlock(list, emptyText = "No tienes pagos pendientes por ahora."){
     if(!list.length){
       return `<div class="okBox">${esc(emptyText)}</div>`;
@@ -915,6 +924,37 @@
             </div>
             <div class="note">Fecha de pago: <b>${esc(item.nextDateISO)}</b> • Día ${item.card.payDay}</div>
             <div style="height:6px"></div>
+            <div class="row two">
+              <div class="k">
+                <div class="t">Deuda actual</div>
+                <div class="v">${fmt(item.debt)}</div>
+              </div>
+              <div class="k">
+                <div class="t">Monto del ciclo</div>
+                <div class="v">${fmt(item.cycle)}</div>
+              </div>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderUrgentPaymentsBlock(list){
+    if(!list.length){
+      return `<div class="okBox">No tienes pagos urgentes esta semana.</div>`;
+    }
+
+    return `
+      <div class="alertGrid">
+        ${list.map(item=>`
+          <div class="alertItem alertUrgent">
+            <div class="alertTop">
+              <strong>⚠ ${esc(item.card.name)}</strong>
+              <span class="badge ${paymentBadgeClass(item.daysLeft)}">${paymentBadgeText(item.daysLeft)}</span>
+            </div>
+            <div class="note">Próximo pago: <b>${esc(item.nextDateISO)}</b> • Día ${item.card.payDay}</div>
+            <div style="height:8px"></div>
             <div class="row two">
               <div class="k">
                 <div class="t">Deuda actual</div>
@@ -986,16 +1026,23 @@
     const el = document.getElementById("vTarjetas");
     const editingCard = state.cards.find(c => c.id === ui.editingCardId) || null;
     const upcoming = getUpcomingPayments();
-    const urgent = upcoming.filter(x=>x.daysLeft <= 7);
+    const urgent = getUrgentPayments();
 
     el.innerHTML = `
+      <div class="card">
+        <h3 class="sectionTitle">Pagos urgentes esta semana</h3>
+        <div class="note">Aquí aparecen primero las tarjetas con deuda que vencen hoy, mañana o dentro de los próximos 7 días.</div>
+        <div style="height:10px"></div>
+        ${renderUrgentPaymentsBlock(urgent)}
+      </div>
+
       <div class="card">
         <h3 class="sectionTitle">Alertas de pago</h3>
         <div class="note">Aquí verás las tarjetas con deuda y su próxima fecha de pago.</div>
         <div style="height:10px"></div>
         ${renderUpcomingPaymentsBlock(
-          urgent.length ? urgent : upcoming.slice(0, 4),
-          "No tienes pagos urgentes durante los próximos 7 días."
+          upcoming.slice(0, 6),
+          "No tienes pagos pendientes por ahora."
         )}
       </div>
 
@@ -1898,6 +1945,7 @@
     const incomesMonth = state.incomes.filter(i=>monthKey(i.date) === selectedMonth);
     const expensesMonth = state.expenses.filter(e=>monthKey(e.date) === selectedMonth);
     const upcoming = getUpcomingPayments();
+    const urgent = getUrgentPayments();
 
     const totalIncome = incomesMonth.reduce((s,i)=>s+Number(i.amount||0),0);
 
@@ -1934,6 +1982,13 @@
     });
 
     el.innerHTML = `
+      <div class="card">
+        <h3 class="sectionTitle">Pagos urgentes esta semana</h3>
+        <div class="note">Aquí se concentran primero los pagos más cercanos para que no se te pasen.</div>
+        <div style="height:10px"></div>
+        ${renderUrgentPaymentsBlock(urgent)}
+      </div>
+
       <div class="card">
         <h3 class="sectionTitle">Alertas de pago</h3>
         <div class="note">Estas alertas se calculan con la fecha de pago de cada tarjeta y tu deuda actual.</div>
