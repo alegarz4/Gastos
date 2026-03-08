@@ -3,25 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Gastos v4.3</title>
-  <meta name="theme-color" content="#2a0b14" />
+  <title>Gastos v5.0</title>
+  <meta name="theme-color" content="#1a0c12" />
   <style>
     :root{
-      --bg:#2a0b14;
-      --card:#3a0f1c;
-      --fg:#ffffff;
-      --muted:#e6c8d0;
-      --line:#5c1a2b;
-      --accent:#b91c3c;
-      --accent2:#ef476f;
+      --bg:#1a0c12;
+      --bg2:#12070c;
+      --card:rgba(74,24,39,.48);
+      --card-strong:rgba(97,31,52,.65);
+      --fg:#fff8fb;
+      --muted:#e8cfd8;
+      --line:rgba(255,255,255,.09);
+      --line-strong:rgba(255,255,255,.14);
+      --accent:#a61d44;
+      --accent2:#d9466a;
       --good:#16a34a;
       --danger:#dc2626;
-      --soft:#4a1423;
+      --soft:rgba(104,35,56,.38);
       --warn:#f59e0b;
       --violet:#8b5cf6;
-      --r:16px;
-      --navH:82px;
-      --shadow:0 12px 28px rgba(0,0,0,.28);
+      --glass:rgba(255,255,255,.05);
+      --r:18px;
+      --navH:84px;
+      --shadow:0 14px 34px rgba(0,0,0,.28);
+      --shadow-soft:0 8px 18px rgba(0,0,0,.18);
     }
 
     *{ box-sizing:border-box; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
@@ -31,17 +36,17 @@
       margin:0;
       color:var(--fg);
       background:
-        radial-gradient(900px 500px at 15% -10%, rgba(185,28,60,.18), transparent 55%),
-        radial-gradient(900px 500px at 90% 0%, rgba(239,71,111,.10), transparent 55%),
-        linear-gradient(180deg, var(--bg), #220811);
+        radial-gradient(900px 500px at 10% -10%, rgba(217,70,106,.14), transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, rgba(139,92,246,.10), transparent 50%),
+        linear-gradient(180deg, #16090f 0%, #1a0c12 45%, #12070c 100%);
       min-height:100vh;
     }
 
     header{
       position:sticky; top:0; z-index:20;
-      background:#2a0b14;
-      background:color-mix(in srgb, var(--bg) 86%, transparent);
-      backdrop-filter:blur(10px) saturate(160%);
+      background:rgba(26,12,18,.60);
+      backdrop-filter:blur(14px) saturate(145%);
+      -webkit-backdrop-filter:blur(14px) saturate(145%);
       border-bottom:1px solid var(--line);
       padding:12px 14px;
       display:flex;
@@ -63,28 +68,32 @@
       padding:6px 10px;
       border-radius:999px;
       white-space:nowrap;
-      background:#32101c;
+      background:rgba(255,255,255,.04);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
     }
 
     .versionBadge{
       font-size:12px;
       color:#fff1f4;
-      border:1px solid rgba(239,71,111,.35);
+      border:1px solid rgba(217,70,106,.26);
       padding:6px 10px;
       border-radius:999px;
-      background:linear-gradient(135deg, rgba(185,28,60,.38), rgba(139,92,246,.18));
+      background:linear-gradient(135deg, rgba(166,29,68,.38), rgba(139,92,246,.15));
       white-space:nowrap;
+      box-shadow:var(--shadow-soft);
     }
 
     main{
       padding:14px 14px calc(var(--navH) + 22px);
-      max-width:1120px;
+      max-width:1200px;
       margin:0 auto;
     }
 
     .card{
-      background:#3a0f1c;
-      background:color-mix(in srgb, var(--card) 92%, rgba(239,71,111,.05));
+      background:var(--card);
+      backdrop-filter:blur(14px) saturate(140%);
+      -webkit-backdrop-filter:blur(14px) saturate(140%);
       border:1px solid var(--line);
       border-radius:var(--r);
       padding:14px;
@@ -97,6 +106,7 @@
       .row.two{grid-template-columns:1fr 1fr;}
       .row.three{grid-template-columns:1fr 1fr 1fr;}
       .row.four{grid-template-columns:1fr 1fr 1fr 1fr;}
+      .row.five{grid-template-columns:repeat(5,1fr);}
     }
 
     label{
@@ -111,16 +121,19 @@
       padding:10px 12px;
       border-radius:12px;
       border:1px solid var(--line);
-      background:#32101c;
+      background:rgba(255,255,255,.05);
       color:var(--fg);
       outline:none;
+      transition:.18s ease;
     }
 
     input:focus, select:focus, textarea:focus{
-      border-color:rgba(239,71,111,.6);
-      box-shadow:0 0 0 3px rgba(185,28,60,.16);
+      border-color:rgba(217,70,106,.42);
+      box-shadow:0 0 0 3px rgba(217,70,106,.10);
+      background:rgba(255,255,255,.06);
     }
 
+    input::placeholder, textarea::placeholder{ color:#d9b6c2; }
     textarea{min-height:70px; resize:vertical;}
 
     .btns{
@@ -137,15 +150,22 @@
       font-weight:800;
       cursor:pointer;
       color:#fff;
-      background:var(--accent);
+      background:linear-gradient(135deg, var(--accent), rgba(217,70,106,.92));
+      box-shadow:var(--shadow-soft);
+      transition:.16s ease;
     }
 
-    button.secondary{background:var(--soft); border:1px solid var(--line);}
-    button.good{background:var(--good);}
-    button.danger{background:var(--danger);}
-    button.warn{background:var(--warn); color:#111827;}
-    button.violet{background:var(--violet);}
-    button:active{transform:translateY(1px);}
+    button:hover{ filter:brightness(1.03); }
+    button:active{ transform:translateY(1px); }
+    button.secondary{
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--line);
+      color:var(--fg);
+    }
+    button.good{ background:linear-gradient(135deg, #15803d, #22c55e); }
+    button.danger{ background:linear-gradient(135deg, #b91c1c, #ef4444); }
+    button.warn{ background:linear-gradient(135deg, #f59e0b, #fbbf24); color:#111827; }
+    button.violet{ background:linear-gradient(135deg, #7c3aed, #8b5cf6); }
     button.small{
       padding:7px 10px;
       font-size:12px;
@@ -159,29 +179,35 @@
     }
 
     @media(min-width:760px){
+      .kpi.three{grid-template-columns:repeat(3,1fr);}
       .kpi.four{grid-template-columns:repeat(4,1fr);}
       .kpi.five{grid-template-columns:repeat(5,1fr);}
       .kpi.six{grid-template-columns:repeat(6,1fr);}
+      .kpi.seven{grid-template-columns:repeat(7,1fr);}
     }
 
     .k{
       padding:12px;
       border-radius:14px;
       border:1px solid var(--line);
-      background:#32101c;
+      background:rgba(255,255,255,.04);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
     }
 
     .k .t{font-size:12px; color:var(--muted);}
-    .k .v{font-size:18px; font-weight:900; margin-top:6px;}
-
+    .k .v{font-size:18px; font-weight:900; margin-top:6px; line-height:1.2;}
     .k.negative{
-      border-color:rgba(220,38,38,.45);
-      background:color-mix(in srgb, var(--danger) 10%, #32101c);
+      border-color:rgba(220,38,38,.35);
+      background:rgba(220,38,38,.10);
     }
-
     .k.positive{
-      border-color:rgba(22,163,74,.45);
-      background:color-mix(in srgb, var(--good) 10%, #32101c);
+      border-color:rgba(22,163,74,.35);
+      background:rgba(22,163,74,.10);
+    }
+    .k.warnish{
+      border-color:rgba(245,158,11,.35);
+      background:rgba(245,158,11,.10);
     }
 
     .view{display:none;}
@@ -193,9 +219,9 @@
       height:var(--navH);
       padding:10px 10px calc(10px + env(safe-area-inset-bottom));
       border-top:1px solid var(--line);
-      background:#2a0b14;
-      background:color-mix(in srgb, var(--bg) 86%, transparent);
-      backdrop-filter:blur(10px) saturate(160%);
+      background:rgba(26,12,18,.64);
+      backdrop-filter:blur(14px) saturate(145%);
+      -webkit-backdrop-filter:blur(14px) saturate(145%);
       display:flex;
       gap:10px;
       z-index:30;
@@ -207,7 +233,7 @@
       flex:1;
       border:1px solid var(--line);
       border-radius:14px;
-      background:var(--soft);
+      background:rgba(255,255,255,.04);
       color:var(--fg);
       font-weight:900;
       display:flex;
@@ -218,23 +244,26 @@
       white-space:nowrap;
       padding:0 10px;
       text-align:center;
+      transition:.16s ease;
     }
 
     .tab.active{
-      background:linear-gradient(135deg, rgba(185,28,60,.9), rgba(239,71,111,.22));
-      border-color:rgba(239,71,111,.4);
+      background:linear-gradient(135deg, rgba(166,29,68,.72), rgba(217,70,106,.15));
+      border-color:rgba(217,70,106,.28);
+      box-shadow:var(--shadow-soft);
     }
 
     .tableWrap{
       overflow:auto;
       border-radius:14px;
       border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
     }
 
     table{
       width:100%;
       border-collapse:collapse;
-      min-width:760px;
+      min-width:820px;
       background:transparent;
     }
 
@@ -248,10 +277,12 @@
     th{
       color:var(--muted);
       text-align:left;
-      background:#441522;
+      background:rgba(255,255,255,.05);
       position:sticky;
       top:0;
       z-index:1;
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
     }
 
     tr:last-child td{border-bottom:0;}
@@ -262,34 +293,30 @@
       line-height:1.35;
     }
 
-    .warnBox{
-      border:1px solid color-mix(in srgb, var(--danger) 40%, var(--line));
-      background:color-mix(in srgb, var(--danger) 10%, var(--card));
+    .warnBox, .okBox, .infoBox{
       padding:10px 12px;
       border-radius:12px;
-      color:#fff2f2;
       font-size:12px;
       margin-top:10px;
+      line-height:1.45;
+    }
+
+    .warnBox{
+      border:1px solid rgba(220,38,38,.32);
+      background:rgba(220,38,38,.10);
+      color:#fff2f2;
     }
 
     .okBox{
-      border:1px solid color-mix(in srgb, var(--good) 40%, var(--line));
-      background:color-mix(in srgb, var(--good) 10%, var(--card));
-      padding:10px 12px;
-      border-radius:12px;
+      border:1px solid rgba(22,163,74,.30);
+      background:rgba(22,163,74,.10);
       color:#f0fff4;
-      font-size:12px;
-      margin-top:10px;
     }
 
     .infoBox{
-      border:1px solid color-mix(in srgb, var(--accent2) 40%, var(--line));
-      background:color-mix(in srgb, var(--accent2) 8%, var(--card));
-      padding:10px 12px;
-      border-radius:12px;
+      border:1px solid rgba(217,70,106,.26);
+      background:rgba(217,70,106,.08);
       color:#fff3f6;
-      font-size:12px;
-      margin-top:10px;
     }
 
     .sectionTitle{
@@ -328,8 +355,8 @@
       gap:6px;
       font-size:12px;
       color:#fff1f4;
-      border:1px solid rgba(239,71,111,.28);
-      background:rgba(185,28,60,.18);
+      border:1px solid rgba(217,70,106,.22);
+      background:rgba(166,29,68,.18);
       border-radius:999px;
       padding:5px 9px;
     }
@@ -350,16 +377,16 @@
     }
 
     .alertItem{
-      border:1px solid rgba(239,71,111,.28);
-      background:rgba(185,28,60,.10);
+      border:1px solid rgba(217,70,106,.20);
+      background:rgba(255,255,255,.04);
       border-radius:14px;
       padding:12px;
     }
 
     .alertUrgent{
-      border:1px solid rgba(245,158,11,.45);
-      background:linear-gradient(135deg, rgba(245,158,11,.18), rgba(185,28,60,.14));
-      box-shadow:0 0 0 1px rgba(245,158,11,.12) inset;
+      border:1px solid rgba(245,158,11,.32);
+      background:linear-gradient(135deg, rgba(245,158,11,.15), rgba(166,29,68,.10));
+      box-shadow:0 0 0 1px rgba(245,158,11,.08) inset;
     }
 
     .alertTop{
@@ -384,26 +411,88 @@
 
     .badge.today{ background:#dc2626; color:#fff; }
     .badge.tomorrow{ background:#f59e0b; color:#111827; }
-    .badge.soon{ background:#b91c3c; color:#fff; }
-    .badge.later{ background:#4a1423; color:#fff; border:1px solid var(--line); }
+    .badge.soon{ background:#a61d44; color:#fff; }
+    .badge.later{ background:rgba(255,255,255,.06); color:#fff; border:1px solid var(--line); }
 
     .rightText{text-align:right;}
     .mono{font-variant-numeric:tabular-nums;}
+    .progress{
+      width:100%;
+      height:10px;
+      background:rgba(255,255,255,.06);
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      margin-top:6px;
+    }
+    .bar{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, rgba(166,29,68,.95), rgba(217,70,106,.95));
+    }
+    .bar.good{
+      background:linear-gradient(90deg, #15803d, #22c55e);
+    }
+    .bar.warn{
+      background:linear-gradient(90deg, #d97706, #f59e0b);
+    }
+    .bar.danger{
+      background:linear-gradient(90deg, #b91c1c, #ef4444);
+    }
+
+    .toastWrap{
+      position:fixed;
+      top:14px;
+      right:14px;
+      z-index:60;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      pointer-events:none;
+    }
+
+    .toast{
+      min-width:220px;
+      max-width:320px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--line-strong);
+      background:rgba(26,12,18,.82);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      color:#fff;
+      box-shadow:var(--shadow);
+      font-size:13px;
+      animation:fadeInUp .18s ease;
+    }
+
+    .toast.good{ border-color:rgba(22,163,74,.35); }
+    .toast.warn{ border-color:rgba(245,158,11,.35); }
+    .toast.danger{ border-color:rgba(220,38,38,.35); }
+
+    @keyframes fadeInUp{
+      from{ opacity:0; transform:translateY(8px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
 
     @media(max-width:640px){
-      table{ min-width:680px; }
+      table{ min-width:760px; }
       .tab{ min-width:110px; }
+      .toastWrap{ left:10px; right:10px; top:10px; }
+      .toast{ min-width:auto; max-width:none; }
     }
   </style>
 </head>
 <body>
+  <div class="toastWrap" id="toastWrap"></div>
+
   <header>
     <div class="title">
       <h1>Gastos</h1>
-      <div class="sub">Control personal • Offline • Alertas de pago</div>
+      <div class="sub">Control personal • Offline • Tarjetas • Presupuestos • CSV</div>
     </div>
     <div class="topRight">
-      <div class="versionBadge" id="versionText">v4.3</div>
+      <div class="versionBadge" id="versionText">v5.0</div>
       <div class="pill" id="fechaHoy">—</div>
     </div>
   </header>
@@ -423,14 +512,73 @@
   </nav>
 
 <script>
-  const APP_VERSION = "v4.3";
-  const KEY = "app_gastos_final_v43";
-  const LEGACY_KEYS = ["app_gastos_final_v42","app_gastos_final_v41","app_gastos_final_v4","app_gastos_final_v3"];
+  const APP_VERSION = "v5.0";
+  const KEY = "app_gastos_final_v50";
+  const LEGACY_KEYS = [
+    "app_gastos_final_v43",
+    "app_gastos_final_v42",
+    "app_gastos_final_v41",
+    "app_gastos_final_v4",
+    "app_gastos_final_v3"
+  ];
 
   const emptyState = {
     cards: [],
     incomes: [],
-    expenses: []
+    expenses: [],
+    budgets: []
+  };
+
+  const INCOME_TYPES = [
+    "Nómina",
+    "Préstamo",
+    "Venta",
+    "Transferencia",
+    "Devolución",
+    "Apoyo familiar",
+    "Ingreso extra",
+    "Otro"
+  ];
+
+  const PURCHASE_CATEGORIES = [
+    "Comida",
+    "Transporte",
+    "Gasolina",
+    "Super",
+    "Servicios",
+    "Salud",
+    "Escuela",
+    "Viajes",
+    "Ahorro",
+    "Gastos generales",
+    "Entretenimiento",
+    "Compras",
+    "Otro"
+  ];
+
+  const EXPENSE_MODE_LABEL = {
+    purchase_card: "Compra con tarjeta",
+    payment_card: "Pago a tarjeta",
+    cash: "Efectivo",
+    debit: "Débito",
+    transfer: "Transferencia"
+  };
+
+  const ui = {
+    activeTab: "Tarjetas",
+    incomeSearch: "",
+    expenseSearch: "",
+    editingCardId: null,
+    editingIncomeId: null,
+    editingExpenseId: null,
+    editingBudgetId: null
+  };
+
+  const TAB_TO_VIEW = {
+    Tarjetas: "vTarjetas",
+    Ingresos: "vIngresos",
+    Egresos: "vEgresos",
+    Resumen: "vResumen"
   };
 
   function structuredCloneSafe(obj){
@@ -452,6 +600,10 @@
 
   function validISO(v){
     return /^\d{4}-\d{2}-\d{2}$/.test(String(v || ""));
+  }
+
+  function validMonth(v){
+    return /^\d{4}-\d{2}$/.test(String(v || ""));
   }
 
   function monthKey(iso){
@@ -499,7 +651,6 @@
     }
 
     s = s.replace(/(?!^)-/g, "");
-
     const x = Number(s);
     return Number.isFinite(x) ? x : NaN;
   }
@@ -520,12 +671,37 @@
     return Math.min(day, last);
   }
 
+  function csvEscape(v){
+    const s = String(v ?? "");
+    return `"${s.replaceAll('"', '""')}"`;
+  }
+
+  function downloadTextFile(filename, content, type = "text/plain;charset=utf-8"){
+    const blob = new Blob([content], {type});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function toast(message, type = "good"){
+    const wrap = document.getElementById("toastWrap");
+    const div = document.createElement("div");
+    div.className = `toast ${type}`;
+    div.textContent = message;
+    wrap.appendChild(div);
+    setTimeout(()=>div.remove(), 2500);
+  }
+
   function normalizeState(raw){
     const base = raw || {};
     const state = {
       cards: Array.isArray(base.cards) ? base.cards : [],
       incomes: Array.isArray(base.incomes) ? base.incomes : [],
-      expenses: Array.isArray(base.expenses) ? base.expenses : []
+      expenses: Array.isArray(base.expenses) ? base.expenses : [],
+      budgets: Array.isArray(base.budgets) ? base.budgets : []
     };
 
     state.cards = state.cards.map(c => ({
@@ -546,14 +722,21 @@
     }));
 
     state.expenses = state.expenses.map(e => {
-      let mode = e.mode;
+      let mode = e.mode || "";
       if(!mode){
-        mode = e.category === "Pago de tarjeta de crédito" ? "payment" : "purchase";
+        if(e.category === "Pago de tarjeta de crédito"){
+          mode = "payment_card";
+        } else {
+          mode = "purchase_card";
+        }
       }
+      if(mode === "purchase") mode = "purchase_card";
+      if(mode === "payment") mode = "payment_card";
+
       return {
         id: e.id || uid(),
         mode,
-        category: String(e.category || (mode === "payment" ? "Pago de tarjeta de crédito" : "Otro")),
+        category: String(e.category || "Otro"),
         cardId: String(e.cardId || ""),
         amount: Number(e.amount || 0),
         date: validISO(e.date) ? e.date : todayISO(),
@@ -561,6 +744,13 @@
         sourceIncomeType: String(e.sourceIncomeType || "")
       };
     });
+
+    state.budgets = state.budgets.map(b => ({
+      id: b.id || uid(),
+      month: validMonth(b.month) ? b.month : monthKey(todayISO()),
+      category: PURCHASE_CATEGORIES.includes(b.category) ? b.category : "Otro",
+      amount: Number(b.amount || 0)
+    }));
 
     return state;
   }
@@ -591,49 +781,6 @@
 
   const state = loadState();
 
-  const INCOME_TYPES = [
-    "Nómina",
-    "Préstamo",
-    "Venta",
-    "Transferencia",
-    "Devolución",
-    "Apoyo familiar",
-    "Ingreso extra",
-    "Otro"
-  ];
-
-  const PURCHASE_CATEGORIES = [
-    "Comida",
-    "Transporte",
-    "Gasolina",
-    "Super",
-    "Servicios",
-    "Salud",
-    "Escuela",
-    "Viajes",
-    "Ahorro",
-    "Gastos generales",
-    "Entretenimiento",
-    "Compras",
-    "Otro"
-  ];
-
-  const ui = {
-    activeTab: "Tarjetas",
-    incomeSearch: "",
-    expenseSearch: "",
-    editingCardId: null,
-    editingIncomeId: null,
-    editingExpenseId: null
-  };
-
-  const TAB_TO_VIEW = {
-    Tarjetas: "vTarjetas",
-    Ingresos: "vIngresos",
-    Egresos: "vEgresos",
-    Resumen: "vResumen"
-  };
-
   function save(){
     localStorage.setItem(KEY, JSON.stringify(state));
   }
@@ -656,7 +803,7 @@
     return state.expenses
       .filter(e =>
         monthKey(e.date) === month &&
-        e.mode === "payment" &&
+        e.mode === "payment_card" &&
         e.sourceIncomeType === "Nómina" &&
         e.id !== ignoreExpenseId
       )
@@ -680,8 +827,8 @@
 
     for(const month of monthsToCheck){
       const baseNomina = sumNominaIncomesForMonth(month, originalIncomeId);
-
       let simulatedNomina = baseNomina;
+
       if(newType === "Nómina" && monthKey(newDate) === month){
         simulatedNomina += Number(newAmount || 0);
       }
@@ -748,13 +895,13 @@
 
   function getCardPurchases(cardId){
     return state.expenses
-      .filter(e => e.cardId === cardId && e.mode === "purchase")
+      .filter(e => e.cardId === cardId && e.mode === "purchase_card")
       .reduce((s,e)=>s+Number(e.amount||0),0);
   }
 
   function getCardPayments(cardId){
     return state.expenses
-      .filter(e => e.cardId === cardId && e.mode === "payment")
+      .filter(e => e.cardId === cardId && e.mode === "payment_card")
       .reduce((s,e)=>s+Number(e.amount||0),0);
   }
 
@@ -766,12 +913,18 @@
     return Math.max(0, Number(card.creditLimit||0) - getCardDebt(card.id));
   }
 
+  function getCardUsagePercent(card){
+    const limit = Number(card.creditLimit || 0);
+    if(limit <= 0) return 0;
+    return Math.min(100, (getCardDebt(card.id) / limit) * 100);
+  }
+
   function getCardCyclePurchases(card){
     const range = getCurrentCycle(card);
     return state.expenses
       .filter(e =>
         e.cardId === card.id &&
-        e.mode === "purchase" &&
+        e.mode === "purchase_card" &&
         isDateBetween(e.date, range.startISO, range.endISO)
       )
       .reduce((s,e)=>s+Number(e.amount||0),0);
@@ -782,7 +935,7 @@
     return state.expenses
       .filter(e =>
         e.cardId === card.id &&
-        e.mode === "payment" &&
+        e.mode === "payment_card" &&
         isDateBetween(e.date, range.startISO, range.endISO)
       )
       .reduce((s,e)=>s+Number(e.amount||0),0);
@@ -833,7 +986,7 @@
     return state.expenses
       .filter(e =>
         monthKey(e.date) === selectedMonth &&
-        e.mode === "payment" &&
+        e.mode === "payment_card" &&
         e.sourceIncomeType === "Nómina"
       )
       .reduce((s,e)=>s+Number(e.amount||0),0);
@@ -971,6 +1124,45 @@
     `;
   }
 
+  function getBudgetForMonthCategory(month, category){
+    return state.budgets
+      .filter(b => b.month === month && b.category === category)
+      .reduce((s,b)=>s + Number(b.amount || 0), 0);
+  }
+
+  function getSpentForBudgetCategory(month, category){
+    return state.expenses
+      .filter(e => monthKey(e.date) === month && e.category === category && e.mode !== "payment_card")
+      .reduce((s,e)=>s + Number(e.amount || 0), 0);
+  }
+
+  function getTotalBudgetMonth(month){
+    return state.budgets
+      .filter(b => b.month === month)
+      .reduce((s,b)=>s + Number(b.amount || 0), 0);
+  }
+
+  function getTotalSpentMonthWithoutCardPayments(month){
+    return state.expenses
+      .filter(e => monthKey(e.date) === month && e.mode !== "payment_card")
+      .reduce((s,e)=>s + Number(e.amount || 0), 0);
+  }
+
+  function budgetPercent(spent, budget){
+    if(!(budget > 0)) return 0;
+    return (spent / budget) * 100;
+  }
+
+  function budgetBarClass(percent){
+    if(percent >= 100) return "danger";
+    if(percent >= 80) return "warn";
+    return "good";
+  }
+
+  function expenseModeNeedsCard(mode){
+    return mode === "purchase_card" || mode === "payment_card";
+  }
+
   function render(){
     document.getElementById("versionText").textContent = APP_VERSION;
     renderTarjetas();
@@ -987,14 +1179,67 @@
       exportedAt: new Date().toISOString(),
       data: state
     };
+    downloadTextFile(`gastos_respaldo_${todayISO()}.json`, JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
+    toast("Respaldo JSON exportado.");
+  }
 
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `gastos_respaldo_${todayISO()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+  function exportCSV(kind){
+    let rows = [];
+    let file = "";
+
+    if(kind === "cards"){
+      file = `gastos_tarjetas_${todayISO()}.csv`;
+      rows = [
+        ["id","tarjeta","corte","pago","limite_credito","deuda_actual","disponible","uso_porcentaje"],
+        ...state.cards.map(card=>{
+          const debt = getCardDebt(card.id);
+          const available = getCardAvailable(card);
+          const used = getCardUsagePercent(card).toFixed(2);
+          return [card.id, card.name, card.cutDay, card.payDay, card.creditLimit, debt, available, used];
+        })
+      ];
+    }
+
+    if(kind === "incomes"){
+      file = `gastos_ingresos_${todayISO()}.csv`;
+      rows = [
+        ["id","fecha","mes","tipo","quincena","monto","nota"],
+        ...state.incomes.map(i=>[i.id, i.date, monthKey(i.date), i.type, i.fortnight, i.amount, i.note])
+      ];
+    }
+
+    if(kind === "expenses"){
+      file = `gastos_egresos_${todayISO()}.csv`;
+      rows = [
+        ["id","fecha","mes","modo","tarjeta","categoria","monto","origen_ingreso","nota"],
+        ...state.expenses.map(e=>[
+          e.id,
+          e.date,
+          monthKey(e.date),
+          EXPENSE_MODE_LABEL[e.mode] || e.mode,
+          cardName(e.cardId),
+          e.category,
+          e.amount,
+          e.sourceIncomeType || "",
+          e.note
+        ])
+      ];
+    }
+
+    if(kind === "budgets"){
+      file = `gastos_presupuestos_${todayISO()}.csv`;
+      rows = [
+        ["id","mes","categoria","monto_presupuestado","gastado","diferencia"],
+        ...state.budgets.map(b=>{
+          const spent = getSpentForBudgetCategory(b.month, b.category);
+          return [b.id, b.month, b.category, b.amount, spent, b.amount - spent];
+        })
+      ];
+    }
+
+    const csv = rows.map(row => row.map(csvEscape).join(",")).join("\n");
+    downloadTextFile(file, csv, "text/csv;charset=utf-8");
+    toast("CSV exportado.");
   }
 
   function importBackup(file){
@@ -1007,14 +1252,16 @@
         state.cards = imported.cards;
         state.incomes = imported.incomes;
         state.expenses = imported.expenses;
+        state.budgets = imported.budgets;
 
         ui.editingCardId = null;
         ui.editingIncomeId = null;
         ui.editingExpenseId = null;
+        ui.editingBudgetId = null;
 
         save();
         render();
-        alert("Respaldo importado correctamente.");
+        toast("Respaldo importado correctamente.");
       }catch{
         alert("El archivo no es un respaldo válido.");
       }
@@ -1040,10 +1287,7 @@
         <h3 class="sectionTitle">Alertas de pago</h3>
         <div class="note">Aquí verás las tarjetas con deuda y su próxima fecha de pago.</div>
         <div style="height:10px"></div>
-        ${renderUpcomingPaymentsBlock(
-          upcoming.slice(0, 6),
-          "No tienes pagos pendientes por ahora."
-        )}
+        ${renderUpcomingPaymentsBlock(upcoming.slice(0, 6))}
       </div>
 
       <div class="card">
@@ -1053,7 +1297,8 @@
             <span class="chip">${APP_VERSION}</span>
           </div>
           <div class="right">
-            <button class="secondary small" id="btnExportJson">Exportar respaldo</button>
+            <button class="secondary small" id="btnExportJson">Exportar JSON</button>
+            <button class="secondary small" id="btnExportCardsCsv">CSV tarjetas</button>
             <label class="secondary small" style="display:inline-flex;align-items:center;cursor:pointer;padding:10px 12px;border-radius:12px">
               Importar respaldo
               <input id="importFile" type="file" accept=".json,application/json" class="hidden">
@@ -1061,7 +1306,7 @@
           </div>
         </div>
 
-        <div class="note">Aquí registras nombre de tarjeta, fecha de corte, fecha de pago y saldo total.</div>
+        <div class="note">Aquí registras nombre de tarjeta, fecha de corte, fecha de pago y límite de crédito.</div>
 
         <div style="height:10px"></div>
 
@@ -1083,7 +1328,7 @@
             </select>
           </div>
           <div>
-            <label>Saldo total de la tarjeta</label>
+            <label>Límite de crédito</label>
             <input id="cLimit" inputmode="decimal" placeholder="Ej. 15000" value="${editingCard ? esc(String(editingCard.creditLimit)) : ""}">
           </div>
         </div>
@@ -1097,7 +1342,7 @@
 
       <div class="card">
         <h3 class="sectionTitle">Mis tarjetas</h3>
-        <div class="note">El saldo disponible se reduce con las compras y vuelve a subir con los pagos a tarjeta.</div>
+        <div class="note">El disponible se reduce con las compras y vuelve a subir con los pagos a tarjeta.</div>
 
         <div style="height:10px"></div>
 
@@ -1110,19 +1355,30 @@
                   <th>Corte</th>
                   <th>Pago</th>
                   <th>Próximo pago</th>
-                  <th>Saldo total</th>
+                  <th>Límite</th>
                   <th>Deuda actual</th>
                   <th>Disponible</th>
+                  <th>% usado</th>
                   <th>Monto del ciclo</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
-                ${state.cards.map(card=>{
-                  const t = cardTotals(card.id);
-                  const nextDate = getNextPaymentDate(card);
-                  const dLeft = daysUntil(nextDate);
-                  return `
+                ${state.cards
+                  .slice()
+                  .sort((a,b)=>{
+                    const da = daysUntil(getNextPaymentDate(a));
+                    const db = daysUntil(getNextPaymentDate(b));
+                    if(da !== db) return da - db;
+                    return getCardDebt(b.id) - getCardDebt(a.id);
+                  })
+                  .map(card=>{
+                    const t = cardTotals(card.id);
+                    const nextDate = getNextPaymentDate(card);
+                    const dLeft = daysUntil(nextDate);
+                    const usedPercent = getCardUsagePercent(card);
+                    const barClass = usedPercent >= 80 ? "danger" : usedPercent >= 50 ? "warn" : "good";
+                    return `
                     <tr>
                       <td>${esc(card.name)}</td>
                       <td>Día ${card.cutDay}</td>
@@ -1134,6 +1390,10 @@
                       <td>${fmt(card.creditLimit)}</td>
                       <td>${fmt(t.currentDebt)}</td>
                       <td>${fmt(t.available)}</td>
+                      <td>
+                        <div>${usedPercent.toFixed(1)}%</div>
+                        <div class="progress"><div class="bar ${barClass}" style="width:${Math.min(100, usedPercent)}%"></div></div>
+                      </td>
                       <td>${fmt(t.cycleTotal)}</td>
                       <td>
                         <div class="actions">
@@ -1142,8 +1402,7 @@
                         </div>
                       </td>
                     </tr>
-                  `;
-                }).join("")}
+                  `;}).join("")}
               </tbody>
             </table>
           </div>
@@ -1151,11 +1410,12 @@
 
         <div style="height:12px"></div>
         <button class="danger" id="btnNuke">Borrar TODO</button>
-        <div class="note" style="margin-top:8px">Esto borra tarjetas, ingresos y egresos del dispositivo.</div>
+        <div class="note" style="margin-top:8px">Esto borra tarjetas, ingresos, egresos y presupuestos del dispositivo.</div>
       </div>
     `;
 
     el.querySelector("#btnExportJson").onclick = exportBackup;
+    el.querySelector("#btnExportCardsCsv").onclick = ()=> exportCSV("cards");
 
     el.querySelector("#importFile").onchange = (ev)=>{
       const file = ev.target.files?.[0];
@@ -1172,7 +1432,7 @@
       if(!name) return alert("Escribe el nombre de la tarjeta.");
       if(!(cutDay >= 1 && cutDay <= 31)) return alert("Fecha de corte inválida.");
       if(!(payDay >= 1 && payDay <= 31)) return alert("Fecha de pago inválida.");
-      if(!Number.isFinite(creditLimit) || creditLimit <= 0) return alert("Saldo total inválido.");
+      if(!Number.isFinite(creditLimit) || creditLimit <= 0) return alert("Límite de crédito inválido.");
 
       const duplicate = state.cards.some(c =>
         normalizeText(c.name) === normalizeText(name) &&
@@ -1186,14 +1446,10 @@
           state.cards[i] = { ...state.cards[i], name, cutDay, payDay, creditLimit };
         }
         ui.editingCardId = null;
+        toast("Tarjeta actualizada.");
       } else {
-        state.cards.push({
-          id: uid(),
-          name,
-          cutDay,
-          payDay,
-          creditLimit
-        });
+        state.cards.push({ id: uid(), name, cutDay, payDay, creditLimit });
+        toast("Tarjeta guardada.");
       }
 
       render();
@@ -1234,6 +1490,7 @@
           if(ui.editingCardId === id) ui.editingCardId = null;
           render();
           setTab("Tarjetas");
+          toast("Tarjeta eliminada.", "warn");
         }
       };
     });
@@ -1280,8 +1537,16 @@
 
     el.innerHTML = `
       <div class="card">
-        <h3 class="sectionTitle">${editingIncome ? "Editar ingreso" : "Registrar ingreso"}</h3>
-        <div class="note">Los ingresos están en lista desplegable y se separan por quincena.</div>
+        <div class="toolbar">
+          <div class="left">
+            <h3 class="sectionTitle" style="margin:0">${editingIncome ? "Editar ingreso" : "Registrar ingreso"}</h3>
+          </div>
+          <div class="right">
+            <button class="secondary small" id="btnExportIncomeCsv">CSV ingresos</button>
+          </div>
+        </div>
+
+        <div class="note">Los ingresos se separan por tipo y quincena.</div>
 
         <div style="height:10px"></div>
 
@@ -1425,6 +1690,7 @@
       </div>
     `;
 
+    el.querySelector("#btnExportIncomeCsv").onclick = ()=> exportCSV("incomes");
     el.querySelector("#inFilterType").value = selectedType;
     el.querySelector("#inFilterQ").value = selectedFortnight;
 
@@ -1455,15 +1721,10 @@
           state.incomes[idx] = { ...state.incomes[idx], type, fortnight, date, amount, note };
         }
         ui.editingIncomeId = null;
+        toast("Ingreso actualizado.");
       } else {
-        state.incomes.push({
-          id: uid(),
-          type,
-          fortnight,
-          date,
-          amount,
-          note
-        });
+        state.incomes.push({ id: uid(), type, fortnight, date, amount, note });
+        toast("Ingreso guardado.");
       }
 
       render();
@@ -1518,6 +1779,7 @@
           if(ui.editingIncomeId === id) ui.editingIncomeId = null;
           render();
           setTab("Ingresos");
+          toast("Ingreso eliminado.", "warn");
         }
       };
     });
@@ -1535,7 +1797,15 @@
       const okMonth = monthKey(e.date) === selectedMonth;
       const okCard = selectedCard === "__all__" || e.cardId === selectedCard;
       const okType = selectedType === "__all__" || e.mode === selectedType;
-      const hay = includesText(e.date, cardName(e.cardId), e.mode, e.category, e.note, e.sourceIncomeType, e.amount);
+      const hay = includesText(
+        e.date,
+        cardName(e.cardId),
+        EXPENSE_MODE_LABEL[e.mode] || e.mode,
+        e.category,
+        e.note,
+        e.sourceIncomeType,
+        e.amount
+      );
       const okSearch = !search || hay.includes(search);
       return okMonth && okCard && okType && okSearch;
     });
@@ -1546,106 +1816,99 @@
 
     const totalFiltered = filtered.reduce((s,e)=>s+Number(e.amount||0),0);
 
-    const totalPurchasesMonth = state.expenses
-      .filter(e=>monthKey(e.date) === selectedMonth && e.mode === "purchase")
+    const totalCardPurchasesMonth = state.expenses
+      .filter(e=>monthKey(e.date) === selectedMonth && e.mode === "purchase_card")
       .reduce((s,e)=>s+Number(e.amount||0),0);
 
-    const totalPaymentsMonth = state.expenses
-      .filter(e=>monthKey(e.date) === selectedMonth && e.mode === "payment")
+    const totalCardPaymentsMonth = state.expenses
+      .filter(e=>monthKey(e.date) === selectedMonth && e.mode === "payment_card")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const totalCashMonth = state.expenses
+      .filter(e=>monthKey(e.date) === selectedMonth && e.mode === "cash")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const totalDebitMonth = state.expenses
+      .filter(e=>monthKey(e.date) === selectedMonth && e.mode === "debit")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const totalTransferMonth = state.expenses
+      .filter(e=>monthKey(e.date) === selectedMonth && e.mode === "transfer")
       .reduce((s,e)=>s+Number(e.amount||0),0);
 
     el.innerHTML = `
       <div class="card">
-        <h3 class="sectionTitle">${editingExpense ? "Editar egreso" : "Registrar egreso"}</h3>
-        <div class="note">Está separado en dos modos: <b>Compra con tarjeta</b> y <b>Pago a tarjeta</b>.</div>
+        <div class="toolbar">
+          <div class="left">
+            <h3 class="sectionTitle" style="margin:0">${editingExpense ? "Editar egreso" : "Registrar egreso"}</h3>
+          </div>
+          <div class="right">
+            <button class="secondary small" id="btnExportExpenseCsv">CSV egresos</button>
+          </div>
+        </div>
 
-        ${state.cards.length ? "" : `<div class="warnBox">Primero agrega al menos una tarjeta en la pestaña Tarjetas.</div>`}
+        <div class="note">Ahora puedes registrar gastos en tarjeta, efectivo, débito y transferencia.</div>
+
+        <div style="height:10px"></div>
+
+        <div class="row three">
+          <div>
+            <label>Tipo de egreso</label>
+            <select id="eMode">
+              <option value="purchase_card" ${editingExpense?.mode === "purchase_card" ? "selected" : ""}>Compra con tarjeta</option>
+              <option value="payment_card" ${editingExpense?.mode === "payment_card" ? "selected" : ""}>Pago a tarjeta</option>
+              <option value="cash" ${editingExpense?.mode === "cash" ? "selected" : ""}>Efectivo</option>
+              <option value="debit" ${editingExpense?.mode === "debit" ? "selected" : ""}>Débito</option>
+              <option value="transfer" ${editingExpense?.mode === "transfer" ? "selected" : ""}>Transferencia</option>
+            </select>
+          </div>
+          <div id="cardFieldWrap">
+            <label>Tarjeta</label>
+            <select id="eCard">
+              ${state.cards.length
+                ? `<option value="">Selecciona</option>` + state.cards.map(c=>`<option value="${c.id}" ${editingExpense?.cardId===c.id?"selected":""}>${esc(c.name)}</option>`).join("")
+                : `<option value="">Primero agrega una tarjeta</option>`
+              }
+            </select>
+          </div>
+          <div>
+            <label>Categoría</label>
+            <select id="eCategory">
+              ${PURCHASE_CATEGORIES.map(c=>`<option ${editingExpense?.category===c ? "selected" : ""}>${c}</option>`).join("")}
+            </select>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="row three">
+          <div>
+            <label>Fecha</label>
+            <input id="eDate" type="date" value="${editingExpense?.date || todayISO()}">
+          </div>
+          <div>
+            <label>Monto</label>
+            <input id="eAmount" inputmode="decimal" placeholder="Ej. 450.75" value="${editingExpense ? esc(String(editingExpense.amount)) : ""}">
+          </div>
+          <div id="paymentSourceWrap" class="hidden">
+            <label>Origen del dinero</label>
+            <select id="eSourceIncomeType">
+              <option value="">No aplica</option>
+              ${INCOME_TYPES.map(t=>`<option ${editingExpense?.sourceIncomeType===t?"selected":""}>${t}</option>`).join("")}
+            </select>
+          </div>
+        </div>
 
         <div style="height:10px"></div>
 
         <div class="row two">
           <div>
-            <label>Tipo de egreso</label>
-            <select id="eMode">
-              <option value="purchase" ${editingExpense?.mode !== "payment" ? "selected" : ""}>Compra con tarjeta</option>
-              <option value="payment" ${editingExpense?.mode === "payment" ? "selected" : ""}>Pago a tarjeta</option>
-            </select>
+            <label>Nota (opcional)</label>
+            <input id="eNote" placeholder="Ej. súper, gasolina, pago mínimo, etc." value="${esc(editingExpense?.note || "")}">
           </div>
           <div>
-            <label>Tarjeta</label>
-            <select id="eCard">
-              ${state.cards.length
-                ? state.cards.map(c=>`<option value="${c.id}" ${editingExpense?.cardId===c.id?"selected":""}>${esc(c.name)}</option>`).join("")
-                : `<option value="">Primero agrega una tarjeta</option>`
-              }
-            </select>
-          </div>
-        </div>
-
-        <div style="height:10px"></div>
-
-        <div id="purchaseFields">
-          <div class="row three">
-            <div>
-              <label>Categoría de compra</label>
-              <select id="eCategory">
-                ${PURCHASE_CATEGORIES.map(c=>`<option ${editingExpense?.mode==="purchase" && editingExpense?.category===c ? "selected":""}>${c}</option>`).join("")}
-              </select>
-            </div>
-            <div>
-              <label>Fecha de compra</label>
-              <input id="eDatePurchase" type="date" value="${editingExpense?.mode==="purchase" ? editingExpense.date : todayISO()}">
-            </div>
-            <div>
-              <label>Monto de compra</label>
-              <input id="eAmountPurchase" inputmode="decimal" placeholder="Ej. 450.75" value="${editingExpense?.mode==="purchase" ? esc(String(editingExpense.amount)) : ""}">
-            </div>
-          </div>
-
-          <div style="height:10px"></div>
-
-          <div class="row two">
-            <div>
-              <label>Nota (opcional)</label>
-              <input id="eNotePurchase" placeholder="Ej. súper, gasolina, comida, etc." value="${editingExpense?.mode==="purchase" ? esc(editingExpense.note || "") : ""}">
-            </div>
-            <div>
-              <label>Información</label>
-              <div class="okBox">Las compras aumentan la deuda de la tarjeta y reducen el saldo disponible.</div>
-            </div>
-          </div>
-        </div>
-
-        <div id="paymentFields" class="hidden">
-          <div class="row three">
-            <div>
-              <label>Fecha de pago</label>
-              <input id="eDatePayment" type="date" value="${editingExpense?.mode==="payment" ? editingExpense.date : todayISO()}">
-            </div>
-            <div>
-              <label>Monto de pago</label>
-              <input id="eAmountPayment" inputmode="decimal" placeholder="Ej. 1200" value="${editingExpense?.mode==="payment" ? esc(String(editingExpense.amount)) : ""}">
-            </div>
-            <div>
-              <label>Origen del dinero</label>
-              <select id="eSourceIncomeType">
-                <option value="">No aplica</option>
-                ${INCOME_TYPES.map(t=>`<option ${editingExpense?.mode==="payment" && editingExpense?.sourceIncomeType===t?"selected":""}>${t}</option>`).join("")}
-              </select>
-            </div>
-          </div>
-
-          <div style="height:10px"></div>
-
-          <div class="row two">
-            <div>
-              <label>Nota (opcional)</label>
-              <input id="eNotePayment" placeholder="Ej. pago mínimo, pago total, abono, etc." value="${editingExpense?.mode==="payment" ? esc(editingExpense.note || "") : ""}">
-            </div>
-            <div>
-              <label>Información</label>
-              <div class="okBox">Los pagos reducen la deuda de la tarjeta. Si eliges origen <b>Nómina</b>, también se descuenta de la nómina disponible del mes.</div>
-            </div>
+            <label>Información</label>
+            <div class="okBox" id="expenseInfoBox">Registra el movimiento según el medio real por el que salió el dinero.</div>
           </div>
         </div>
 
@@ -1674,8 +1937,11 @@
             <label>Tipo de egreso</label>
             <select id="egFilterType">
               <option value="__all__">Todos</option>
-              <option value="purchase">Compras con tarjeta</option>
-              <option value="payment">Pagos a tarjeta</option>
+              <option value="purchase_card">Compra con tarjeta</option>
+              <option value="payment_card">Pago a tarjeta</option>
+              <option value="cash">Efectivo</option>
+              <option value="debit">Débito</option>
+              <option value="transfer">Transferencia</option>
             </select>
           </div>
           <div>
@@ -1686,22 +1952,43 @@
 
         <div style="height:12px"></div>
 
-        <div class="kpi four">
+        <div class="kpi six">
           <div class="k">
-            <div class="t">Compras del mes</div>
-            <div class="v">${fmt(totalPurchasesMonth)}</div>
+            <div class="t">Compras con tarjeta</div>
+            <div class="v">${fmt(totalCardPurchasesMonth)}</div>
           </div>
           <div class="k">
-            <div class="t">Pagos del mes</div>
-            <div class="v">${fmt(totalPaymentsMonth)}</div>
+            <div class="t">Pagos a tarjeta</div>
+            <div class="v">${fmt(totalCardPaymentsMonth)}</div>
           </div>
           <div class="k">
-            <div class="t">Total egresos del mes</div>
+            <div class="t">Efectivo</div>
+            <div class="v">${fmt(totalCashMonth)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Débito</div>
+            <div class="v">${fmt(totalDebitMonth)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Transferencia</div>
+            <div class="v">${fmt(totalTransferMonth)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Total del mes</div>
             <div class="v">${fmt(totalMonth)}</div>
           </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="kpi two">
           <div class="k">
             <div class="t">Total filtrado</div>
             <div class="v">${fmt(totalFiltered)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Gastos reales del mes (sin pagos a tarjeta)</div>
+            <div class="v">${fmt(getTotalSpentMonthWithoutCardPayments(selectedMonth))}</div>
           </div>
         </div>
       </div>
@@ -1713,9 +2000,10 @@
             <thead>
               <tr>
                 <th>Fecha</th>
-                <th>Tarjeta</th>
                 <th>Tipo</th>
-                <th>Categoría / Origen</th>
+                <th>Tarjeta</th>
+                <th>Categoría</th>
+                <th>Origen</th>
                 <th>Monto</th>
                 <th>Nota</th>
                 <th>Acciones</th>
@@ -1728,9 +2016,10 @@
                 .map(e=>`
                   <tr>
                     <td>${e.date}</td>
-                    <td>${esc(cardName(e.cardId))}</td>
-                    <td>${e.mode === "purchase" ? "Compra" : "Pago a tarjeta"}</td>
-                    <td>${e.mode === "purchase" ? esc(e.category) : esc(e.sourceIncomeType || "—")}</td>
+                    <td>${esc(EXPENSE_MODE_LABEL[e.mode] || e.mode)}</td>
+                    <td>${expenseModeNeedsCard(e.mode) ? esc(cardName(e.cardId)) : "—"}</td>
+                    <td>${esc(e.category || "—")}</td>
+                    <td>${e.mode === "payment_card" ? esc(e.sourceIncomeType || "—") : "—"}</td>
                     <td>${fmt(e.amount)}</td>
                     <td>${esc(e.note || "")}</td>
                     <td>
@@ -1741,7 +2030,7 @@
                     </td>
                   </tr>
                 `).join("")
-                : `<tr><td colspan="7" class="note">No hay egresos para ese filtro.</td></tr>`
+                : `<tr><td colspan="8" class="note">No hay egresos para ese filtro.</td></tr>`
               }
             </tbody>
           </table>
@@ -1750,146 +2039,124 @@
     `;
 
     const modeSelect = el.querySelector("#eMode");
-    const purchaseFields = el.querySelector("#purchaseFields");
-    const paymentFields = el.querySelector("#paymentFields");
+    const paymentSourceWrap = el.querySelector("#paymentSourceWrap");
+    const cardFieldWrap = el.querySelector("#cardFieldWrap");
+    const expenseInfoBox = el.querySelector("#expenseInfoBox");
 
     function syncExpenseModeUI(){
       const mode = modeSelect.value;
-      purchaseFields.classList.toggle("hidden", mode !== "purchase");
-      paymentFields.classList.toggle("hidden", mode !== "payment");
+      const needsCard = expenseModeNeedsCard(mode);
+      const isPayment = mode === "payment_card";
+
+      cardFieldWrap.classList.toggle("hidden", !needsCard);
+      paymentSourceWrap.classList.toggle("hidden", !isPayment);
+
+      if(mode === "purchase_card"){
+        expenseInfoBox.innerHTML = "Las compras con tarjeta aumentan la deuda y reducen el disponible de la tarjeta.";
+      } else if(mode === "payment_card"){
+        expenseInfoBox.innerHTML = "Los pagos a tarjeta reducen la deuda. Si eliges origen <b>Nómina</b>, se descuenta de la nómina disponible del mes.";
+      } else if(mode === "cash"){
+        expenseInfoBox.innerHTML = "Este gasto cuenta como salida directa de dinero en <b>efectivo</b>.";
+      } else if(mode === "debit"){
+        expenseInfoBox.innerHTML = "Este gasto cuenta como salida directa de dinero desde tu <b>débito</b>.";
+      } else {
+        expenseInfoBox.innerHTML = "Este gasto cuenta como salida directa de dinero por <b>transferencia</b>.";
+      }
     }
 
     modeSelect.onchange = syncExpenseModeUI;
     syncExpenseModeUI();
 
+    el.querySelector("#btnExportExpenseCsv").onclick = ()=> exportCSV("expenses");
     el.querySelector("#egFilterCard").value = selectedCard;
     el.querySelector("#egFilterType").value = selectedType;
 
     el.querySelector("#btnSaveExpense").onclick = ()=>{
-      if(!state.cards.length){
-        alert("Primero agrega una tarjeta.");
-        setTab("Tarjetas");
-        return;
-      }
-
       const mode = el.querySelector("#eMode").value;
       const cardId = el.querySelector("#eCard").value;
-      const card = state.cards.find(c=>c.id === cardId);
+      const category = el.querySelector("#eCategory").value;
+      const date = el.querySelector("#eDate").value;
+      const amount = parseMoney(el.querySelector("#eAmount").value);
+      const note = el.querySelector("#eNote").value.trim();
+      const sourceIncomeType = el.querySelector("#eSourceIncomeType").value || "";
 
-      if(!cardId) return alert("Selecciona una tarjeta.");
-      if(!card) return alert("Tarjeta no encontrada.");
+      if(!date) return alert("Selecciona una fecha.");
+      if(!Number.isFinite(amount) || amount <= 0) return alert("Monto inválido.");
 
-      if(mode === "purchase"){
-        const category = el.querySelector("#eCategory").value;
-        const date = el.querySelector("#eDatePurchase").value;
-        const amount = parseMoney(el.querySelector("#eAmountPurchase").value);
-        const note = el.querySelector("#eNotePurchase").value.trim();
-
-        if(!date) return alert("Selecciona una fecha de compra.");
-        if(!Number.isFinite(amount) || amount <= 0) return alert("Monto inválido.");
-
-        const currentPurchaseTotalExcludingEdited =
-          state.expenses
-            .filter(e => e.cardId === cardId && e.mode === "purchase" && e.id !== ui.editingExpenseId)
-            .reduce((s,e)=>s+Number(e.amount||0),0);
-
-        const currentPaymentTotalExcludingEdited =
-          state.expenses
-            .filter(e => e.cardId === cardId && e.mode === "payment" && e.id !== ui.editingExpenseId)
-            .reduce((s,e)=>s+Number(e.amount||0),0);
-
-        const simulatedDebt = Math.max(0, currentPurchaseTotalExcludingEdited + amount - currentPaymentTotalExcludingEdited);
-
-        if(simulatedDebt > Number(card.creditLimit || 0)){
-          return alert("Esa compra supera el saldo disponible actual de la tarjeta.");
+      if(expenseModeNeedsCard(mode)){
+        if(!state.cards.length){
+          alert("Primero agrega una tarjeta.");
+          setTab("Tarjetas");
+          return;
         }
+        if(!cardId) return alert("Selecciona una tarjeta.");
 
-        if(ui.editingExpenseId){
-          const idx = state.expenses.findIndex(x=>x.id===ui.editingExpenseId);
-          if(idx >= 0){
-            state.expenses[idx] = {
-              ...state.expenses[idx],
-              mode: "purchase",
-              category,
-              cardId,
-              date,
-              amount,
-              note,
-              sourceIncomeType: ""
-            };
+        const card = state.cards.find(c=>c.id === cardId);
+        if(!card) return alert("Tarjeta no encontrada.");
+
+        if(mode === "purchase_card"){
+          const currentPurchaseTotalExcludingEdited =
+            state.expenses
+              .filter(e => e.cardId === cardId && e.mode === "purchase_card" && e.id !== ui.editingExpenseId)
+              .reduce((s,e)=>s+Number(e.amount||0),0);
+
+          const currentPaymentTotalExcludingEdited =
+            state.expenses
+              .filter(e => e.cardId === cardId && e.mode === "payment_card" && e.id !== ui.editingExpenseId)
+              .reduce((s,e)=>s+Number(e.amount||0),0);
+
+          const simulatedDebt = Math.max(0, currentPurchaseTotalExcludingEdited + amount - currentPaymentTotalExcludingEdited);
+
+          if(simulatedDebt > Number(card.creditLimit || 0)){
+            return alert("Esa compra supera el disponible actual de la tarjeta.");
           }
-          ui.editingExpenseId = null;
-        } else {
-          state.expenses.push({
-            id: uid(),
-            mode: "purchase",
-            category,
-            cardId,
-            date,
-            amount,
-            note,
-            sourceIncomeType: ""
-          });
         }
+
+        if(mode === "payment_card"){
+          const simulatedPurchases = state.expenses
+            .filter(e => e.cardId === cardId && e.mode === "purchase_card" && e.id !== ui.editingExpenseId)
+            .reduce((s,e)=>s+Number(e.amount||0),0);
+
+          const simulatedPayments = state.expenses
+            .filter(e => e.cardId === cardId && e.mode === "payment_card" && e.id !== ui.editingExpenseId)
+            .reduce((s,e)=>s+Number(e.amount||0),0);
+
+          const simulatedDebt = Math.max(0, simulatedPurchases - simulatedPayments);
+          if(amount > simulatedDebt){
+            return alert("El pago no puede ser mayor que la deuda actual de la tarjeta.");
+          }
+
+          if(sourceIncomeType === "Nómina"){
+            const selectedM = monthKey(date);
+            const nominaDisponible = getNominaDisponibleMonth(selectedM, ui.editingExpenseId);
+            if(amount > nominaDisponible){
+              return alert("Ese pago supera la nómina disponible del mes.");
+            }
+          }
+        }
+      }
+
+      const payload = {
+        id: ui.editingExpenseId || uid(),
+        mode,
+        category: mode === "payment_card" ? "Pago de tarjeta de crédito" : category,
+        cardId: expenseModeNeedsCard(mode) ? cardId : "",
+        amount,
+        date,
+        note,
+        sourceIncomeType: mode === "payment_card" ? sourceIncomeType : ""
+      };
+
+      if(ui.editingExpenseId){
+        const idx = state.expenses.findIndex(x=>x.id===ui.editingExpenseId);
+        if(idx >= 0){
+          state.expenses[idx] = payload;
+        }
+        ui.editingExpenseId = null;
+        toast("Egreso actualizado.");
       } else {
-        const date = el.querySelector("#eDatePayment").value;
-        const amount = parseMoney(el.querySelector("#eAmountPayment").value);
-        const note = el.querySelector("#eNotePayment").value.trim();
-        const sourceIncomeType = el.querySelector("#eSourceIncomeType").value || "";
-
-        if(!date) return alert("Selecciona una fecha de pago.");
-        if(!Number.isFinite(amount) || amount <= 0) return alert("Monto inválido.");
-
-        const simulatedPurchases = state.expenses
-          .filter(e => e.cardId === cardId && e.mode === "purchase" && e.id !== ui.editingExpenseId)
-          .reduce((s,e)=>s+Number(e.amount||0),0);
-
-        const simulatedPayments = state.expenses
-          .filter(e => e.cardId === cardId && e.mode === "payment" && e.id !== ui.editingExpenseId)
-          .reduce((s,e)=>s+Number(e.amount||0),0);
-
-        const simulatedDebt = Math.max(0, simulatedPurchases - simulatedPayments);
-
-        if(amount > simulatedDebt){
-          return alert("El pago no puede ser mayor que la deuda actual de la tarjeta.");
-        }
-
-        if(sourceIncomeType === "Nómina"){
-          const selectedM = monthKey(date);
-          const nominaDisponible = getNominaDisponibleMonth(selectedM, ui.editingExpenseId);
-
-          if(amount > nominaDisponible){
-            return alert("Ese pago supera la nómina disponible del mes.");
-          }
-        }
-
-        if(ui.editingExpenseId){
-          const idx = state.expenses.findIndex(x=>x.id===ui.editingExpenseId);
-          if(idx >= 0){
-            state.expenses[idx] = {
-              ...state.expenses[idx],
-              mode: "payment",
-              category: "Pago de tarjeta de crédito",
-              cardId,
-              date,
-              amount,
-              note,
-              sourceIncomeType
-            };
-          }
-          ui.editingExpenseId = null;
-        } else {
-          state.expenses.push({
-            id: uid(),
-            mode: "payment",
-            category: "Pago de tarjeta de crédito",
-            cardId,
-            date,
-            amount,
-            note,
-            sourceIncomeType
-          });
-        }
+        state.expenses.push(payload);
+        toast("Egreso guardado.");
       }
 
       render();
@@ -1927,12 +2194,12 @@
     el.querySelectorAll("[data-delexpense]").forEach(btn=>{
       btn.onclick = ()=>{
         const id = btn.getAttribute("data-delexpense");
-
         if(confirm("¿Eliminar este egreso?")){
           state.expenses = state.expenses.filter(x=>x.id !== id);
           if(ui.editingExpenseId === id) ui.editingExpenseId = null;
           render();
           setTab("Egresos");
+          toast("Egreso eliminado.", "warn");
         }
       };
     });
@@ -1941,6 +2208,7 @@
   function renderResumen(){
     const el = document.getElementById("vResumen");
     const selectedMonth = document.getElementById("rMonth")?.value || monthKey(todayISO());
+    const editingBudget = state.budgets.find(b => b.id === ui.editingBudgetId) || null;
 
     const incomesMonth = state.incomes.filter(i=>monthKey(i.date) === selectedMonth);
     const expensesMonth = state.expenses.filter(e=>monthKey(e.date) === selectedMonth);
@@ -1949,12 +2217,28 @@
 
     const totalIncome = incomesMonth.reduce((s,i)=>s+Number(i.amount||0),0);
 
-    const totalPurchasesMonth = expensesMonth
-      .filter(e=>e.mode === "purchase")
+    const totalCardPurchasesMonth = expensesMonth
+      .filter(e=>e.mode === "purchase_card")
       .reduce((s,e)=>s+Number(e.amount||0),0);
 
-    const totalPaymentsMonth = expensesMonth
-      .filter(e=>e.mode === "payment")
+    const totalCardPaymentsMonth = expensesMonth
+      .filter(e=>e.mode === "payment_card")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const totalCashMonth = expensesMonth
+      .filter(e=>e.mode === "cash")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const totalDebitMonth = expensesMonth
+      .filter(e=>e.mode === "debit")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const totalTransferMonth = expensesMonth
+      .filter(e=>e.mode === "transfer")
+      .reduce((s,e)=>s+Number(e.amount||0),0);
+
+    const totalRealSpendingMonth = expensesMonth
+      .filter(e=>e.mode !== "payment_card")
       .reduce((s,e)=>s+Number(e.amount||0),0);
 
     const totalQ1 = incomesMonth
@@ -1972,14 +2256,29 @@
     const totalDebtAllCards = state.cards.reduce((s,card)=>s + getCardDebt(card.id), 0);
     const totalAvailableAllCards = state.cards.reduce((s,card)=>s + getCardAvailable(card), 0);
 
-    const cashFlowBalance = totalIncome - totalPaymentsMonth;
+    const cashFlowBalance = totalIncome - totalCardPaymentsMonth;
+    const practicalBalance = totalIncome - totalRealSpendingMonth;
 
     const expenseByCategory = {};
     for(const c of PURCHASE_CATEGORIES) expenseByCategory[c] = 0;
 
-    expensesMonth.filter(e=>e.mode === "purchase").forEach(e=>{
-      expenseByCategory[e.category] = (expenseByCategory[e.category] || 0) + Number(e.amount||0);
-    });
+    expensesMonth
+      .filter(e=>e.mode !== "payment_card")
+      .forEach(e=>{
+        expenseByCategory[e.category] = (expenseByCategory[e.category] || 0) + Number(e.amount||0);
+      });
+
+    const budgetRows = PURCHASE_CATEGORIES.map(category=>{
+      const budget = getBudgetForMonthCategory(selectedMonth, category);
+      const spent = getSpentForBudgetCategory(selectedMonth, category);
+      const percent = budgetPercent(spent, budget);
+      return { category, budget, spent, diff: budget - spent, percent };
+    }).filter(row => row.budget > 0 || row.spent > 0)
+      .sort((a,b)=>b.spent - a.spent);
+
+    const totalBudget = getTotalBudgetMonth(selectedMonth);
+    const totalSpentAgainstBudget = getTotalSpentMonthWithoutCardPayments(selectedMonth);
+    const totalBudgetDiff = totalBudget - totalSpentAgainstBudget;
 
     el.innerHTML = `
       <div class="card">
@@ -1991,7 +2290,7 @@
 
       <div class="card">
         <h3 class="sectionTitle">Alertas de pago</h3>
-        <div class="note">Estas alertas se calculan con la fecha de pago de cada tarjeta y tu deuda actual.</div>
+        <div class="note">Estas alertas se calculan con la fecha de pago de cada tarjeta y la deuda actual.</div>
         <div style="height:10px"></div>
         ${renderUpcomingPaymentsBlock(upcoming.slice(0, 6))}
       </div>
@@ -2032,11 +2331,36 @@
           </div>
           <div class="k">
             <div class="t">Compras con tarjeta</div>
-            <div class="v">${fmt(totalPurchasesMonth)}</div>
+            <div class="v">${fmt(totalCardPurchasesMonth)}</div>
           </div>
           <div class="k">
-            <div class="t">Pagos a tarjeta del mes</div>
-            <div class="v">${fmt(totalPaymentsMonth)}</div>
+            <div class="t">Pagos a tarjeta</div>
+            <div class="v">${fmt(totalCardPaymentsMonth)}</div>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="kpi five">
+          <div class="k">
+            <div class="t">Efectivo</div>
+            <div class="v">${fmt(totalCashMonth)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Débito</div>
+            <div class="v">${fmt(totalDebitMonth)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Transferencia</div>
+            <div class="v">${fmt(totalTransferMonth)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Gasto real del mes</div>
+            <div class="v">${fmt(totalRealSpendingMonth)}</div>
+          </div>
+          <div class="k ${practicalBalance < 0 ? "negative" : "positive"}">
+            <div class="t">Balance real del mes</div>
+            <div class="v">${fmt(practicalBalance)}</div>
           </div>
         </div>
 
@@ -2056,7 +2380,7 @@
             <div class="v">${fmt(nominaDisponible)}</div>
           </div>
           <div class="k ${cashFlowBalance < 0 ? "negative" : "positive"}">
-            <div class="t">Balance de flujo del mes</div>
+            <div class="t">Flujo vs pagos a tarjeta</div>
             <div class="v">${fmt(cashFlowBalance)}</div>
           </div>
         </div>
@@ -2075,18 +2399,122 @@
         </div>
 
         <div class="infoBox">
-          <b>Nota del resumen:</b> el <b>balance de flujo del mes</b> se calcula con ingresos menos <b>pagos a tarjeta</b>. 
-          Las <b>compras con tarjeta</b> se muestran aparte para no contar doble el mismo dinero.
+          <b>Balance real del mes:</b> ingresos menos gastos reales del mes, es decir:
+          compras con tarjeta + efectivo + débito + transferencia.
+          <br><br>
+          <b>Flujo vs pagos a tarjeta:</b> ingresos menos pagos a tarjeta del mes. Lo mantuve porque te ayuda a controlar con qué pagas la deuda, pero ahora ya tienes también un balance más práctico.
         </div>
 
-        ${cashFlowBalance < 0
-          ? `<div class="warnBox">Tu balance de flujo del mes está en negativo. Eso significa que tus pagos a tarjeta del mes superan tus ingresos registrados para este periodo.</div>`
-          : `<div class="okBox">Tu balance de flujo del mes está en positivo. Vas bien mientras tus registros sean completos.</div>`
+        ${practicalBalance < 0
+          ? `<div class="warnBox">Tu balance real del mes está en negativo. Tus gastos reales registrados superan tus ingresos del periodo.</div>`
+          : `<div class="okBox">Tu balance real del mes está en positivo. Vas bien mientras tus registros estén completos.</div>`
         }
       </div>
 
       <div class="card">
-        <h3 class="sectionTitle">Compras por categoría</h3>
+        <div class="toolbar">
+          <div class="left">
+            <h3 class="sectionTitle" style="margin:0">${editingBudget ? "Editar presupuesto" : "Agregar presupuesto mensual"}</h3>
+          </div>
+          <div class="right">
+            <button class="secondary small" id="btnExportBudgetCsv">CSV presupuestos</button>
+          </div>
+        </div>
+
+        <div class="note">Define cuánto quieres gastar por categoría en cada mes.</div>
+
+        <div style="height:10px"></div>
+
+        <div class="row three">
+          <div>
+            <label>Mes</label>
+            <input type="month" id="bMonth" value="${editingBudget?.month || selectedMonth}">
+          </div>
+          <div>
+            <label>Categoría</label>
+            <select id="bCategory">
+              ${PURCHASE_CATEGORIES.map(c=>`<option ${editingBudget?.category===c?"selected":""}>${c}</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <label>Monto presupuestado</label>
+            <input id="bAmount" inputmode="decimal" placeholder="Ej. 2500" value="${editingBudget ? esc(String(editingBudget.amount)) : ""}">
+          </div>
+        </div>
+
+        <div class="btns">
+          <button class="good" id="btnSaveBudget">${editingBudget ? "Actualizar presupuesto" : "Guardar presupuesto"}</button>
+          <button class="secondary" id="btnClearBudget">Limpiar</button>
+          ${editingBudget ? `<button class="warn" id="btnCancelEditBudget">Cancelar edición</button>` : ""}
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="kpi three">
+          <div class="k">
+            <div class="t">Total presupuestado</div>
+            <div class="v">${fmt(totalBudget)}</div>
+          </div>
+          <div class="k">
+            <div class="t">Gastado contra presupuesto</div>
+            <div class="v">${fmt(totalSpentAgainstBudget)}</div>
+          </div>
+          <div class="k ${totalBudgetDiff < 0 ? "negative" : "positive"}">
+            <div class="t">Diferencia</div>
+            <div class="v">${fmt(totalBudgetDiff)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="sectionTitle">Presupuesto por categoría</h3>
+
+        ${budgetRows.length ? `
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Categoría</th>
+                  <th>Presupuesto</th>
+                  <th>Gastado</th>
+                  <th>Disponible / Excedente</th>
+                  <th>% usado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${budgetRows.map(row=>{
+                  const budgetItems = state.budgets.filter(b => b.month === selectedMonth && b.category === row.category);
+                  const firstId = budgetItems[0]?.id || "";
+                  return `
+                    <tr>
+                      <td>${esc(row.category)}</td>
+                      <td>${fmt(row.budget)}</td>
+                      <td>${fmt(row.spent)}</td>
+                      <td>${fmt(row.diff)}</td>
+                      <td>
+                        <div>${row.budget > 0 ? row.percent.toFixed(1) + "%" : "—"}</div>
+                        <div class="progress">
+                          <div class="bar ${budgetBarClass(row.percent)}" style="width:${Math.min(100, row.percent)}%"></div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="actions">
+                          ${firstId ? `<button class="secondary small" data-editbudget="${firstId}">Editar</button>` : ""}
+                          ${budgetItems.length ? `<button class="danger small" data-delbudgetcat="${esc(row.category)}">Eliminar</button>` : ""}
+                        </div>
+                      </td>
+                    </tr>
+                  `;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        ` : `<div class="warnBox">Todavía no hay presupuestos o gastos por categoría en este mes.</div>`}
+      </div>
+
+      <div class="card">
+        <h3 class="sectionTitle">Gastos reales por categoría</h3>
         <div class="tableWrap">
           <table>
             <thead>
@@ -2096,12 +2524,15 @@
               </tr>
             </thead>
             <tbody>
-              ${PURCHASE_CATEGORIES.map(c=>`
-                <tr>
-                  <td>${esc(c)}</td>
-                  <td>${fmt(expenseByCategory[c] || 0)}</td>
-                </tr>
-              `).join("")}
+              ${PURCHASE_CATEGORIES
+                .filter(c => (expenseByCategory[c] || 0) > 0)
+                .sort((a,b)=>(expenseByCategory[b]||0) - (expenseByCategory[a]||0))
+                .map(c=>`
+                  <tr>
+                    <td>${esc(c)}</td>
+                    <td>${fmt(expenseByCategory[c] || 0)}</td>
+                  </tr>
+                `).join("") || `<tr><td colspan="2" class="note">No hay gastos reales registrados en este mes.</td></tr>`}
             </tbody>
           </table>
         </div>
@@ -2115,11 +2546,12 @@
               <thead>
                 <tr>
                   <th>Tarjeta</th>
-                  <th>Saldo total</th>
+                  <th>Límite</th>
                   <th>Total comprado</th>
                   <th>Total pagado</th>
                   <th>Deuda actual</th>
                   <th>Disponible</th>
+                  <th>% usado</th>
                   <th>Monto del ciclo</th>
                   <th>Periodo del ciclo</th>
                 </tr>
@@ -2127,6 +2559,7 @@
               <tbody>
                 ${state.cards.map(card=>{
                   const t = cardTotals(card.id);
+                  const usedPercent = getCardUsagePercent(card);
                   return `
                     <tr>
                       <td>${esc(card.name)}</td>
@@ -2135,6 +2568,7 @@
                       <td>${fmt(t.totalPayments)}</td>
                       <td>${fmt(t.currentDebt)}</td>
                       <td>${fmt(t.available)}</td>
+                      <td>${usedPercent.toFixed(1)}%</td>
                       <td>${fmt(t.cycleTotal)}</td>
                       <td>${t.cycleRange ? `${t.cycleRange.startISO} a ${t.cycleRange.endISO}` : "—"}</td>
                     </tr>
@@ -2147,8 +2581,74 @@
       </div>
     `;
 
+    el.querySelector("#btnExportBudgetCsv").onclick = ()=> exportCSV("budgets");
+
+    el.querySelector("#btnSaveBudget").onclick = ()=>{
+      const month = el.querySelector("#bMonth").value;
+      const category = el.querySelector("#bCategory").value;
+      const amount = parseMoney(el.querySelector("#bAmount").value);
+
+      if(!month) return alert("Selecciona un mes.");
+      if(!Number.isFinite(amount) || amount <= 0) return alert("Monto inválido.");
+
+      if(ui.editingBudgetId){
+        const idx = state.budgets.findIndex(b=>b.id===ui.editingBudgetId);
+        if(idx >= 0){
+          state.budgets[idx] = { ...state.budgets[idx], month, category, amount };
+        }
+        ui.editingBudgetId = null;
+        toast("Presupuesto actualizado.");
+      } else {
+        const existing = state.budgets.find(b => b.month === month && b.category === category);
+        if(existing){
+          existing.amount = amount;
+          toast("Presupuesto actualizado.");
+        } else {
+          state.budgets.push({ id: uid(), month, category, amount });
+          toast("Presupuesto guardado.");
+        }
+      }
+
+      render();
+      setTab("Resumen");
+    };
+
+    el.querySelector("#btnClearBudget").onclick = ()=>{
+      ui.editingBudgetId = null;
+      render();
+    };
+
+    if(el.querySelector("#btnCancelEditBudget")){
+      el.querySelector("#btnCancelEditBudget").onclick = ()=>{
+        ui.editingBudgetId = null;
+        render();
+      };
+    }
+
     el.querySelector("#rMonth").onchange = render;
     el.querySelector("#rJump").onchange = (ev)=> setTab(ev.target.value);
+
+    el.querySelectorAll("[data-editbudget]").forEach(btn=>{
+      btn.onclick = ()=>{
+        ui.editingBudgetId = btn.getAttribute("data-editbudget");
+        render();
+        window.scrollTo({top:0, behavior:"smooth"});
+      };
+    });
+
+    el.querySelectorAll("[data-delbudgetcat]").forEach(btn=>{
+      btn.onclick = ()=>{
+        const cat = btn.getAttribute("data-delbudgetcat");
+        if(confirm(`¿Eliminar presupuesto de ${cat} para ${selectedMonth}?`)){
+          state.budgets = state.budgets.filter(b => !(b.month === selectedMonth && b.category === cat));
+          if(editingBudget?.category === cat && editingBudget?.month === selectedMonth){
+            ui.editingBudgetId = null;
+          }
+          render();
+          toast("Presupuesto eliminado.", "warn");
+        }
+      };
+    });
   }
 
   document.getElementById("fechaHoy").textContent =
