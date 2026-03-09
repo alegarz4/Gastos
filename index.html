@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Control de Gastos</title>
 
+<meta name="theme-color" content="#b4234a" />
+<link rel="manifest" href="/Gastos/manifest.json" />
+<link rel="apple-touch-icon" href="/Gastos/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Gastos" />
+
 <style>
 :root{
   --radius:16px;
@@ -511,7 +518,7 @@ tr:last-child td{ border-bottom:none; }
 
   <div class="headerRight">
     <button id="themeToggle" class="secondary">☀️ Tema claro</button>
-    <div class="pill" id="versionText">v7.0</div>
+    <div class="pill" id="versionText">v7.1</div>
     <div class="pill" id="fechaHoy">—</div>
   </div>
 </header>
@@ -1900,43 +1907,6 @@ document.querySelectorAll(".filterPill").forEach(p=>{
   });
 });
 
-function processFixedExpensesForMonth(targetMonth){
-  const year = Number(targetMonth.slice(0,4));
-  const monthIndex = Number(targetMonth.slice(5,7)) - 1;
-  let changed = false;
-
-  fixedExpenses.forEach(f=>{
-    if(!f.active) return;
-
-    const alreadyExists = expenses.some(e =>
-      e.source === "fixed" &&
-      e.fixedId === f.id &&
-      monthKey(e.date) === targetMonth
-    );
-    if(alreadyExists) return;
-
-    const safeDay = clampDay(year, monthIndex, Number(f.day || 1));
-    expenses.push({
-      id: uid(),
-      fixedId: f.id,
-      method: f.method,
-      card: f.method === "tarjeta" ? (f.cardId || "") : "",
-      amount: Number(f.amount || 0),
-      category: f.category,
-      note: f.note || "",
-      date: makeISO(year, monthIndex, safeDay),
-      source: "fixed"
-    });
-    changed = true;
-  });
-
-  if(changed) save();
-}
-
-function processFixedExpensesForAllKnownMonths(){
-  getKnownMonths().forEach(m => processFixedExpensesForMonth(m));
-}
-
 function exportJSON(){
   const data = { selectedMonth, incomes, cards, fixedExpenses, expenses, budgets };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
@@ -1996,6 +1966,19 @@ function render(){
 initTheme();
 processFixedExpensesForAllKnownMonths();
 render();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", async () => {
+    try {
+      const registration = await navigator.serviceWorker.register("/Gastos/sw.js", {
+        scope: "/Gastos/"
+      });
+      console.log("Service Worker registrado:", registration.scope);
+    } catch (error) {
+      console.error("Error al registrar el Service Worker:", error);
+    }
+  });
+}
 </script>
 
 </body>
