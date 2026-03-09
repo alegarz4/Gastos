@@ -10,13 +10,13 @@
   "theme_color": "#b4234a",
   "icons": [
     {
-      "src": "/Gastos/icon-192.png",
+      "src": "/Gastos/icon-192-pro.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/Gastos/icon-512.png",
+      "src": "/Gastos/icon-512-pro.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
