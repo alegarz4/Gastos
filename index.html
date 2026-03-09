@@ -459,12 +459,12 @@ tr:last-child td{
 <header>
   <div class="headerLeft">
     <div class="headerTitle">Gastos</div>
-    <div class="headerSub">Control personal • Tarjetas • Presupuestos • Dashboard</div>
+    <div class="headerSub">Control personal • Ingresos • Tarjetas • Presupuestos • Dashboard</div>
   </div>
 
   <div class="headerRight">
     <button id="themeToggle" class="secondary">☀️ Tema claro</button>
-    <div class="pill" id="versionText">v6.1</div>
+    <div class="pill" id="versionText">v6.2</div>
     <div class="pill" id="fechaHoy">—</div>
   </div>
 </header>
@@ -503,6 +503,39 @@ tr:last-child td{
         <div class="dashboardTitle">Movimientos recientes</div>
         <div id="recentMoves"></div>
       </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="toolbar">
+      <h2>Registrar ingreso</h2>
+      <div class="note">Agrega entradas de dinero para calcular tu balance real.</div>
+    </div>
+
+    <div class="grid grid3">
+      <div>
+        <label>Tipo de ingreso</label>
+        <select id="incomeType">
+          <option value="nomina">Nómina</option>
+          <option value="extra">Ingreso extra</option>
+          <option value="venta">Venta</option>
+          <option value="prestamo">Préstamo</option>
+          <option value="transferencia">Transferencia</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div>
+        <label>Monto</label>
+        <input id="incomeAmount" type="number" placeholder="Ej. 8500">
+      </div>
+      <div>
+        <label>Nota</label>
+        <input id="incomeNote" placeholder="Ej. quincena, venta, apoyo...">
+      </div>
+    </div>
+
+    <div class="btns">
+      <button onclick="addIncome()">Guardar ingreso</button>
     </div>
   </div>
 
@@ -602,6 +635,13 @@ tr:last-child td{
   </div>
 
   <div class="card">
+    <h2>Ingresos</h2>
+    <div class="tableWrap">
+      <table id="incomeTable"></table>
+    </div>
+  </div>
+
+  <div class="card">
     <h2>Tarjetas</h2>
     <div class="tableWrap">
       <table id="cardTable"></table>
@@ -632,21 +672,24 @@ tr:last-child td{
 </div>
 
 <script>
-const STORAGE_KEY_CARDS = "gastos_cards_v61";
-const STORAGE_KEY_EXPENSES = "gastos_expenses_v61";
-const STORAGE_KEY_BUDGETS = "gastos_budgets_v61";
-const STORAGE_KEY_THEME = "gastos_theme_v61";
-const STORAGE_KEY_PERIOD = "gastos_period_v61";
+const STORAGE_KEY_CARDS = "gastos_cards_v62";
+const STORAGE_KEY_EXPENSES = "gastos_expenses_v62";
+const STORAGE_KEY_BUDGETS = "gastos_budgets_v62";
+const STORAGE_KEY_INCOMES = "gastos_incomes_v62";
+const STORAGE_KEY_THEME = "gastos_theme_v62";
+const STORAGE_KEY_PERIOD = "gastos_period_v62";
 
-let cards = JSON.parse(localStorage.getItem(STORAGE_KEY_CARDS) || localStorage.getItem("gastos_cards_v6") || "[]");
-let expenses = JSON.parse(localStorage.getItem(STORAGE_KEY_EXPENSES) || localStorage.getItem("gastos_expenses_v6") || "[]");
-let budgets = JSON.parse(localStorage.getItem(STORAGE_KEY_BUDGETS) || localStorage.getItem("gastos_budgets_v6") || "[]");
-let activePeriod = localStorage.getItem(STORAGE_KEY_PERIOD) || "month";
+let cards = JSON.parse(localStorage.getItem(STORAGE_KEY_CARDS) || localStorage.getItem("gastos_cards_v61") || localStorage.getItem("gastos_cards_v6") || "[]");
+let expenses = JSON.parse(localStorage.getItem(STORAGE_KEY_EXPENSES) || localStorage.getItem("gastos_expenses_v61") || localStorage.getItem("gastos_expenses_v6") || "[]");
+let budgets = JSON.parse(localStorage.getItem(STORAGE_KEY_BUDGETS) || localStorage.getItem("gastos_budgets_v61") || localStorage.getItem("gastos_budgets_v6") || "[]");
+let incomes = JSON.parse(localStorage.getItem(STORAGE_KEY_INCOMES) || "[]");
+let activePeriod = localStorage.getItem(STORAGE_KEY_PERIOD) || localStorage.getItem("gastos_period_v61") || "month";
 
 function save(){
   localStorage.setItem(STORAGE_KEY_CARDS, JSON.stringify(cards));
   localStorage.setItem(STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
   localStorage.setItem(STORAGE_KEY_BUDGETS, JSON.stringify(budgets));
+  localStorage.setItem(STORAGE_KEY_INCOMES, JSON.stringify(incomes));
 }
 
 function toast(message){
@@ -674,7 +717,7 @@ function applyTheme(theme){
 }
 
 function initTheme(){
-  const saved = localStorage.getItem(STORAGE_KEY_THEME) || localStorage.getItem("gastos_theme_v6") || "dark";
+  const saved = localStorage.getItem(STORAGE_KEY_THEME) || localStorage.getItem("gastos_theme_v61") || localStorage.getItem("gastos_theme_v6") || "dark";
   applyTheme(saved);
 }
 
@@ -688,6 +731,29 @@ function money(n){
     style:"currency",
     currency:"MXN"
   }).format(Number(n || 0));
+}
+
+function addIncome(){
+  const type = document.getElementById("incomeType").value;
+  const amount = Number(document.getElementById("incomeAmount").value);
+  const note = document.getElementById("incomeNote").value.trim();
+
+  if(!(amount > 0)) return alert("Escribe un monto válido.");
+
+  incomes.push({
+    id: Date.now().toString() + Math.random().toString(16).slice(2),
+    type,
+    amount,
+    note,
+    date: new Date().toISOString()
+  });
+
+  document.getElementById("incomeAmount").value = "";
+  document.getElementById("incomeNote").value = "";
+
+  save();
+  render();
+  toast("Ingreso guardado.");
 }
 
 function addCard(){
@@ -801,6 +867,40 @@ function renderCardSelect(){
   cards.forEach(c=>{
     sel.innerHTML += `<option value="${c.id}">${escapeHtml(c.name)}</option>`;
   });
+}
+
+function renderIncomeTable(){
+  const table = document.getElementById("incomeTable");
+  if(!incomes.length){
+    table.innerHTML = `
+      <tr><td><div class="emptyBox">Aún no has registrado ingresos.</div></td></tr>
+    `;
+    return;
+  }
+
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Tipo</th>
+        <th>Nota</th>
+        <th>Monto</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${incomes
+        .slice()
+        .sort((a,b)=> new Date(b.date) - new Date(a.date))
+        .map(i=>`
+          <tr>
+            <td>${new Date(i.date).toLocaleDateString("es-MX")}</td>
+            <td>${escapeHtml(capitalize(i.type))}</td>
+            <td>${escapeHtml(i.note || "—")}</td>
+            <td>${money(i.amount)}</td>
+          </tr>
+        `).join("")}
+    </tbody>
+  `;
 }
 
 function renderCards(){
@@ -932,15 +1032,25 @@ function renderBudgets(){
 }
 
 function renderSummary(){
+  const totalIncome = incomes.reduce((a,b)=>a + Number(b.amount || 0), 0);
   const totalExpenses = expenses.reduce((a,b)=>a + Number(b.amount || 0), 0);
   const totalBudget = budgets.reduce((a,b)=>a + Number(b.amount || 0), 0);
   const totalDebt = cards.reduce((a,c)=>a + getCardDebt(c.id), 0);
   const totalAvailable = cards.reduce((a,c)=>a + Math.max(0, c.limit - getCardDebt(c.id)), 0);
+  const balance = totalIncome - totalExpenses;
 
   document.getElementById("summary").innerHTML = `
     <div class="stat">
+      <div class="t">Ingresos registrados</div>
+      <div class="v">${money(totalIncome)}</div>
+    </div>
+    <div class="stat">
       <div class="t">Gastos registrados</div>
       <div class="v">${money(totalExpenses)}</div>
+    </div>
+    <div class="stat">
+      <div class="t">Balance general</div>
+      <div class="v ${balance < 0 ? "dangerText" : "goodText"}">${money(balance)}</div>
     </div>
     <div class="stat">
       <div class="t">Presupuesto total</div>
@@ -957,10 +1067,13 @@ function renderSummary(){
   `;
 }
 
-function isExpenseInActivePeriod(expense){
-  const d = new Date(expense.date);
-  const day = d.getDate();
+function isInPeriod(dateString){
+  const d = new Date(dateString);
+  const now = new Date();
+  const sameMonth = d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  if(!sameMonth) return false;
 
+  const day = d.getDate();
   if(activePeriod === "month") return true;
   if(activePeriod === "q1") return day >= 1 && day <= 15;
   if(activePeriod === "q2") return day >= 16 && day <= 31;
@@ -968,29 +1081,36 @@ function isExpenseInActivePeriod(expense){
 }
 
 function getPeriodExpenses(){
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
+  return expenses.filter(e => isInPeriod(e.date));
+}
 
-  return expenses.filter(e=>{
-    const d = new Date(e.date);
-    const sameMonth = d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-    return sameMonth && isExpenseInActivePeriod(e);
-  });
+function getPeriodIncomes(){
+  return incomes.filter(i => isInPeriod(i.date));
 }
 
 function renderDashboard(){
   const periodExpenses = getPeriodExpenses();
+  const periodIncomes = getPeriodIncomes();
+
   const totalSpent = periodExpenses.reduce((a,b)=>a + Number(b.amount || 0), 0);
+  const totalIncome = periodIncomes.reduce((a,b)=>a + Number(b.amount || 0), 0);
+  const balance = totalIncome - totalSpent;
   const totalBudget = budgets.reduce((a,b)=>a + Number(b.amount || 0), 0);
   const remainingBudget = totalBudget - totalSpent;
   const totalDebt = cards.reduce((a,c)=>a + getCardDebt(c.id), 0);
-  const totalAvailable = cards.reduce((a,c)=>a + Math.max(0, c.limit - getCardDebt(c.id)), 0);
 
   document.getElementById("dashboardSummary").innerHTML = `
     <div class="stat">
-      <div class="t">Gasto del periodo</div>
+      <div class="t">Ingresos del periodo</div>
+      <div class="v">${money(totalIncome)}</div>
+    </div>
+    <div class="stat">
+      <div class="t">Gastos del periodo</div>
       <div class="v">${money(totalSpent)}</div>
+    </div>
+    <div class="stat">
+      <div class="t">Balance del periodo</div>
+      <div class="v ${balance < 0 ? "dangerText" : "goodText"}">${money(balance)}</div>
     </div>
     <div class="stat">
       <div class="t">Presupuesto restante</div>
@@ -1000,28 +1120,28 @@ function renderDashboard(){
       <div class="t">Deuda total en tarjetas</div>
       <div class="v">${money(totalDebt)}</div>
     </div>
-    <div class="stat">
-      <div class="t">Disponible total</div>
-      <div class="v">${money(totalAvailable)}</div>
-    </div>
   `;
 
-  renderAlerts(periodExpenses, totalSpent, remainingBudget);
+  renderAlerts(periodExpenses, periodIncomes, totalSpent, totalIncome, remainingBudget);
   renderTopCategories(periodExpenses);
-  renderRecentMoves(periodExpenses);
+  renderRecentMoves(periodExpenses, periodIncomes);
   renderPeriodPills();
 }
 
-function renderAlerts(periodExpenses, totalSpent, remainingBudget){
+function renderAlerts(periodExpenses, periodIncomes, totalSpent, totalIncome, remainingBudget){
   const box = document.getElementById("alertsBox");
   const alerts = [];
 
-  if(!cards.length){
-    alerts.push(`<div class="alert warn">Aún no has agregado tarjetas.</div>`);
+  if(!periodIncomes.length){
+    alerts.push(`<div class="alert warn">No has registrado ingresos en este periodo.</div>`);
   }
 
   if(!periodExpenses.length){
     alerts.push(`<div class="alert good">No hay gastos registrados en este periodo.</div>`);
+  }
+
+  if(totalIncome > 0 && totalSpent > totalIncome){
+    alerts.push(`<div class="alert danger">Tus gastos del periodo ya superan tus ingresos.</div>`);
   }
 
   if(remainingBudget < 0){
@@ -1048,8 +1168,8 @@ function renderAlerts(periodExpenses, totalSpent, remainingBudget){
     }
   });
 
-  if(totalSpent > 0 && remainingBudget >= 0){
-    alerts.push(`<div class="alert good">Vas registrando ${money(totalSpent)} en este periodo.</div>`);
+  if(totalIncome > 0 && totalSpent <= totalIncome && remainingBudget >= 0){
+    alerts.push(`<div class="alert good">Tu balance del periodo sigue controlado.</div>`);
   }
 
   box.innerHTML = alerts.length ? alerts.join("") : `<div class="emptyBox">Sin alertas por ahora.</div>`;
@@ -1085,30 +1205,47 @@ function renderTopCategories(periodExpenses){
   `;
 }
 
-function renderRecentMoves(periodExpenses){
+function renderRecentMoves(periodExpenses, periodIncomes){
   const box = document.getElementById("recentMoves");
-  if(!periodExpenses.length){
+
+  const moves = [
+    ...periodExpenses.map(e => ({ kind:"gasto", ...e })),
+    ...periodIncomes.map(i => ({ kind:"ingreso", ...i }))
+  ]
+  .sort((a,b)=>new Date(b.date) - new Date(a.date))
+  .slice(0,5);
+
+  if(!moves.length){
     box.innerHTML = `<div class="emptyBox">Sin movimientos recientes.</div>`;
     return;
   }
 
-  const recent = periodExpenses
-    .slice()
-    .sort((a,b)=>new Date(b.date) - new Date(a.date))
-    .slice(0,5);
-
   box.innerHTML = `
     <div class="miniList">
-      ${recent.map(e=>{
-        const cardName = cards.find(c=>c.id === e.card)?.name || "—";
+      ${moves.map(m=>{
+        if(m.kind === "gasto"){
+          const cardName = cards.find(c=>c.id === m.card)?.name || "—";
+          return `
+            <div class="miniItem">
+              <div class="miniTop">
+                <strong>${escapeHtml(m.category)}</strong>
+                <strong>${money(m.amount)}</strong>
+              </div>
+              <div class="miniSub">
+                ${new Date(m.date).toLocaleDateString("es-MX")} • Gasto • ${escapeHtml(capitalize(m.method))}${m.method === "tarjeta" ? " • " + escapeHtml(cardName) : ""}
+              </div>
+            </div>
+          `;
+        }
+
         return `
           <div class="miniItem">
             <div class="miniTop">
-              <strong>${escapeHtml(e.category)}</strong>
-              <strong>${money(e.amount)}</strong>
+              <strong>${escapeHtml(capitalize(m.type))}</strong>
+              <strong>${money(m.amount)}</strong>
             </div>
             <div class="miniSub">
-              ${new Date(e.date).toLocaleDateString("es-MX")} • ${escapeHtml(capitalize(e.method))}${e.method === "tarjeta" ? " • " + escapeHtml(cardName) : ""}
+              ${new Date(m.date).toLocaleDateString("es-MX")} • Ingreso${m.note ? " • " + escapeHtml(m.note) : ""}
             </div>
           </div>
         `;
@@ -1132,7 +1269,7 @@ document.querySelectorAll(".filterPill").forEach(p=>{
 });
 
 function exportJSON(){
-  const data = { cards, expenses, budgets };
+  const data = { incomes, cards, expenses, budgets };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -1144,12 +1281,24 @@ function exportJSON(){
 
 function exportCSV(){
   const rows = [
-    ["fecha","tipo","tarjeta","categoria","monto"]
+    ["tipo_registro","fecha","tipo","tarjeta","categoria_o_nota","monto"]
   ];
+
+  incomes.forEach(i=>{
+    rows.push([
+      "ingreso",
+      new Date(i.date).toLocaleDateString("es-MX"),
+      i.type,
+      "",
+      i.note,
+      i.amount
+    ]);
+  });
 
   expenses.forEach(e=>{
     const cardName = cards.find(c=>c.id === e.card)?.name || "";
     rows.push([
+      "gasto",
       new Date(e.date).toLocaleDateString("es-MX"),
       e.method,
       cardName,
@@ -1186,6 +1335,7 @@ function escapeHtml(s){
 function render(){
   renderCardSelect();
   toggleCardSelect();
+  renderIncomeTable();
   renderCards();
   renderExpenses();
   renderBudgets();
