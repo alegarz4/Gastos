@@ -64,9 +64,7 @@ body.light{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
 
-html{
-  scroll-behavior:smooth;
-}
+html{ scroll-behavior:smooth; }
 
 body{
   margin:0;
@@ -125,7 +123,7 @@ header{
 }
 
 .container{
-  max-width:1150px;
+  max-width:1180px;
   margin:auto;
   padding:20px;
 }
@@ -139,7 +137,6 @@ header{
   backdrop-filter:blur(18px);
   -webkit-backdrop-filter:blur(18px);
   box-shadow:var(--shadow);
-  transition:background .25s ease, border-color .25s ease;
 }
 
 .card h2{
@@ -159,28 +156,16 @@ header{
   gap:12px;
 }
 
-.grid2{
-  grid-template-columns:1fr 1fr;
-}
-
-.grid3{
-  grid-template-columns:repeat(3,1fr);
-}
-
-.grid4{
-  grid-template-columns:repeat(4,1fr);
-}
+.grid2{ grid-template-columns:1fr 1fr; }
+.grid3{ grid-template-columns:repeat(3,1fr); }
+.grid4{ grid-template-columns:repeat(4,1fr); }
 
 @media(max-width:900px){
-  .grid4{
-    grid-template-columns:repeat(2,1fr);
-  }
+  .grid4{ grid-template-columns:repeat(2,1fr); }
 }
 
 @media(max-width:760px){
-  .grid2,.grid3,.grid4{
-    grid-template-columns:1fr;
-  }
+  .grid2,.grid3,.grid4{ grid-template-columns:1fr; }
 }
 
 label{
@@ -206,9 +191,7 @@ input:focus,select:focus{
   box-shadow:0 0 0 3px rgba(192,38,75,.12);
 }
 
-input::placeholder{
-  color:var(--muted);
-}
+input::placeholder{ color:var(--muted); }
 
 button{
   padding:10px 14px;
@@ -231,6 +214,15 @@ button.small{
   padding:7px 10px;
   font-size:12px;
   border-radius:10px;
+}
+
+button.danger{
+  background:linear-gradient(135deg,#b91c1c,#ef4444);
+}
+
+button.warn{
+  background:linear-gradient(135deg,#d97706,#f59e0b);
+  color:#111827;
 }
 
 .btns{
@@ -273,7 +265,7 @@ button.small{
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:760px;
+  min-width:900px;
 }
 
 th,td{
@@ -289,9 +281,7 @@ th{
   color:var(--muted);
 }
 
-tr:last-child td{
-  border-bottom:none;
-}
+tr:last-child td{ border-bottom:none; }
 
 .emptyBox{
   padding:12px;
@@ -406,17 +396,9 @@ tr:last-child td{
   margin-bottom:10px;
 }
 
-.alert.good{
-  border-color:rgba(22,163,74,.25);
-}
-
-.alert.warn{
-  border-color:rgba(217,119,6,.25);
-}
-
-.alert.danger{
-  border-color:rgba(185,28,28,.25);
-}
+.alert.good{ border-color:rgba(22,163,74,.25); }
+.alert.warn{ border-color:rgba(217,119,6,.25); }
+.alert.danger{ border-color:rgba(185,28,28,.25); }
 
 .filterPills{
   display:flex;
@@ -456,15 +438,64 @@ tr:last-child td{
 .badge.warn{ color:var(--warn); }
 .badge.danger{ color:var(--danger); }
 
+.hidden{ display:none !important; }
+
+.chartWrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.chartRow{
+  display:grid;
+  grid-template-columns:140px 1fr 90px;
+  gap:10px;
+  align-items:center;
+}
+
+.chartLabel{
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.chartTrack{
+  height:14px;
+  border-radius:999px;
+  background:rgba(128,128,128,.14);
+  overflow:hidden;
+}
+
+.chartFill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+}
+
+.chartValue{
+  text-align:right;
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+@media(max-width:700px){
+  .chartRow{
+    grid-template-columns:1fr;
+  }
+  .chartValue{
+    text-align:left;
+  }
+}
+
 @media(max-width:640px){
   .toastWrap{
     left:10px;
     right:10px;
     top:10px;
   }
-  .toast{
-    min-width:auto;
-  }
+  .toast{ min-width:auto; }
 }
 </style>
 </head>
@@ -475,12 +506,12 @@ tr:last-child td{
 <header>
   <div class="headerLeft">
     <div class="headerTitle">Gastos</div>
-    <div class="headerSub">Control personal • Ingresos • Tarjetas • Gastos fijos • Presupuestos • Dashboard</div>
+    <div class="headerSub">Control personal • Historial mensual • Gráfica • Dashboard</div>
   </div>
 
   <div class="headerRight">
     <button id="themeToggle" class="secondary">☀️ Tema claro</button>
-    <div class="pill" id="versionText">v6.3</div>
+    <div class="pill" id="versionText">v7.0</div>
     <div class="pill" id="fechaHoy">—</div>
   </div>
 </header>
@@ -491,14 +522,29 @@ tr:last-child td{
     <div class="toolbar">
       <div>
         <h2>Dashboard</h2>
-        <div class="note">Vista rápida de cómo va tu dinero en el periodo actual.</div>
+        <div class="note">Revisa cualquier mes y analiza tus gastos con más claridad.</div>
       </div>
-      <div class="filterPills" id="periodFilters">
-        <div class="filterPill active" data-period="month">Mes</div>
-        <div class="filterPill" data-period="q1">Quincena 1</div>
-        <div class="filterPill" data-period="q2">Quincena 2</div>
+
+      <div class="grid" style="grid-template-columns:180px auto; gap:10px; align-items:end;">
+        <div>
+          <label>Mes</label>
+          <input type="month" id="selectedMonth">
+        </div>
+        <div class="btns" style="margin-top:0">
+          <button class="secondary" id="btnTodayMonth">Hoy</button>
+        </div>
       </div>
     </div>
+
+    <div style="height:10px"></div>
+
+    <div class="filterPills" id="periodFilters">
+      <div class="filterPill active" data-period="month">Mes</div>
+      <div class="filterPill" data-period="q1">Quincena 1</div>
+      <div class="filterPill" data-period="q2">Quincena 2</div>
+    </div>
+
+    <div style="height:12px"></div>
 
     <div class="summary" id="dashboardSummary"></div>
 
@@ -520,11 +566,18 @@ tr:last-child td{
         <div id="recentMoves"></div>
       </div>
     </div>
+
+    <div style="height:12px"></div>
+
+    <div class="dashboardBlock">
+      <div class="dashboardTitle">Gráfica de gastos por categoría</div>
+      <div id="categoryChart"></div>
+    </div>
   </div>
 
   <div class="card">
     <div class="toolbar">
-      <h2>Registrar ingreso</h2>
+      <h2 id="incomeFormTitle">Registrar ingreso</h2>
       <div class="note">Agrega entradas de dinero para calcular tu balance real.</div>
     </div>
 
@@ -551,13 +604,14 @@ tr:last-child td{
     </div>
 
     <div class="btns">
-      <button onclick="addIncome()">Guardar ingreso</button>
+      <button id="btnSaveIncome" onclick="saveIncome()">Guardar ingreso</button>
+      <button id="btnCancelIncome" class="secondary hidden" onclick="cancelIncomeEdit()">Cancelar edición</button>
     </div>
   </div>
 
   <div class="card">
     <div class="toolbar">
-      <h2>Agregar tarjeta</h2>
+      <h2 id="cardFormTitle">Agregar tarjeta</h2>
       <div class="note">Registra nombre, límite y fechas clave.</div>
     </div>
 
@@ -581,13 +635,14 @@ tr:last-child td{
     </div>
 
     <div class="btns">
-      <button onclick="addCard()">Guardar tarjeta</button>
+      <button id="btnSaveCard" onclick="saveCard()">Guardar tarjeta</button>
+      <button id="btnCancelCard" class="secondary hidden" onclick="cancelCardEdit()">Cancelar edición</button>
     </div>
   </div>
 
   <div class="card">
     <div class="toolbar">
-      <h2>Registrar gasto</h2>
+      <h2 id="expenseFormTitle">Registrar gasto</h2>
       <div class="note">Puedes usar tarjeta, débito, efectivo o transferencia.</div>
     </div>
 
@@ -619,13 +674,14 @@ tr:last-child td{
     </div>
 
     <div class="btns">
-      <button onclick="addExpense()">Guardar gasto</button>
+      <button id="btnSaveExpense" onclick="saveExpense()">Guardar gasto</button>
+      <button id="btnCancelExpense" class="secondary hidden" onclick="cancelExpenseEdit()">Cancelar edición</button>
     </div>
   </div>
 
   <div class="card">
     <div class="toolbar">
-      <h2>Gasto fijo mensual</h2>
+      <h2 id="fixedFormTitle">Gasto fijo mensual</h2>
       <div class="note">Se genera automáticamente una vez por mes, sin duplicarse.</div>
     </div>
 
@@ -662,13 +718,14 @@ tr:last-child td{
     </div>
 
     <div class="btns">
-      <button onclick="addFixedExpense()">Guardar gasto fijo</button>
+      <button id="btnSaveFixed" onclick="saveFixedExpense()">Guardar gasto fijo</button>
+      <button id="btnCancelFixed" class="secondary hidden" onclick="cancelFixedEdit()">Cancelar edición</button>
     </div>
   </div>
 
   <div class="card">
     <div class="toolbar">
-      <h2>Presupuesto</h2>
+      <h2 id="budgetFormTitle">Presupuesto</h2>
       <div class="note">Controla cuánto quieres gastar por categoría.</div>
     </div>
 
@@ -684,12 +741,13 @@ tr:last-child td{
     </div>
 
     <div class="btns">
-      <button onclick="addBudget()">Guardar presupuesto</button>
+      <button id="btnSaveBudget" onclick="saveBudget()">Guardar presupuesto</button>
+      <button id="btnCancelBudget" class="secondary hidden" onclick="cancelBudgetEdit()">Cancelar edición</button>
     </div>
   </div>
 
   <div class="card">
-    <h2>Resumen general</h2>
+    <h2>Resumen general del mes seleccionado</h2>
     <div class="summary" id="summary"></div>
   </div>
 
@@ -738,20 +796,35 @@ tr:last-child td{
 </div>
 
 <script>
-const STORAGE_KEY_CARDS = "gastos_cards_v63";
-const STORAGE_KEY_EXPENSES = "gastos_expenses_v63";
-const STORAGE_KEY_BUDGETS = "gastos_budgets_v63";
-const STORAGE_KEY_INCOMES = "gastos_incomes_v63";
-const STORAGE_KEY_FIXED = "gastos_fixed_v63";
-const STORAGE_KEY_THEME = "gastos_theme_v63";
-const STORAGE_KEY_PERIOD = "gastos_period_v63";
+const STORAGE_KEY_CARDS = "gastos_cards_v70";
+const STORAGE_KEY_EXPENSES = "gastos_expenses_v70";
+const STORAGE_KEY_BUDGETS = "gastos_budgets_v70";
+const STORAGE_KEY_INCOMES = "gastos_incomes_v70";
+const STORAGE_KEY_FIXED = "gastos_fixed_v70";
+const STORAGE_KEY_THEME = "gastos_theme_v70";
+const STORAGE_KEY_PERIOD = "gastos_period_v70";
+const STORAGE_KEY_MONTH = "gastos_selected_month_v70";
 
-let cards = JSON.parse(localStorage.getItem(STORAGE_KEY_CARDS) || localStorage.getItem("gastos_cards_v62") || localStorage.getItem("gastos_cards_v61") || localStorage.getItem("gastos_cards_v6") || "[]");
-let expenses = JSON.parse(localStorage.getItem(STORAGE_KEY_EXPENSES) || localStorage.getItem("gastos_expenses_v62") || localStorage.getItem("gastos_expenses_v61") || localStorage.getItem("gastos_expenses_v6") || "[]");
-let budgets = JSON.parse(localStorage.getItem(STORAGE_KEY_BUDGETS) || localStorage.getItem("gastos_budgets_v62") || localStorage.getItem("gastos_budgets_v61") || localStorage.getItem("gastos_budgets_v6") || "[]");
-let incomes = JSON.parse(localStorage.getItem(STORAGE_KEY_INCOMES) || localStorage.getItem("gastos_incomes_v62") || "[]");
-let fixedExpenses = JSON.parse(localStorage.getItem(STORAGE_KEY_FIXED) || "[]");
-let activePeriod = localStorage.getItem(STORAGE_KEY_PERIOD) || localStorage.getItem("gastos_period_v62") || localStorage.getItem("gastos_period_v61") || "month";
+let cards = JSON.parse(localStorage.getItem(STORAGE_KEY_CARDS) || localStorage.getItem("gastos_cards_v64") || localStorage.getItem("gastos_cards_v63") || localStorage.getItem("gastos_cards_v62") || localStorage.getItem("gastos_cards_v61") || localStorage.getItem("gastos_cards_v6") || "[]");
+let expenses = JSON.parse(localStorage.getItem(STORAGE_KEY_EXPENSES) || localStorage.getItem("gastos_expenses_v64") || localStorage.getItem("gastos_expenses_v63") || localStorage.getItem("gastos_expenses_v62") || localStorage.getItem("gastos_expenses_v61") || localStorage.getItem("gastos_expenses_v6") || "[]");
+let budgets = JSON.parse(localStorage.getItem(STORAGE_KEY_BUDGETS) || localStorage.getItem("gastos_budgets_v64") || localStorage.getItem("gastos_budgets_v63") || localStorage.getItem("gastos_budgets_v62") || localStorage.getItem("gastos_budgets_v61") || localStorage.getItem("gastos_budgets_v6") || "[]");
+let incomes = JSON.parse(localStorage.getItem(STORAGE_KEY_INCOMES) || localStorage.getItem("gastos_incomes_v64") || localStorage.getItem("gastos_incomes_v63") || localStorage.getItem("gastos_incomes_v62") || "[]");
+let fixedExpenses = JSON.parse(localStorage.getItem(STORAGE_KEY_FIXED) || localStorage.getItem("gastos_fixed_v64") || localStorage.getItem("gastos_fixed_v63") || "[]");
+let activePeriod = localStorage.getItem(STORAGE_KEY_PERIOD) || localStorage.getItem("gastos_period_v64") || localStorage.getItem("gastos_period_v63") || localStorage.getItem("gastos_period_v62") || localStorage.getItem("gastos_period_v61") || "month";
+
+const currentMonthKey = (() => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+})();
+let selectedMonth = localStorage.getItem(STORAGE_KEY_MONTH) || currentMonthKey;
+
+const ui = {
+  editingIncomeId: null,
+  editingCardId: null,
+  editingExpenseId: null,
+  editingFixedId: null,
+  editingBudgetId: null
+};
 
 function save(){
   localStorage.setItem(STORAGE_KEY_CARDS, JSON.stringify(cards));
@@ -773,7 +846,6 @@ function toast(message){
 function todayText(){
   return new Date().toLocaleDateString("es-MX", { dateStyle:"full" });
 }
-
 document.getElementById("fechaHoy").textContent = todayText();
 
 function applyTheme(theme){
@@ -784,7 +856,7 @@ function applyTheme(theme){
 }
 
 function initTheme(){
-  const saved = localStorage.getItem(STORAGE_KEY_THEME) || localStorage.getItem("gastos_theme_v62") || localStorage.getItem("gastos_theme_v61") || localStorage.getItem("gastos_theme_v6") || "dark";
+  const saved = localStorage.getItem(STORAGE_KEY_THEME) || localStorage.getItem("gastos_theme_v64") || localStorage.getItem("gastos_theme_v63") || localStorage.getItem("gastos_theme_v62") || localStorage.getItem("gastos_theme_v61") || localStorage.getItem("gastos_theme_v6") || "dark";
   applyTheme(saved);
 }
 
@@ -818,56 +890,20 @@ function makeISO(year, monthIndex, day){
   return `${year}-${pad2(monthIndex+1)}-${pad2(day)}T12:00:00`;
 }
 
-function addIncome(){
-  const type = document.getElementById("incomeType").value;
-  const amount = Number(document.getElementById("incomeAmount").value);
-  const note = document.getElementById("incomeNote").value.trim();
-
-  if(!(amount > 0)) return alert("Escribe un monto válido.");
-
-  incomes.push({
-    id: uid(),
-    type,
-    amount,
-    note,
-    date: new Date().toISOString()
-  });
-
-  document.getElementById("incomeAmount").value = "";
-  document.getElementById("incomeNote").value = "";
-
-  save();
-  render();
-  toast("Ingreso guardado.");
+function uid(){
+  return Date.now().toString() + Math.random().toString(16).slice(2);
 }
 
-function addCard(){
-  const name = document.getElementById("cardName").value.trim();
-  const limit = Number(document.getElementById("limit").value);
-  const cut = Number(document.getElementById("cut").value);
-  const pay = Number(document.getElementById("pay").value);
+function capitalize(v){
+  const s = String(v || "");
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
 
-  if(!name) return alert("Escribe el nombre de la tarjeta.");
-  if(!(limit > 0)) return alert("Escribe un límite válido.");
-  if(!(cut >= 1 && cut <= 31)) return alert("El día de corte debe estar entre 1 y 31.");
-  if(!(pay >= 1 && pay <= 31)) return alert("El día de pago debe estar entre 1 y 31.");
-
-  cards.push({
-    id: uid(),
-    name,
-    limit,
-    cut,
-    pay
-  });
-
-  document.getElementById("cardName").value = "";
-  document.getElementById("limit").value = "";
-  document.getElementById("cut").value = "";
-  document.getElementById("pay").value = "";
-
-  save();
-  render();
-  toast("Tarjeta guardada.");
+function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
 }
 
 function toggleCardSelect(){
@@ -880,7 +916,122 @@ function toggleFixedCardSelect(){
   document.getElementById("fixedCardWrap").style.display = method === "tarjeta" ? "block" : "none";
 }
 
-function addExpense(){
+function clearIncomeForm(){
+  document.getElementById("incomeType").value = "nomina";
+  document.getElementById("incomeAmount").value = "";
+  document.getElementById("incomeNote").value = "";
+}
+function clearCardForm(){
+  document.getElementById("cardName").value = "";
+  document.getElementById("limit").value = "";
+  document.getElementById("cut").value = "";
+  document.getElementById("pay").value = "";
+}
+function clearExpenseForm(){
+  document.getElementById("method").value = "tarjeta";
+  document.getElementById("cardSelect").value = "";
+  document.getElementById("amount").value = "";
+  document.getElementById("category").value = "";
+  toggleCardSelect();
+}
+function clearFixedForm(){
+  document.getElementById("fixedCategory").value = "";
+  document.getElementById("fixedAmount").value = "";
+  document.getElementById("fixedDay").value = "";
+  document.getElementById("fixedMethod").value = "transferencia";
+  document.getElementById("fixedCardSelect").value = "";
+  document.getElementById("fixedNote").value = "";
+  toggleFixedCardSelect();
+}
+function clearBudgetForm(){
+  document.getElementById("budgetCat").value = "";
+  document.getElementById("budgetAmount").value = "";
+}
+
+function refreshIncomeFormUI(){
+  document.getElementById("incomeFormTitle").textContent = ui.editingIncomeId ? "Editar ingreso" : "Registrar ingreso";
+  document.getElementById("btnSaveIncome").textContent = ui.editingIncomeId ? "Actualizar ingreso" : "Guardar ingreso";
+  document.getElementById("btnCancelIncome").classList.toggle("hidden", !ui.editingIncomeId);
+}
+function refreshCardFormUI(){
+  document.getElementById("cardFormTitle").textContent = ui.editingCardId ? "Editar tarjeta" : "Agregar tarjeta";
+  document.getElementById("btnSaveCard").textContent = ui.editingCardId ? "Actualizar tarjeta" : "Guardar tarjeta";
+  document.getElementById("btnCancelCard").classList.toggle("hidden", !ui.editingCardId);
+}
+function refreshExpenseFormUI(){
+  document.getElementById("expenseFormTitle").textContent = ui.editingExpenseId ? "Editar gasto manual" : "Registrar gasto";
+  document.getElementById("btnSaveExpense").textContent = ui.editingExpenseId ? "Actualizar gasto" : "Guardar gasto";
+  document.getElementById("btnCancelExpense").classList.toggle("hidden", !ui.editingExpenseId);
+}
+function refreshFixedFormUI(){
+  document.getElementById("fixedFormTitle").textContent = ui.editingFixedId ? "Editar gasto fijo mensual" : "Gasto fijo mensual";
+  document.getElementById("btnSaveFixed").textContent = ui.editingFixedId ? "Actualizar gasto fijo" : "Guardar gasto fijo";
+  document.getElementById("btnCancelFixed").classList.toggle("hidden", !ui.editingFixedId);
+}
+function refreshBudgetFormUI(){
+  document.getElementById("budgetFormTitle").textContent = ui.editingBudgetId ? "Editar presupuesto" : "Presupuesto";
+  document.getElementById("btnSaveBudget").textContent = ui.editingBudgetId ? "Actualizar presupuesto" : "Guardar presupuesto";
+  document.getElementById("btnCancelBudget").classList.toggle("hidden", !ui.editingBudgetId);
+}
+
+function cancelIncomeEdit(){ ui.editingIncomeId = null; clearIncomeForm(); refreshIncomeFormUI(); }
+function cancelCardEdit(){ ui.editingCardId = null; clearCardForm(); refreshCardFormUI(); }
+function cancelExpenseEdit(){ ui.editingExpenseId = null; clearExpenseForm(); refreshExpenseFormUI(); }
+function cancelFixedEdit(){ ui.editingFixedId = null; clearFixedForm(); refreshFixedFormUI(); }
+function cancelBudgetEdit(){ ui.editingBudgetId = null; clearBudgetForm(); refreshBudgetFormUI(); }
+
+function saveIncome(){
+  const type = document.getElementById("incomeType").value;
+  const amount = Number(document.getElementById("incomeAmount").value);
+  const note = document.getElementById("incomeNote").value.trim();
+  if(!(amount > 0)) return alert("Escribe un monto válido.");
+
+  if(ui.editingIncomeId){
+    const item = incomes.find(i=>i.id === ui.editingIncomeId);
+    if(item){
+      item.type = type;
+      item.amount = amount;
+      item.note = note;
+    }
+    toast("Ingreso actualizado.");
+  } else {
+    incomes.push({ id: uid(), type, amount, note, date: new Date().toISOString() });
+    toast("Ingreso guardado.");
+  }
+
+  save();
+  cancelIncomeEdit();
+  render();
+}
+
+function saveCard(){
+  const name = document.getElementById("cardName").value.trim();
+  const limit = Number(document.getElementById("limit").value);
+  const cut = Number(document.getElementById("cut").value);
+  const pay = Number(document.getElementById("pay").value);
+
+  if(!name) return alert("Escribe el nombre de la tarjeta.");
+  if(!(limit > 0)) return alert("Escribe un límite válido.");
+  if(!(cut >= 1 && cut <= 31)) return alert("El día de corte debe estar entre 1 y 31.");
+  if(!(pay >= 1 && pay <= 31)) return alert("El día de pago debe estar entre 1 y 31.");
+
+  if(ui.editingCardId){
+    const item = cards.find(c=>c.id === ui.editingCardId);
+    if(item){
+      item.name = name; item.limit = limit; item.cut = cut; item.pay = pay;
+    }
+    toast("Tarjeta actualizada.");
+  } else {
+    cards.push({ id: uid(), name, limit, cut, pay });
+    toast("Tarjeta guardada.");
+  }
+
+  save();
+  cancelCardEdit();
+  render();
+}
+
+function saveExpense(){
   const method = document.getElementById("method").value;
   const card = document.getElementById("cardSelect").value;
   const amount = Number(document.getElementById("amount").value);
@@ -890,25 +1041,34 @@ function addExpense(){
   if(!category) return alert("Escribe una categoría.");
   if(method === "tarjeta" && !card) return alert("Selecciona una tarjeta.");
 
-  expenses.push({
-    id: uid(),
-    method,
-    card,
-    amount,
-    category,
-    date: new Date().toISOString(),
-    source: "manual"
-  });
-
-  document.getElementById("amount").value = "";
-  document.getElementById("category").value = "";
+  if(ui.editingExpenseId){
+    const item = expenses.find(e=>e.id === ui.editingExpenseId && e.source !== "fixed");
+    if(item){
+      item.method = method;
+      item.card = card;
+      item.amount = amount;
+      item.category = category;
+    }
+    toast("Gasto actualizado.");
+  } else {
+    expenses.push({
+      id: uid(),
+      method,
+      card,
+      amount,
+      category,
+      date: new Date().toISOString(),
+      source: "manual"
+    });
+    toast("Gasto guardado.");
+  }
 
   save();
+  cancelExpenseEdit();
   render();
-  toast("Gasto guardado.");
 }
 
-function addFixedExpense(){
+function saveFixedExpense(){
   const category = document.getElementById("fixedCategory").value.trim();
   const amount = Number(document.getElementById("fixedAmount").value);
   const day = Number(document.getElementById("fixedDay").value);
@@ -921,56 +1081,221 @@ function addFixedExpense(){
   if(!(day >= 1 && day <= 31)) return alert("Escribe un día de cargo válido.");
   if(method === "tarjeta" && !cardId) return alert("Selecciona una tarjeta.");
 
-  fixedExpenses.push({
-    id: uid(),
-    category,
-    amount,
-    day,
-    method,
-    cardId: method === "tarjeta" ? cardId : "",
-    note,
-    active: true,
-    createdAt: new Date().toISOString()
-  });
-
-  document.getElementById("fixedCategory").value = "";
-  document.getElementById("fixedAmount").value = "";
-  document.getElementById("fixedDay").value = "";
-  document.getElementById("fixedMethod").value = "transferencia";
-  document.getElementById("fixedCardSelect").value = "";
-  document.getElementById("fixedNote").value = "";
-  toggleFixedCardSelect();
+  if(ui.editingFixedId){
+    const item = fixedExpenses.find(f=>f.id === ui.editingFixedId);
+    if(item){
+      item.category = category;
+      item.amount = amount;
+      item.day = day;
+      item.method = method;
+      item.cardId = method === "tarjeta" ? cardId : "";
+      item.note = note;
+    }
+    toast("Gasto fijo actualizado.");
+  } else {
+    fixedExpenses.push({
+      id: uid(),
+      category,
+      amount,
+      day,
+      method,
+      cardId: method === "tarjeta" ? cardId : "",
+      note,
+      active: true,
+      createdAt: new Date().toISOString()
+    });
+    toast("Gasto fijo guardado.");
+  }
 
   save();
-  processFixedExpensesForCurrentMonth();
+  cancelFixedEdit();
+  processFixedExpensesForAllKnownMonths();
   render();
-  toast("Gasto fijo guardado.");
 }
 
-function addBudget(){
+function saveBudget(){
   const category = document.getElementById("budgetCat").value.trim();
   const amount = Number(document.getElementById("budgetAmount").value);
 
   if(!category) return alert("Escribe una categoría.");
   if(!(amount > 0)) return alert("Escribe un presupuesto válido.");
 
-  const existing = budgets.find(b => b.category.toLowerCase() === category.toLowerCase());
-  if(existing){
-    existing.amount = amount;
+  if(ui.editingBudgetId){
+    const item = budgets.find(b=>b.id === ui.editingBudgetId);
+    if(item){
+      item.category = category;
+      item.amount = amount;
+    }
+    toast("Presupuesto actualizado.");
   } else {
-    budgets.push({
-      id: uid(),
-      category,
-      amount
-    });
+    const existing = budgets.find(b => b.category.toLowerCase() === category.toLowerCase());
+    if(existing){
+      existing.amount = amount;
+      toast("Presupuesto actualizado.");
+    } else {
+      budgets.push({ id: uid(), category, amount });
+      toast("Presupuesto guardado.");
+    }
   }
 
-  document.getElementById("budgetCat").value = "";
-  document.getElementById("budgetAmount").value = "";
+  save();
+  cancelBudgetEdit();
+  render();
+}
+
+function editIncome(id){
+  const item = incomes.find(i=>i.id === id);
+  if(!item) return;
+  ui.editingIncomeId = id;
+  document.getElementById("incomeType").value = item.type;
+  document.getElementById("incomeAmount").value = item.amount;
+  document.getElementById("incomeNote").value = item.note || "";
+  refreshIncomeFormUI();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function deleteIncome(id){
+  if(!confirm("¿Eliminar este ingreso?")) return;
+  incomes = incomes.filter(i=>i.id !== id);
+  if(ui.editingIncomeId === id) cancelIncomeEdit();
+  save();
+  render();
+  toast("Ingreso eliminado.");
+}
+
+function editCard(id){
+  const item = cards.find(c=>c.id === id);
+  if(!item) return;
+  ui.editingCardId = id;
+  document.getElementById("cardName").value = item.name;
+  document.getElementById("limit").value = item.limit;
+  document.getElementById("cut").value = item.cut;
+  document.getElementById("pay").value = item.pay;
+  refreshCardFormUI();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function deleteCard(id){
+  const usedByExpenses = expenses.some(e => e.card === id);
+  const usedByFixed = fixedExpenses.some(f => f.cardId === id);
+  if(usedByExpenses || usedByFixed){
+    return alert("No puedes eliminar esta tarjeta porque está ligada a gastos o gastos fijos.");
+  }
+  if(!confirm("¿Eliminar esta tarjeta?")) return;
+  cards = cards.filter(c=>c.id !== id);
+  if(ui.editingCardId === id) cancelCardEdit();
+  save();
+  render();
+  toast("Tarjeta eliminada.");
+}
+
+function editExpense(id){
+  const item = expenses.find(e=>e.id === id && e.source !== "fixed");
+  if(!item) return;
+  ui.editingExpenseId = id;
+  document.getElementById("method").value = item.method;
+  renderCardSelect();
+  document.getElementById("cardSelect").value = item.card || "";
+  document.getElementById("amount").value = item.amount;
+  document.getElementById("category").value = item.category;
+  toggleCardSelect();
+  refreshExpenseFormUI();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function deleteExpense(id){
+  const item = expenses.find(e=>e.id === id);
+  if(!item) return;
+  if(item.source === "fixed"){
+    return alert("Este gasto fue generado automáticamente desde un gasto fijo. Edita o pausa el gasto fijo.");
+  }
+  if(!confirm("¿Eliminar este gasto?")) return;
+  expenses = expenses.filter(e=>e.id !== id);
+  if(ui.editingExpenseId === id) cancelExpenseEdit();
+  save();
+  render();
+  toast("Gasto eliminado.");
+}
+
+function editFixed(id){
+  const item = fixedExpenses.find(f=>f.id === id);
+  if(!item) return;
+  ui.editingFixedId = id;
+  document.getElementById("fixedCategory").value = item.category;
+  document.getElementById("fixedAmount").value = item.amount;
+  document.getElementById("fixedDay").value = item.day;
+  document.getElementById("fixedMethod").value = item.method;
+  renderCardSelect();
+  document.getElementById("fixedCardSelect").value = item.cardId || "";
+  document.getElementById("fixedNote").value = item.note || "";
+  toggleFixedCardSelect();
+  refreshFixedFormUI();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function toggleFixedActive(id){
+  const item = fixedExpenses.find(f=>f.id === id);
+  if(!item) return;
+  item.active = !item.active;
+  save();
+  render();
+  toast(item.active ? "Gasto fijo activado." : "Gasto fijo pausado.");
+}
+function deleteFixed(id){
+  if(!confirm("¿Eliminar este gasto fijo?")) return;
+  fixedExpenses = fixedExpenses.filter(f=>f.id !== id);
+  if(ui.editingFixedId === id) cancelFixedEdit();
+  save();
+  render();
+  toast("Gasto fijo eliminado.");
+}
+function runFixedNow(id){
+  const f = fixedExpenses.find(x=>x.id === id);
+  if(!f) return;
+  const year = Number(selectedMonth.slice(0,4));
+  const monthIndex = Number(selectedMonth.slice(5,7)) - 1;
+
+  const alreadyExists = expenses.some(e =>
+    e.source === "fixed" &&
+    e.fixedId === f.id &&
+    monthKey(e.date) === selectedMonth
+  );
+
+  if(alreadyExists){
+    toast("Ese gasto fijo ya está cargado en el mes seleccionado.");
+    return;
+  }
+
+  const safeDay = clampDay(year, monthIndex, Number(f.day || 1));
+  expenses.push({
+    id: uid(),
+    fixedId: f.id,
+    method: f.method,
+    card: f.method === "tarjeta" ? (f.cardId || "") : "",
+    amount: Number(f.amount || 0),
+    category: f.category,
+    note: f.note || "",
+    date: makeISO(year, monthIndex, safeDay),
+    source: "fixed"
+  });
 
   save();
   render();
-  toast("Presupuesto guardado.");
+  toast("Gasto fijo cargado en el mes seleccionado.");
+}
+
+function editBudget(id){
+  const item = budgets.find(b=>b.id === id);
+  if(!item) return;
+  ui.editingBudgetId = id;
+  document.getElementById("budgetCat").value = item.category;
+  document.getElementById("budgetAmount").value = item.amount;
+  refreshBudgetFormUI();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function deleteBudget(id){
+  if(!confirm("¿Eliminar este presupuesto?")) return;
+  budgets = budgets.filter(b=>b.id !== id);
+  if(ui.editingBudgetId === id) cancelBudgetEdit();
+  save();
+  render();
+  toast("Presupuesto eliminado.");
 }
 
 function getCardDebt(cardId){
@@ -978,17 +1303,107 @@ function getCardDebt(cardId){
     .filter(e => e.method === "tarjeta" && e.card === cardId)
     .reduce((a,b)=>a + Number(b.amount || 0), 0);
 }
-
 function usagePercent(limit, debt){
   if(!(limit > 0)) return 0;
   return Math.min(100, (debt / limit) * 100);
 }
-
 function barClass(percent){
   if(percent >= 80) return "danger";
   if(percent >= 50) return "warn";
   return "good";
 }
+
+function getKnownMonths(){
+  const months = new Set([currentMonthKey]);
+  incomes.forEach(i=>months.add(monthKey(i.date)));
+  expenses.forEach(e=>months.add(monthKey(e.date)));
+  const arr = Array.from(months).sort();
+  return arr;
+}
+
+function processFixedExpensesForMonth(targetMonth){
+  const year = Number(targetMonth.slice(0,4));
+  const monthIndex = Number(targetMonth.slice(5,7)) - 1;
+  let changed = false;
+
+  fixedExpenses.forEach(f=>{
+    if(!f.active) return;
+
+    const alreadyExists = expenses.some(e =>
+      e.source === "fixed" &&
+      e.fixedId === f.id &&
+      monthKey(e.date) === targetMonth
+    );
+    if(alreadyExists) return;
+
+    const safeDay = clampDay(year, monthIndex, Number(f.day || 1));
+    expenses.push({
+      id: uid(),
+      fixedId: f.id,
+      method: f.method,
+      card: f.method === "tarjeta" ? (f.cardId || "") : "",
+      amount: Number(f.amount || 0),
+      category: f.category,
+      note: f.note || "",
+      date: makeISO(year, monthIndex, safeDay),
+      source: "fixed"
+    });
+    changed = true;
+  });
+
+  if(changed) save();
+}
+
+function processFixedExpensesForAllKnownMonths(){
+  getKnownMonths().forEach(m => processFixedExpensesForMonth(m));
+}
+
+function isInSelectedMonth(dateString){
+  return monthKey(dateString) === selectedMonth;
+}
+
+function isInPeriod(dateString){
+  const d = new Date(dateString);
+  if(monthKey(dateString) !== selectedMonth) return false;
+
+  const day = d.getDate();
+  if(activePeriod === "month") return true;
+  if(activePeriod === "q1") return day >= 1 && day <= 15;
+  if(activePeriod === "q2") return day >= 16 && day <= 31;
+  return true;
+}
+
+function getSelectedMonthExpenses(){
+  return expenses.filter(e => isInSelectedMonth(e.date));
+}
+function getSelectedMonthIncomes(){
+  return incomes.filter(i => isInSelectedMonth(i.date));
+}
+function getPeriodExpenses(){
+  return expenses.filter(e => isInPeriod(e.date));
+}
+function getPeriodIncomes(){
+  return incomes.filter(i => isInPeriod(i.date));
+}
+
+function renderMonthSelector(){
+  const input = document.getElementById("selectedMonth");
+  input.value = selectedMonth;
+}
+
+document.getElementById("selectedMonth").addEventListener("change", (e)=>{
+  selectedMonth = e.target.value || currentMonthKey;
+  localStorage.setItem(STORAGE_KEY_MONTH, selectedMonth);
+  processFixedExpensesForMonth(selectedMonth);
+  render();
+});
+
+document.getElementById("btnTodayMonth").addEventListener("click", ()=>{
+  selectedMonth = currentMonthKey;
+  localStorage.setItem(STORAGE_KEY_MONTH, selectedMonth);
+  processFixedExpensesForMonth(selectedMonth);
+  render();
+});
 
 function renderCardSelect(){
   const sel = document.getElementById("cardSelect");
@@ -1006,8 +1421,10 @@ function renderCardSelect(){
 
 function renderIncomeTable(){
   const table = document.getElementById("incomeTable");
-  if(!incomes.length){
-    table.innerHTML = `<tr><td><div class="emptyBox">Aún no has registrado ingresos.</div></td></tr>`;
+  const monthIncomes = getSelectedMonthIncomes();
+
+  if(!monthIncomes.length){
+    table.innerHTML = `<tr><td><div class="emptyBox">No hay ingresos en el mes seleccionado.</div></td></tr>`;
     return;
   }
 
@@ -1018,10 +1435,11 @@ function renderIncomeTable(){
         <th>Tipo</th>
         <th>Nota</th>
         <th>Monto</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
-      ${incomes
+      ${monthIncomes
         .slice()
         .sort((a,b)=> new Date(b.date) - new Date(a.date))
         .map(i=>`
@@ -1030,6 +1448,12 @@ function renderIncomeTable(){
             <td>${escapeHtml(capitalize(i.type))}</td>
             <td>${escapeHtml(i.note || "—")}</td>
             <td>${money(i.amount)}</td>
+            <td>
+              <div class="actions">
+                <button class="secondary small" onclick="editIncome('${i.id}')">Editar</button>
+                <button class="danger small" onclick="deleteIncome('${i.id}')">Eliminar</button>
+              </div>
+            </td>
           </tr>
         `).join("")}
     </tbody>
@@ -1061,9 +1485,7 @@ function renderFixedTable(){
         const cardName = cards.find(c=>c.id === f.cardId)?.name || "—";
         return `
           <tr>
-            <td>
-              <span class="badge ${f.active ? "good" : "warn"}">${f.active ? "Activo" : "Pausado"}</span>
-            </td>
+            <td><span class="badge ${f.active ? "good" : "warn"}">${f.active ? "Activo" : "Pausado"}</span></td>
             <td>${escapeHtml(f.category)}</td>
             <td>${money(f.amount)}</td>
             <td>${f.day}</td>
@@ -1072,9 +1494,10 @@ function renderFixedTable(){
             <td>${escapeHtml(f.note || "—")}</td>
             <td>
               <div class="actions">
+                <button class="secondary small" onclick="editFixed('${f.id}')">Editar</button>
                 <button class="secondary small" onclick="toggleFixedActive('${f.id}')">${f.active ? "Pausar" : "Activar"}</button>
-                <button class="secondary small" onclick="runFixedNow('${f.id}')">Cargar mes</button>
-                <button class="secondary small" onclick="deleteFixed('${f.id}')">Eliminar</button>
+                <button class="warn small" onclick="runFixedNow('${f.id}')">Cargar mes</button>
+                <button class="danger small" onclick="deleteFixed('${f.id}')">Eliminar</button>
               </div>
             </td>
           </tr>
@@ -1099,6 +1522,7 @@ function renderCards(){
         <th>Deuda</th>
         <th>Disponible</th>
         <th>% usado</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -1114,8 +1538,12 @@ function renderCards(){
             <td>${money(available)}</td>
             <td>
               <div>${percent.toFixed(1)}%</div>
-              <div class="progress">
-                <div class="bar ${barClass(percent)}" style="width:${percent}%"></div>
+              <div class="progress"><div class="bar ${barClass(percent)}" style="width:${percent}%"></div></div>
+            </td>
+            <td>
+              <div class="actions">
+                <button class="secondary small" onclick="editCard('${c.id}')">Editar</button>
+                <button class="danger small" onclick="deleteCard('${c.id}')">Eliminar</button>
               </div>
             </td>
           </tr>
@@ -1127,8 +1555,10 @@ function renderCards(){
 
 function renderExpenses(){
   const table = document.getElementById("expenseTable");
-  if(!expenses.length){
-    table.innerHTML = `<tr><td><div class="emptyBox">Aún no has registrado gastos.</div></td></tr>`;
+  const monthExpenses = getSelectedMonthExpenses();
+
+  if(!monthExpenses.length){
+    table.innerHTML = `<tr><td><div class="emptyBox">No hay gastos en el mes seleccionado.</div></td></tr>`;
     return;
   }
 
@@ -1141,10 +1571,11 @@ function renderExpenses(){
         <th>Categoría</th>
         <th>Origen</th>
         <th>Monto</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
-      ${expenses
+      ${monthExpenses
         .slice()
         .sort((a,b)=> new Date(b.date) - new Date(a.date))
         .map(e=>{
@@ -1158,6 +1589,15 @@ function renderExpenses(){
               <td>${escapeHtml(e.category)}</td>
               <td>${origin}</td>
               <td>${money(e.amount)}</td>
+              <td>
+                ${e.source === "fixed"
+                  ? `<span class="badge warn">Editar en gasto fijo</span>`
+                  : `<div class="actions">
+                      <button class="secondary small" onclick="editExpense('${e.id}')">Editar</button>
+                      <button class="danger small" onclick="deleteExpense('${e.id}')">Eliminar</button>
+                    </div>`
+                }
+              </td>
             </tr>
           `;
         }).join("")}
@@ -1172,6 +1612,8 @@ function renderBudgets(){
     return;
   }
 
+  const monthExpenses = getSelectedMonthExpenses();
+
   table.innerHTML = `
     <thead>
       <tr>
@@ -1179,11 +1621,12 @@ function renderBudgets(){
         <th>Presupuesto</th>
         <th>Gastado</th>
         <th>Diferencia</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
       ${budgets.map(b=>{
-        const spent = expenses
+        const spent = monthExpenses
           .filter(e => e.category.toLowerCase() === b.category.toLowerCase())
           .reduce((a,e)=>a + Number(e.amount || 0), 0);
 
@@ -1196,6 +1639,12 @@ function renderBudgets(){
             <td>${money(b.amount)}</td>
             <td>${money(spent)}</td>
             <td class="${diffClass}">${money(diff)}</td>
+            <td>
+              <div class="actions">
+                <button class="secondary small" onclick="editBudget('${b.id}')">Editar</button>
+                <button class="danger small" onclick="deleteBudget('${b.id}')">Eliminar</button>
+              </div>
+            </td>
           </tr>
         `;
       }).join("")}
@@ -1204,24 +1653,24 @@ function renderBudgets(){
 }
 
 function renderSummary(){
-  const totalIncome = incomes.reduce((a,b)=>a + Number(b.amount || 0), 0);
-  const totalExpenses = expenses.reduce((a,b)=>a + Number(b.amount || 0), 0);
+  const monthIncome = getSelectedMonthIncomes().reduce((a,b)=>a + Number(b.amount || 0), 0);
+  const monthExpenses = getSelectedMonthExpenses().reduce((a,b)=>a + Number(b.amount || 0), 0);
   const totalBudget = budgets.reduce((a,b)=>a + Number(b.amount || 0), 0);
   const totalDebt = cards.reduce((a,c)=>a + getCardDebt(c.id), 0);
   const totalAvailable = cards.reduce((a,c)=>a + Math.max(0, c.limit - getCardDebt(c.id)), 0);
-  const balance = totalIncome - totalExpenses;
+  const balance = monthIncome - monthExpenses;
 
   document.getElementById("summary").innerHTML = `
     <div class="stat">
-      <div class="t">Ingresos registrados</div>
-      <div class="v">${money(totalIncome)}</div>
+      <div class="t">Ingresos del mes</div>
+      <div class="v">${money(monthIncome)}</div>
     </div>
     <div class="stat">
-      <div class="t">Gastos registrados</div>
-      <div class="v">${money(totalExpenses)}</div>
+      <div class="t">Gastos del mes</div>
+      <div class="v">${money(monthExpenses)}</div>
     </div>
     <div class="stat">
-      <div class="t">Balance general</div>
+      <div class="t">Balance del mes</div>
       <div class="v ${balance < 0 ? "dangerText" : "goodText"}">${money(balance)}</div>
     </div>
     <div class="stat">
@@ -1237,27 +1686,6 @@ function renderSummary(){
       <div class="v">${money(totalAvailable)}</div>
     </div>
   `;
-}
-
-function isInPeriod(dateString){
-  const d = new Date(dateString);
-  const now = new Date();
-  const sameMonth = d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  if(!sameMonth) return false;
-
-  const day = d.getDate();
-  if(activePeriod === "month") return true;
-  if(activePeriod === "q1") return day >= 1 && day <= 15;
-  if(activePeriod === "q2") return day >= 16 && day <= 31;
-  return true;
-}
-
-function getPeriodExpenses(){
-  return expenses.filter(e => isInPeriod(e.date));
-}
-
-function getPeriodIncomes(){
-  return incomes.filter(i => isInPeriod(i.date));
 }
 
 function renderDashboard(){
@@ -1297,6 +1725,7 @@ function renderDashboard(){
   renderAlerts(periodExpenses, periodIncomes, totalSpent, totalIncome, remainingBudget);
   renderTopCategories(periodExpenses);
   renderRecentMoves(periodExpenses, periodIncomes);
+  renderCategoryChart(periodExpenses);
   renderPeriodPills();
 }
 
@@ -1307,15 +1736,12 @@ function renderAlerts(periodExpenses, periodIncomes, totalSpent, totalIncome, re
   if(!periodIncomes.length){
     alerts.push(`<div class="alert warn">No has registrado ingresos en este periodo.</div>`);
   }
-
   if(!periodExpenses.length){
     alerts.push(`<div class="alert good">No hay gastos registrados en este periodo.</div>`);
   }
-
   if(totalIncome > 0 && totalSpent > totalIncome){
     alerts.push(`<div class="alert danger">Tus gastos del periodo ya superan tus ingresos.</div>`);
   }
-
   if(remainingBudget < 0){
     alerts.push(`<div class="alert danger">Ya superaste tu presupuesto total del periodo.</div>`);
   }
@@ -1360,9 +1786,7 @@ function renderTopCategories(periodExpenses){
     grouped[e.category] = (grouped[e.category] || 0) + Number(e.amount || 0);
   });
 
-  const top = Object.entries(grouped)
-    .sort((a,b)=>b[1] - a[1])
-    .slice(0,3);
+  const top = Object.entries(grouped).sort((a,b)=>b[1]-a[1]).slice(0,3);
 
   box.innerHTML = `
     <div class="miniList">
@@ -1411,7 +1835,6 @@ function renderRecentMoves(periodExpenses, periodIncomes){
             </div>
           `;
         }
-
         return `
           <div class="miniItem">
             <div class="miniTop">
@@ -1421,6 +1844,41 @@ function renderRecentMoves(periodExpenses, periodIncomes){
             <div class="miniSub">
               ${new Date(m.date).toLocaleDateString("es-MX")} • Ingreso${m.note ? " • " + escapeHtml(m.note) : ""}
             </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderCategoryChart(periodExpenses){
+  const box = document.getElementById("categoryChart");
+  if(!periodExpenses.length){
+    box.innerHTML = `<div class="emptyBox">No hay gastos en este periodo para graficar.</div>`;
+    return;
+  }
+
+  const grouped = {};
+  periodExpenses.forEach(e=>{
+    grouped[e.category] = (grouped[e.category] || 0) + Number(e.amount || 0);
+  });
+
+  const rows = Object.entries(grouped).sort((a,b)=>b[1]-a[1]);
+  const max = rows[0]?.[1] || 1;
+  const total = rows.reduce((s,[,v])=>s+v,0);
+
+  box.innerHTML = `
+    <div class="chartWrap">
+      ${rows.map(([cat,val])=>{
+        const width = (val / max) * 100;
+        const pct = total > 0 ? (val / total) * 100 : 0;
+        return `
+          <div class="chartRow">
+            <div class="chartLabel">${escapeHtml(cat)}</div>
+            <div class="chartTrack">
+              <div class="chartFill" style="width:${width}%"></div>
+            </div>
+            <div class="chartValue">${money(val)} • ${pct.toFixed(1)}%</div>
           </div>
         `;
       }).join("")}
@@ -1442,15 +1900,9 @@ document.querySelectorAll(".filterPill").forEach(p=>{
   });
 });
 
-function uid(){
-  return Date.now().toString() + Math.random().toString(16).slice(2);
-}
-
-function processFixedExpensesForCurrentMonth(){
-  const now = new Date();
-  const year = now.getFullYear();
-  const monthIndex = now.getMonth();
-  const currentMonth = `${year}-${pad2(monthIndex+1)}`;
+function processFixedExpensesForMonth(targetMonth){
+  const year = Number(targetMonth.slice(0,4));
+  const monthIndex = Number(targetMonth.slice(5,7)) - 1;
   let changed = false;
 
   fixedExpenses.forEach(f=>{
@@ -1459,9 +1911,8 @@ function processFixedExpensesForCurrentMonth(){
     const alreadyExists = expenses.some(e =>
       e.source === "fixed" &&
       e.fixedId === f.id &&
-      monthKey(e.date) === currentMonth
+      monthKey(e.date) === targetMonth
     );
-
     if(alreadyExists) return;
 
     const safeDay = clampDay(year, monthIndex, Number(f.day || 1));
@@ -1482,63 +1933,12 @@ function processFixedExpensesForCurrentMonth(){
   if(changed) save();
 }
 
-function toggleFixedActive(id){
-  const item = fixedExpenses.find(f=>f.id === id);
-  if(!item) return;
-  item.active = !item.active;
-  save();
-  render();
-  toast(item.active ? "Gasto fijo activado." : "Gasto fijo pausado.");
-}
-
-function deleteFixed(id){
-  if(!confirm("¿Eliminar este gasto fijo?")) return;
-  fixedExpenses = fixedExpenses.filter(f=>f.id !== id);
-  save();
-  render();
-  toast("Gasto fijo eliminado.");
-}
-
-function runFixedNow(id){
-  const f = fixedExpenses.find(x=>x.id === id);
-  if(!f) return;
-
-  const now = new Date();
-  const year = now.getFullYear();
-  const monthIndex = now.getMonth();
-  const currentMonth = `${year}-${pad2(monthIndex+1)}`;
-
-  const alreadyExists = expenses.some(e =>
-    e.source === "fixed" &&
-    e.fixedId === f.id &&
-    monthKey(e.date) === currentMonth
-  );
-
-  if(alreadyExists){
-    toast("Ese gasto fijo ya está cargado en este mes.");
-    return;
-  }
-
-  const safeDay = clampDay(year, monthIndex, Number(f.day || 1));
-  expenses.push({
-    id: uid(),
-    fixedId: f.id,
-    method: f.method,
-    card: f.method === "tarjeta" ? (f.cardId || "") : "",
-    amount: Number(f.amount || 0),
-    category: f.category,
-    note: f.note || "",
-    date: makeISO(year, monthIndex, safeDay),
-    source: "fixed"
-  });
-
-  save();
-  render();
-  toast("Gasto fijo cargado en este mes.");
+function processFixedExpensesForAllKnownMonths(){
+  getKnownMonths().forEach(m => processFixedExpensesForMonth(m));
 }
 
 function exportJSON(){
-  const data = { incomes, cards, fixedExpenses, expenses, budgets };
+  const data = { selectedMonth, incomes, cards, fixedExpenses, expenses, budgets };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type:"application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -1549,33 +1949,15 @@ function exportJSON(){
 }
 
 function exportCSV(){
-  const rows = [
-    ["tipo_registro","fecha","tipo","tarjeta","categoria_o_nota","monto","origen"]
-  ];
+  const rows = [["tipo_registro","fecha","tipo","tarjeta","categoria_o_nota","monto","origen"]];
 
   incomes.forEach(i=>{
-    rows.push([
-      "ingreso",
-      new Date(i.date).toLocaleDateString("es-MX"),
-      i.type,
-      "",
-      i.note,
-      i.amount,
-      "manual"
-    ]);
+    rows.push(["ingreso", new Date(i.date).toLocaleDateString("es-MX"), i.type, "", i.note, i.amount, "manual"]);
   });
 
   expenses.forEach(e=>{
     const cardName = cards.find(c=>c.id === e.card)?.name || "";
-    rows.push([
-      "gasto",
-      new Date(e.date).toLocaleDateString("es-MX"),
-      e.method,
-      cardName,
-      e.category,
-      e.amount,
-      e.source || "manual"
-    ]);
+    rows.push(["gasto", new Date(e.date).toLocaleDateString("es-MX"), e.method, cardName, e.category, e.amount, e.source || "manual"]);
   });
 
   const csv = rows.map(row =>
@@ -1591,20 +1973,9 @@ function exportCSV(){
   toast("CSV exportado.");
 }
 
-function capitalize(v){
-  const s = String(v || "");
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-function escapeHtml(s){
-  return String(s ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;");
-}
-
 function render(){
-  processFixedExpensesForCurrentMonth();
+  processFixedExpensesForMonth(selectedMonth);
+  renderMonthSelector();
   renderCardSelect();
   toggleCardSelect();
   toggleFixedCardSelect();
@@ -1615,9 +1986,15 @@ function render(){
   renderBudgets();
   renderSummary();
   renderDashboard();
+  refreshIncomeFormUI();
+  refreshCardFormUI();
+  refreshExpenseFormUI();
+  refreshFixedFormUI();
+  refreshBudgetFormUI();
 }
 
 initTheme();
+processFixedExpensesForAllKnownMonths();
 render();
 </script>
 
