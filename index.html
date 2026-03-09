@@ -4,20 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Control de Gastos</title>
-<meta name="theme-color" content="#b4234a">
-
-<link rel="manifest" href="/Gastos/manifest.json">
-
-<link rel="apple-touch-icon" href="/Gastos/apple-touch-icon-pro.png">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-
-<meta name="apple-mobile-web-app-title" content="Gastos">
 <meta name="theme-color" content="#b4234a" />
 <link rel="manifest" href="/Gastos/manifest.json" />
-<link rel="apple-touch-icon" href="/Gastos/icon-192.png" />
+<link rel="apple-touch-icon" href="/Gastos/apple-touch-icon-pro.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="Gastos" />
@@ -1989,33 +1978,6 @@ if ("serviceWorker" in navigator) {
     }
   });
 }
-</script>
-<script>
-
-if ("serviceWorker" in navigator) {
-
-window.addEventListener("load", async () => {
-
-try {
-
-const registration = await navigator.serviceWorker.register("/Gastos/sw.js", {
-
-scope: "/Gastos/"
-
-});
-
-console.log("Service Worker registrado:", registration.scope);
-
-} catch (error) {
-
-console.error("Error al registrar el Service Worker:", error);
-
-}
-
-});
-
-}
-
 </script>
 </body>
 </html>
