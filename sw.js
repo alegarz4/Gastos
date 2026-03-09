@@ -1,12 +1,14 @@
-const CACHE_NAME = "gastos-cache-v1";
+const CACHE_NAME = "gastos-cache-v3";
 const APP_PREFIX = "/Gastos";
 
 const ASSETS = [
   `${APP_PREFIX}/`,
   `${APP_PREFIX}/index.html`,
   `${APP_PREFIX}/manifest.json`,
-  `${APP_PREFIX}/icon-192.png`,
-  `${APP_PREFIX}/icon-512.png`
+  `${APP_PREFIX}/icon-192-pro.png`,
+  `${APP_PREFIX}/icon-512-pro.png`,
+  `${APP_PREFIX}/apple-touch-icon-pro.png`,
+  `${APP_PREFIX}/favicon-64-pro.png`
 ];
 
 self.addEventListener("install", (event) => {
