@@ -1,12 +1,12 @@
 {
-  "name": "VinoGastos",
-  "short_name": "VinoGastos",
+  "name": "Gastos",
+  "short_name": "Gastos",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#2a0b14",
   "theme_color": "#7a1631",
-  "description": "Control personal de gastos y tarjetas (sin datos sensibles).",
+  "description": "Control personal de gastos y tarjetas.",
   "icons": [
     {
       "src": "icon-192-pro.png",
